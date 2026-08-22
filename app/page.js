@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { computeStatus } from '../lib/logic';
+import { computeStatus, isoToLocalDatetimeInputValue, localDateTimeToUtc } from '../lib/logic';
 
 const LOG_BUTTONS = [
   { type: 'feed', label: 'Fed', cls: 'btn-feed' },
@@ -25,6 +25,11 @@ const TYPE_LABELS = {
 };
 
 const RECENT_LIMIT = 20;
+// Bounds how much history is fetched/rescanned on every load and 60s tick.
+// 30 days of events comfortably covers rolling-average sample windows and
+// the medicine schedule's today/yesterday lookback, without growing
+// unbounded as baby_events accumulates over months of use.
+const HISTORY_DAYS = 30;
 
 function formatLocalTime(iso, timezone) {
   if (!iso) return '';
@@ -46,12 +51,6 @@ function formatHours(h) {
   return `${h.toFixed(1)}h`;
 }
 
-function toDatetimeLocalValue(iso) {
-  const d = new Date(iso);
-  const pad = n => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
 export default function Page() {
   const [config, setConfig] = useState(null);
   const [events, setEvents] = useState([]);
@@ -63,9 +62,10 @@ export default function Page() {
   const [now, setNow] = useState(() => new Date());
 
   const fetchAll = useCallback(async () => {
+    const since = new Date(Date.now() - HISTORY_DAYS * 24 * 60 * 60 * 1000).toISOString();
     const [configRes, eventsRes] = await Promise.all([
       supabase.from('baby_config').select('*').eq('id', 1).single(),
-      supabase.from('baby_events').select('*').order('event_time', { ascending: false }),
+      supabase.from('baby_events').select('*').gte('event_time', since).order('event_time', { ascending: false }),
     ]);
     if (configRes.error) console.error(configRes.error);
     if (eventsRes.error) console.error(eventsRes.error);
@@ -103,8 +103,8 @@ export default function Page() {
 
   const openEdit = useCallback((event) => {
     setEditingEvent(event);
-    setEditValue(toDatetimeLocalValue(event.event_time));
-  }, []);
+    setEditValue(isoToLocalDatetimeInputValue(event.event_time, config?.timezone || 'America/New_York'));
+  }, [config]);
 
   const cancelEdit = useCallback(() => {
     setEditingEvent(null);
@@ -113,7 +113,8 @@ export default function Page() {
 
   const confirmEdit = useCallback(async () => {
     if (!editingEvent || !editValue) return;
-    const iso = new Date(editValue).toISOString();
+    const [datePart, timePart] = editValue.split('T');
+    const iso = localDateTimeToUtc(datePart, timePart, config?.timezone || 'America/New_York').toISOString();
     try {
       const res = await fetch(`/api/events/${editingEvent.id}`, {
         method: 'PATCH',
@@ -128,7 +129,7 @@ export default function Page() {
       console.error(err);
       showToast('Failed to update — try again');
     }
-  }, [editingEvent, editValue, cancelEdit, fetchAll, showToast]);
+  }, [editingEvent, editValue, config, cancelEdit, fetchAll, showToast]);
 
   const status = useMemo(() => {
     if (!config) return null;
