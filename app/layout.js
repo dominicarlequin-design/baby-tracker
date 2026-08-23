@@ -2,7 +2,7 @@ import './globals.css';
 
 export const metadata = {
   title: 'Baby Tracker',
-  description: 'Tap-to-log baby habit tracker with alerts',
+  description: 'Tap-to-log baby habit tracker',
 };
 
 export const viewport = {
