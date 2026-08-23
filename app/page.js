@@ -60,6 +60,7 @@ export default function Page() {
   const [editingEvent, setEditingEvent] = useState(null);
   const [editValue, setEditValue] = useState('');
   const [now, setNow] = useState(() => new Date());
+  const [statusOpen, setStatusOpen] = useState(false);
 
   const fetchAll = useCallback(async () => {
     const since = new Date(Date.now() - HISTORY_DAYS * 24 * 60 * 60 * 1000).toISOString();
@@ -138,6 +139,9 @@ export default function Page() {
 
   const timezone = config?.timezone || 'America/New_York';
   const recent = events.slice(0, RECENT_LIMIT);
+  const overdueCount = status
+    ? ['feed', 'diaper', 'nap', 'sleep', 'medicine'].filter(k => status[k].overdue).length
+    : 0;
 
   return (
     <div className="wrap">
@@ -160,9 +164,19 @@ export default function Page() {
       </div>
 
       <div className="card">
-        <div className="section-title">Status</div>
-        {loading || !status ? (
-          <div className="info-item">Loading…</div>
+        <button
+          className="section-title section-toggle"
+          onClick={() => setStatusOpen(o => !o)}
+          aria-expanded={statusOpen}
+        >
+          <span>Status</span>
+          {!statusOpen && overdueCount > 0 && (
+            <span className="overdue-badge">{overdueCount} overdue</span>
+          )}
+          <span className={`chevron ${statusOpen ? 'open' : ''}`}>{'>'}</span>
+        </button>
+        {statusOpen && (loading || !status ? (
+          <div className="info-item">Loading{'…'}</div>
         ) : (
           <>
             <StatusRow
@@ -217,7 +231,7 @@ export default function Page() {
               }
             />
           </>
-        )}
+        ))}
       </div>
 
       <div className="card">
