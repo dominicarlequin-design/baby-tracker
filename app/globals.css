@@ -86,11 +86,13 @@ h1 {
 
 .btn-feed { background: #5b7fa6; }
 .btn-nap-start { background: #8a6bb0; }
-.btn-nap-end { background: #a98ccb; }
+/* Light backgrounds — white text falls below WCAG AA contrast, so these
+   two use the dark ink color instead (~5:1 / ~6.4:1). */
+.btn-nap-end { background: #a98ccb; color: var(--ink); }
 .btn-diaper { background: #4f9e8f; }
 .btn-medicine { background: #c2604a; }
 .btn-sleep-start { background: #3d4f6b; }
-.btn-sleep-end { background: #d9a441; }
+.btn-sleep-end { background: #d9a441; color: var(--ink); }
 
 .status-row {
   display: flex;
