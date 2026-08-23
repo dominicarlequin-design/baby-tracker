@@ -142,7 +142,7 @@ export default function Page() {
   return (
     <div className="wrap">
       <h1>Baby Tracker</h1>
-      <div className="subtitle">Tap to log. Alerts push to your phone automatically.</div>
+      <div className="subtitle">Tap to log.</div>
 
       <div className="card">
         <div className="section-title">Log an event</div>
