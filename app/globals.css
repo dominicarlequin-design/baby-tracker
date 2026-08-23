@@ -63,6 +63,41 @@ h1 {
   margin-bottom: 12px;
 }
 
+.section-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+.section-toggle span:first-child {
+  flex-shrink: 0;
+}
+
+.overdue-badge {
+  flex: 1;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--overdue);
+}
+
+.chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+.chevron.open {
+  transform: rotate(90deg);
+}
+
 .btn-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
