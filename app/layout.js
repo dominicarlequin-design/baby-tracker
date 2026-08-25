@@ -1,5 +1,4 @@
 import './globals.css';
-import AuthGate from './AuthGate';
 
 export const metadata = {
   title: 'Baby Tracker',
@@ -15,9 +14,7 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
-        <AuthGate>{children}</AuthGate>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

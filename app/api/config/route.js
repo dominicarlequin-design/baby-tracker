@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
-import { getAuthedUser } from '../../../lib/requireUser';
 
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -20,15 +19,8 @@ const FIELD_VALIDATORS = {
 
 // Edit baby_config's tunable values. Goes through the service role key
 // server-side, matching app/api/events/[id]/route.js — RLS grants the
-// public anon role select-only on baby_config, no update policy. The
-// service role bypasses RLS entirely, so the bearer-token check below is
-// this route's only access control.
+// public anon role select-only on baby_config, no update policy.
 export async function PATCH(request) {
-  const user = await getAuthedUser(request);
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   let body;
   try {
     body = await request.json();

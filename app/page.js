@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { authHeaders, supabase } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 import {
   computeStatus,
   isoToLocalDatetimeInputValue,
@@ -336,7 +336,7 @@ export default function Page() {
     try {
       const res = await fetch(`/api/events/${editingEvent.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ event_time: iso, type: editType }),
       });
       if (!res.ok) throw new Error(await res.text());

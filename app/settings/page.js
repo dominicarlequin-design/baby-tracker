@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { authHeaders, supabase } from '../../lib/supabase';
+import { supabase } from '../../lib/supabase';
 
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -83,7 +83,7 @@ export default function SettingsPage() {
     try {
       const res = await fetch('/api/config', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', ...(await authHeaders()) },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(update),
       });
       const body = await res.json();
@@ -134,10 +134,6 @@ export default function SettingsPage() {
           </button>
         </div>
       )}
-
-      <div className="card">
-        <button className="signout-link" onClick={() => supabase.auth.signOut()}>Sign out</button>
-      </div>
     </div>
   );
 }

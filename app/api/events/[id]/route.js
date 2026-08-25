@@ -1,20 +1,12 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../lib/supabaseAdmin';
-import { getAuthedUser } from '../../../../lib/requireUser';
 
 const VALID_TYPES = ['feed', 'diaper', 'nap_start', 'nap_end', 'medicine', 'sleep_start', 'sleep_end'];
 
 // Edit an event's time and/or type after logging. This has to go through
 // the service role key server-side since RLS grants the public anon role
-// select/insert/delete on baby_events but no update policy. The service
-// role bypasses RLS entirely, so the bearer-token check below is this
-// route's only access control.
+// select/insert/delete on baby_events but no update policy.
 export async function PATCH(request, { params }) {
-  const user = await getAuthedUser(request);
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   const { id } = await params;
   const eventId = Number(id);
   if (!Number.isInteger(eventId) || eventId <= 0) {
