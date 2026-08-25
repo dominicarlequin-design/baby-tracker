@@ -389,7 +389,7 @@ export default function Page() {
       <div className="header-row">
         <h1>Today</h1>
         <div className="header-right">
-          <div className="header-datetime">
+          <div className="header-datetime" suppressHydrationWarning>
             {new Intl.DateTimeFormat('en-US', { timeZone: timezone, weekday: 'short', month: 'short', day: 'numeric' }).format(now)}
             {' · '}
             {formatLocalTime(now.toISOString(), timezone)}
