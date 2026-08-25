@@ -242,6 +242,7 @@ export default function Page() {
   const [editType, setEditType] = useState('');
   const [now, setNow] = useState(() => new Date());
   const [moreOpen, setMoreOpen] = useState(false);
+  const [activityOpen, setActivityOpen] = useState(false);
   const toastTimeoutRef = useRef(null);
 
   const fetchAll = useCallback(async () => {
@@ -496,40 +497,45 @@ export default function Page() {
           </div>
 
           <div className="card">
-            <div className="section-title">Recent activity</div>
-            <div className="history">
-              {activityGroups.length === 0 ? (
-                <div className="info-item">Nothing logged yet.</div>
-              ) : (
-                activityGroups.map(group => (
-                  <div key={group.dayStr} className="activity-group">
-                    <div className="activity-day-label">{group.label}</div>
-                    {group.items.map(item => (
-                      <button key={item.id} className="activity-item" onClick={() => openEdit(item.raw)}>
-                        {item.kind === 'nap' ? (
-                          <>
-                            <span className="activity-type">
-                              Nap · {formatDurationWords((new Date(item.end) - new Date(item.start)) / (1000 * 60 * 60))}
-                            </span>
-                            <span className="activity-time">
-                              {formatLocalTime(item.start, timezone)} – {formatLocalTime(item.end, timezone)}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="activity-type">{TYPE_LABELS[item.type] || item.type}</span>
-                            <span className="activity-time">
-                              {formatLocalTime(item.event_time, timezone)}
-                              {group.label === 'Today' ? ` · ${formatRelative(item.event_time, now)}` : ''}
-                            </span>
-                          </>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                ))
-              )}
-            </div>
+            <button className="section-title section-toggle" onClick={() => setActivityOpen(o => !o)} aria-expanded={activityOpen}>
+              <span>Recent activity</span>
+              <span className={`chevron ${activityOpen ? 'open' : ''}`}>{'>'}</span>
+            </button>
+            {activityOpen && (
+              <div className="history">
+                {activityGroups.length === 0 ? (
+                  <div className="info-item">Nothing logged yet.</div>
+                ) : (
+                  activityGroups.map(group => (
+                    <div key={group.dayStr} className="activity-group">
+                      <div className="activity-day-label">{group.label}</div>
+                      {group.items.map(item => (
+                        <button key={item.id} className="activity-item" onClick={() => openEdit(item.raw)}>
+                          {item.kind === 'nap' ? (
+                            <>
+                              <span className="activity-type">
+                                Nap · {formatDurationWords((new Date(item.end) - new Date(item.start)) / (1000 * 60 * 60))}
+                              </span>
+                              <span className="activity-time">
+                                {formatLocalTime(item.start, timezone)} – {formatLocalTime(item.end, timezone)}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="activity-type">{TYPE_LABELS[item.type] || item.type}</span>
+                              <span className="activity-time">
+                                {formatLocalTime(item.event_time, timezone)}
+                                {group.label === 'Today' ? ` · ${formatRelative(item.event_time, now)}` : ''}
+                              </span>
+                            </>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </>
       )}
