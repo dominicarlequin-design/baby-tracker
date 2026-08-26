@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
-import { dailySummaries } from '../../lib/summaries';
+import { dailySummaries, bedtimeMinutesLocal, formatMinutesAsClock } from '../../lib/summaries';
 
 // Two 14-day windows: the displayed window, and the one before it, so the
 // headline and the "typical day" comparisons have something to compare
@@ -33,24 +33,6 @@ function formatShortDate(dayStr) {
   const [y, m, d] = dayStr.split('-').map(Number);
   const date = new Date(Date.UTC(y, m - 1, d, 12));
   return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }).format(date);
-}
-
-function bedtimeMinutesLocal(iso, timezone) {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: timezone, hour: '2-digit', minute: '2-digit', hour12: false,
-  }).formatToParts(new Date(iso));
-  const map = {};
-  for (const p of parts) map[p.type] = p.value;
-  const hour = Number(map.hour) === 24 ? 0 : Number(map.hour);
-  return hour * 60 + Number(map.minute);
-}
-
-function formatMinutesAsClock(totalMinutes) {
-  const h24 = Math.floor(totalMinutes / 60) % 24;
-  const m = Math.round(totalMinutes % 60);
-  const period = h24 >= 12 ? 'PM' : 'AM';
-  const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
-  return `${h12}:${String(m).padStart(2, '0')} ${period}`;
 }
 
 // Most notable change over the window, in plain language. Headlines on the

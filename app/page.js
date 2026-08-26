@@ -9,7 +9,7 @@ import {
   localDateStr,
   localDateTimeToUtc,
 } from '../lib/logic';
-import { dailySummaries } from '../lib/summaries';
+import { dailySummaries, bedtimePattern, formatMinutesAsClock } from '../lib/summaries';
 
 const EVENT_TYPES = ['feed', 'diaper', 'nap_start', 'nap_end', 'medicine', 'sleep_start', 'sleep_end'];
 
@@ -306,6 +306,7 @@ export default function Page() {
   const [editFeedOunces, setEditFeedOunces] = useState('');
   const [editDiaperDetail, setEditDiaperDetail] = useState('');
   const [explainKey, setExplainKey] = useState(null);
+  const [bedtimePatternOpen, setBedtimePatternOpen] = useState(false);
   const toastTimeoutRef = useRef(null);
 
   const fetchAll = useCallback(async () => {
@@ -452,6 +453,14 @@ export default function Page() {
     return dailySummaries(events, config, 1)[0];
   }, [events, config, now]);
 
+  // Historical bedtime pattern (last 14 nights), shown in a dropdown under
+  // the Night sleep row alongside — not instead of — the Target-bedtime
+  // due/overdue judgment that already drives status.sleep.
+  const bedtimeInfo = useMemo(() => {
+    if (!config) return null;
+    return bedtimePattern(events, config, now, 14);
+  }, [events, config, now]);
+
   const timezone = config?.timezone || 'America/New_York';
   const activityGroups = useMemo(
     () => buildActivityGroups(events.slice(0, RECENT_ACTIVITY_LIMIT), timezone, now),
@@ -559,7 +568,14 @@ export default function Page() {
                 <MoreRow label="Feed" status={status.feed} timezone={timezone} statusKey="feed" onExplain={setExplainKey} />
                 <MoreRow label="Diaper" status={status.diaper} timezone={timezone} statusKey="diaper" onExplain={setExplainKey} />
                 <MoreRow label="Nap" status={status.nap} timezone={timezone} asleepLabel="Napping" statusKey="nap" onExplain={setExplainKey} />
-                <MoreRow label="Night sleep" status={status.sleep} timezone={timezone} asleepLabel="Asleep" statusKey="sleep" onExplain={setExplainKey} />
+                <NightSleepRow
+                  status={status.sleep}
+                  timezone={timezone}
+                  pattern={bedtimeInfo}
+                  patternOpen={bedtimePatternOpen}
+                  onTogglePattern={() => setBedtimePatternOpen(o => !o)}
+                  onExplain={setExplainKey}
+                />
                 <div className="status-row">
                   <div>
                     <div className="status-label">
@@ -765,6 +781,57 @@ export default function Page() {
         <span className="tab-item tab-active">Log</span>
         <Link href="/patterns" className="tab-item">Patterns</Link>
       </nav>
+    </div>
+  );
+}
+
+// Night sleep gets its own row (instead of the generic MoreRow) so it can
+// carry a second, collapsible "Bedtime pattern" dropdown underneath the
+// usual label/detail line — the historical actual-bedtime pattern, shown
+// alongside the Target-bedtime-driven due/overdue status, not replacing it.
+function NightSleepRow({ status, timezone, pattern, patternOpen, onTogglePattern, onExplain }) {
+  const detail = status.asleep
+    ? `Asleep since ${formatLocalTime(status.lastEventTime, timezone)}`
+    : status.dueAt
+      ? formatLocalTime(status.dueAt, timezone)
+      : 'On track';
+  const toneClass = status.asleep ? 'muted' : status.state === 'overdue' ? 'overdue' : status.state === 'due-soon' ? 'due-soon' : 'muted';
+
+  return (
+    <div className="status-row-block">
+      <div className="status-row">
+        <div>
+          <div className="status-label">
+            Night sleep
+            <button type="button" className="why-btn" onClick={() => onExplain('sleep')} aria-label="Why Night sleep?">Why?</button>
+          </div>
+        </div>
+        <span className={`more-detail ${toneClass}`}>{detail}</span>
+      </div>
+      <button type="button" className="pattern-toggle" onClick={onTogglePattern} aria-expanded={patternOpen}>
+        <span>Bedtime pattern</span>
+        <span className={`chevron ${patternOpen ? 'open' : ''}`}>{'>'}</span>
+      </button>
+      {patternOpen && pattern && (
+        <div className="pattern-dropdown">
+          {pattern.sampleCount < 3 ? (
+            <div className="pattern-line">
+              Not enough bedtime history yet ({pattern.sampleCount} night{pattern.sampleCount === 1 ? '' : 's'} logged) — keep logging and a pattern will show up here.
+            </div>
+          ) : (
+            <>
+              <div className="pattern-line">
+                Based on her last {pattern.sampleCount} nights, she usually goes down around {formatMinutesAsClock(pattern.meanMinutes)} (±{Math.round(pattern.spreadMinutes)} min).
+              </div>
+              <div className={`pattern-line ${pattern.overdue ? 'overdue' : ''}`}>
+                {pattern.overdue
+                  ? "That's past her usual window for tonight, based on pattern alone."
+                  : `Tonight's pattern-based window: around ${formatLocalTime(pattern.estimateAt, timezone)}.`}
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
