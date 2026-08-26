@@ -307,6 +307,7 @@ export default function Page() {
   const [editDiaperDetail, setEditDiaperDetail] = useState('');
   const [explainKey, setExplainKey] = useState(null);
   const [bedtimePatternOpen, setBedtimePatternOpen] = useState(false);
+  const [overdueOpen, setOverdueOpen] = useState(true);
   const toastTimeoutRef = useRef(null);
 
   const fetchAll = useCallback(async () => {
@@ -471,6 +472,35 @@ export default function Page() {
   const nextUpTone = nextUpKey ? status[nextUpKey].state : null;
   const medicineNext = config ? nextMedicineSlot(config, now) : null;
 
+  // Every currently-overdue category at once, for the banner at the very
+  // top of the page — the Next-up card below only ever surfaces the single
+  // worst offender, so with two things overdue at the same time (e.g. Feed
+  // and Diaper) the second one would otherwise go unnoticed without
+  // expanding Upcoming and checking each row by hand.
+  const overdueItems = useMemo(() => {
+    if (!status) return [];
+    const items = [];
+    if (status.feed.overdue) {
+      items.push({ key: 'feed', label: 'Feed', detail: `Late by ${formatDurationWords(status.feed.hoursSince - status.feed.avgHours)}` });
+    }
+    if (status.diaper.overdue) {
+      items.push({ key: 'diaper', label: 'Diaper', detail: `Late by ${formatDurationWords(status.diaper.hoursSince - status.diaper.avgHours)}` });
+    }
+    if (status.nap.overdue) {
+      items.push({ key: 'nap', label: 'Nap', detail: `Late by ${formatDurationWords(status.nap.hoursSince - status.nap.avgHours)}` });
+    }
+    if (status.sleep.overdue) {
+      items.push({ key: 'sleep', label: 'Night sleep', detail: `Late by ${formatDurationWords(status.sleep.hoursSince)}` });
+    }
+    if (status.medicine.overdue) {
+      const lateHours = status.medicine.graceDeadline
+        ? Math.max(0, (now.getTime() - new Date(status.medicine.graceDeadline).getTime()) / (1000 * 60 * 60))
+        : 0;
+      items.push({ key: 'medicine', label: 'Medicine', detail: `Late by ${formatDurationWords(lateHours)}` });
+    }
+    return items;
+  }, [status, now]);
+
   return (
     <div className="wrap">
       <div className="header-row">
@@ -489,6 +519,35 @@ export default function Page() {
         <div className="card"><div className="info-item">Loading{'…'}</div></div>
       ) : (
         <>
+          {overdueItems.length > 0 && (
+            <div className="overdue-banner">
+              <button
+                className="overdue-banner-toggle"
+                onClick={() => setOverdueOpen(o => !o)}
+                aria-expanded={overdueOpen}
+              >
+                <span className="overdue-banner-title">
+                  {overdueItems.length} overdue
+                </span>
+                <span className={`chevron ${overdueOpen ? 'open' : ''}`}>{'>'}</span>
+              </button>
+              {overdueOpen && (
+                <div className="overdue-banner-list">
+                  {overdueItems.map(item => (
+                    <button
+                      key={item.key}
+                      className="overdue-banner-item"
+                      onClick={() => setExplainKey(item.key)}
+                    >
+                      <span>{item.label}</span>
+                      <span className="overdue-banner-detail">{item.detail}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {nextUp ? (
             <div className={`nextup nextup-${nextUpTone}`}>
               <div className="nextup-eyebrow">{nextUp.eyebrow}</div>
