@@ -203,6 +203,53 @@ function nextUpContent(key, status, config, timezone) {
   };
 }
 
+// Plain-language explanation of how a category's due-time estimate was
+// reached, for the "Why?" button on each Upcoming row. Mirrors the actual
+// logic in lib/logic.js's computeStatus rather than restating it loosely,
+// so this never drifts from what the app is actually doing.
+function explainStatus(key, status, config, timezone) {
+  const overdueMultiplier = config.overdue_multiplier ?? 1.25;
+
+  if (key === 'feed' || key === 'diaper') {
+    const noun = key === 'feed' ? 'feeds' : 'diaper changes';
+    const verb = key === 'feed' ? 'fed' : 'changed';
+    if (!status.lastEventTime) {
+      return `No ${noun} logged yet, so this starts from an assumed gap of ${formatHours(status.avgHours)} until real history builds up.`;
+    }
+    const dueSoonAfter = formatHours(status.avgHours * 0.8);
+    const overdueAfter = formatHours(status.avgHours * overdueMultiplier);
+    return `Based on the average time between your last several ${noun} (currently ${formatHours(status.avgHours)}). Last ${verb} at ${formatLocalTime(status.lastEventTime, timezone)}, so the next one is expected around ${formatLocalTime(status.dueAt, timezone)}. It's flagged "due soon" once ${dueSoonAfter} has passed, and "overdue" past ${overdueAfter} — that's the average gap times the ${overdueMultiplier} overdue multiplier from Settings.`;
+  }
+
+  if (key === 'nap') {
+    if (status.asleep) {
+      return `She's currently napping, tracked since ${formatLocalTime(status.lastEventTime, timezone)}. The next nap estimate starts fresh once she wakes.`;
+    }
+    if (!status.lastEventTime) {
+      return `No naps logged yet, so this starts from an assumed wake window of ${formatHours(status.avgHours)} until real history builds up.`;
+    }
+    const dueSoonAfter = formatHours(status.avgHours * 0.8);
+    const overdueAfter = formatHours(status.avgHours * overdueMultiplier);
+    return `Based on how long she typically stays awake between naps (currently ${formatHours(status.avgHours)}). Awake since ${formatLocalTime(status.lastEventTime, timezone)}, so the next nap is expected around ${formatLocalTime(status.dueAt, timezone)}. "Due soon" kicks in after ${dueSoonAfter} awake, "overdue" after ${overdueAfter} — the usual wake window times the ${overdueMultiplier} overdue multiplier from Settings.`;
+  }
+
+  if (key === 'sleep') {
+    if (status.asleep) {
+      return `She's asleep for the night, tracked since ${formatLocalTime(status.lastEventTime, timezone)}.`;
+    }
+    const bedtime = formatTimeOfDay(config.target_bedtime_local ?? '19:15');
+    return `Night sleep isn't averaged from history like the others — it's judged against your Target bedtime (${bedtime}, set in Settings). Once that time passes with no Bedtime tap, it's flagged "due soon," then "overdue" ${config.medicine_grace_minutes} minutes after that.`;
+  }
+
+  if (key === 'medicine') {
+    const times = (config.medicine_times_local || []).map(formatTimeOfDay).join(', ');
+    const lastSlot = status.lastScheduledSlot ? formatLocalTime(status.lastScheduledSlot, timezone) : null;
+    return `Medicine runs on a fixed daily schedule (${times}, set in Settings) rather than an average.${lastSlot ? ` The most recent scheduled dose was ${lastSlot}.` : ''} It's flagged overdue if nothing is logged within ${config.medicine_grace_minutes} minutes of that time.`;
+  }
+
+  return '';
+}
+
 // Collapses adjacent nap_start/nap_end pairs (in the newest-first event
 // list) into a single row, and groups the rest by local day.
 function buildActivityGroups(events, timezone, now) {
@@ -258,6 +305,7 @@ export default function Page() {
   const [diaperPickerOpen, setDiaperPickerOpen] = useState(false);
   const [editFeedOunces, setEditFeedOunces] = useState('');
   const [editDiaperDetail, setEditDiaperDetail] = useState('');
+  const [explainKey, setExplainKey] = useState(null);
   const toastTimeoutRef = useRef(null);
 
   const fetchAll = useCallback(async () => {
@@ -508,13 +556,16 @@ export default function Page() {
             </button>
             {moreOpen && (
               <>
-                <MoreRow label="Feed" status={status.feed} timezone={timezone} />
-                <MoreRow label="Diaper" status={status.diaper} timezone={timezone} />
-                <MoreRow label="Nap" status={status.nap} timezone={timezone} asleepLabel="Napping" />
-                <MoreRow label="Night sleep" status={status.sleep} timezone={timezone} asleepLabel="Asleep" />
+                <MoreRow label="Feed" status={status.feed} timezone={timezone} statusKey="feed" onExplain={setExplainKey} />
+                <MoreRow label="Diaper" status={status.diaper} timezone={timezone} statusKey="diaper" onExplain={setExplainKey} />
+                <MoreRow label="Nap" status={status.nap} timezone={timezone} asleepLabel="Napping" statusKey="nap" onExplain={setExplainKey} />
+                <MoreRow label="Night sleep" status={status.sleep} timezone={timezone} asleepLabel="Asleep" statusKey="sleep" onExplain={setExplainKey} />
                 <div className="status-row">
                   <div>
-                    <div className="status-label">Medicine</div>
+                    <div className="status-label">
+                      Medicine
+                      <button type="button" className="why-btn" onClick={() => setExplainKey('medicine')} aria-label="Why Medicine?">Why?</button>
+                    </div>
                     {status.medicine.overdue && <div className="status-detail">Overdue</div>}
                   </div>
                   <span className={`more-detail ${status.medicine.overdue ? 'overdue' : 'muted'}`}>
@@ -700,6 +751,16 @@ export default function Page() {
         </div>
       )}
 
+      {explainKey && status && (
+        <div className="modal-overlay" onClick={() => setExplainKey(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-title">How this is estimated</div>
+            <div className="explain-body">{explainStatus(explainKey, status[explainKey], config, timezone)}</div>
+            <button className="modal-btn-confirm form-save" onClick={() => setExplainKey(null)}>Got it</button>
+          </div>
+        </div>
+      )}
+
       <nav className="tab-bar">
         <span className="tab-item tab-active">Log</span>
         <Link href="/patterns" className="tab-item">Patterns</Link>
@@ -708,7 +769,7 @@ export default function Page() {
   );
 }
 
-function MoreRow({ label, status, timezone, asleepLabel }) {
+function MoreRow({ label, status, timezone, asleepLabel, statusKey, onExplain }) {
   const detail = status.asleep
     ? `${asleepLabel} since ${formatLocalTime(status.lastEventTime, timezone)}`
     : status.dueAt
@@ -718,7 +779,10 @@ function MoreRow({ label, status, timezone, asleepLabel }) {
   return (
     <div className="status-row">
       <div>
-        <div className="status-label">{label}</div>
+        <div className="status-label">
+          {label}
+          <button type="button" className="why-btn" onClick={() => onExplain(statusKey)} aria-label={`Why ${label}?`}>Why?</button>
+        </div>
       </div>
       <span className={`more-detail ${toneClass}`}>{detail}</span>
     </div>
