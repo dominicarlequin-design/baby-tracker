@@ -211,7 +211,7 @@ export default function PatternsPage() {
               />
               <BarChart
                 title="Total sleep per day"
-                color="#3d4f6b"
+                color="var(--latte-deep)"
                 days={recentWindow}
                 valueOf={d => d.totalSleepMinutes / 60}
                 formatValue={v => (v == null ? '—' : `${v.toFixed(1)}h/day`)}

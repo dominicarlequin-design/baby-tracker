@@ -3,18 +3,38 @@
 }
 
 :root {
-  --bg: #f4f1ec;
+  /* Requested palette: Cream White, Soft Beige, Dusty Pink, Sage Green,
+     Baby Blue, Butter Yellow, Muted Lilac, Warm Brown/Latte. Used as-is for
+     light surfaces + dark-ink text; deepened variants (suffixed -deep) exist
+     only where a color needs to carry its own text/border against a plain
+     white card (e.g. the "not yet" outline buttons), so the same 8 hues
+     stay legible without introducing new colors. --overdue stays the
+     original red rather than a palette pastel, at your call, so missed
+     feeds/diapers/medicine still read as urgent.  */
+  --bg: #fdf6ec;              /* Cream White */
   --card: #ffffff;
   --ink: #2c2a26;
-  --ink-muted: #6b6660;
-  --border: #e6e1d8;
-  --accent: #5b7fa6;
+  --ink-muted: #7a6f60;
+  --border: #ead9bb;          /* Soft Beige */
+  --accent: #5a7292;          /* deepened Baby Blue — links, CTAs, focus */
   --accent-ink: #ffffff;
-  --ok: #3f7a54;
-  --ok-bg: #eaf5ee;
+  --ok: #5b7048;              /* deepened Sage Green */
+  --ok-bg: #edf1e3;
+  --due-soon: #8a6a1e;        /* deepened Butter Yellow */
   --overdue: #b3492f;
   --overdue-bg: #fbeae6;
   --radius: 14px;
+
+  --sage: #92a378;            /* Sage Green */
+  --dusty-pink: #e8c4be;      /* Dusty Pink */
+  --dusty-pink-bg: #f6e7e4;
+  --baby-blue: #c7d3e3;       /* Baby Blue / Powder Blue */
+  --butter-yellow: #f5dfa0;   /* Butter Yellow */
+  --muted-lilac: #d2c4dc;     /* Muted Lilac */
+  --lilac-deep: #8b6fa0;
+  --latte: #c08a5f;           /* Warm Brown / Latte */
+  --latte-deep: #8c5a34;
+  --soft-beige-tint: #f7efe0; /* lighter than --border, for input/picker fills */
 }
 
 html, body {
@@ -153,15 +173,17 @@ h1 {
   font-size: 17px;
 }
 
-.btn-feed { background: #5b7fa6; }
-.btn-nap-start { background: #8a6bb0; }
-/* Light backgrounds — white text falls below WCAG AA contrast, so these
-   two use the dark ink color instead (~5:1 / ~6.4:1). */
-.btn-nap-end { background: #a98ccb; color: var(--ink); }
-.btn-diaper { background: #4f9e8f; }
-.btn-medicine { background: #c2604a; }
-.btn-sleep-start { background: #3d4f6b; }
-.btn-sleep-end { background: #d9a441; color: var(--ink); }
+/* Every palette color here is light/pastel, so every category button uses
+   dark-ink text rather than white — safer contrast than forcing white onto
+   a pastel fill, and it reads as one cohesive family instead of some
+   buttons being deep and others pale. */
+.btn-feed { background: var(--baby-blue); color: var(--ink); }
+.btn-nap-start { background: var(--muted-lilac); color: var(--ink); }
+.btn-nap-end { background: var(--muted-lilac); color: var(--ink); }
+.btn-diaper { background: var(--sage); color: var(--ink); }
+.btn-medicine { background: var(--dusty-pink); color: var(--ink); }
+.btn-sleep-start { background: var(--latte); color: var(--ink); }
+.btn-sleep-end { background: var(--butter-yellow); color: var(--ink); }
 
 /* Overdue banner: aggregates every currently-overdue category at once, at
    the very top of the page — the Next-up card below only ever shows the
@@ -251,7 +273,7 @@ h1 {
   border-color: #e0d3ad;
 }
 .nextup-due-soon .nextup-eyebrow {
-  color: #9a7420;
+  color: var(--due-soon);
 }
 .nextup-overdue {
   border-color: #eccbc1;
@@ -295,15 +317,15 @@ h1 {
   background: var(--card);
   border: 1.5px solid var(--border);
 }
-.nap-outline { border-color: #8a6bb0; color: #8a6bb0; }
-.sleep-outline { border-color: #3d4f6b; color: #3d4f6b; }
+.nap-outline { border-color: var(--lilac-deep); color: var(--lilac-deep); }
+.sleep-outline { border-color: var(--latte-deep); color: var(--latte-deep); }
 
 .stateful-btn.filled {
   border: none;
   color: var(--ink);
 }
-.nap-filled { background: #a98ccb; }
-.sleep-filled { background: #d9a441; }
+.nap-filled { background: var(--muted-lilac); }
+.sleep-filled { background: var(--butter-yellow); }
 
 .medicine-row {
   display: flex;
@@ -311,7 +333,7 @@ h1 {
   justify-content: space-between;
   gap: 10px;
   width: 100%;
-  background: var(--card);
+  background: var(--dusty-pink-bg);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 14px;
@@ -358,7 +380,7 @@ h1 {
   white-space: nowrap;
 }
 .more-detail.muted { color: var(--ink-muted); }
-.more-detail.due-soon { color: #9a7420; }
+.more-detail.due-soon { color: var(--due-soon); }
 .more-detail.overdue { color: var(--overdue); }
 
 /* Patterns screen */
@@ -444,7 +466,7 @@ h1 {
   border-radius: 8px;
   border: 1px solid var(--border);
   font-family: inherit;
-  background: var(--bg);
+  background: var(--soft-beige-tint);
   color: var(--ink);
 }
 .form-hint {
@@ -672,7 +694,7 @@ h1 {
 .toast-action {
   background: none;
   border: none;
-  color: #bcd2ea;
+  color: var(--baby-blue);
   font-weight: 700;
   font-size: 13.5px;
   cursor: pointer;
@@ -790,7 +812,7 @@ h1 {
 }
 
 .picker-btn {
-  background: var(--bg);
+  background: var(--soft-beige-tint);
   border: 1.5px solid var(--border);
   border-radius: 12px;
   padding: 14px 0;
