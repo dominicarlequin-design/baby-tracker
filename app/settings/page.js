@@ -81,14 +81,18 @@ export default function SettingsPage() {
     setSaving(true);
     setMessage(null);
     try {
-      const res = await fetch('/api/config', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(update),
-      });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.error || 'Save failed');
-      setForm(toFormState(body.config));
+      // baby_config already has a public RLS update policy (same as
+      // baby_events'), so this can go straight through the anon client
+      // instead of /api/config's service-role route, which 500s in
+      // production because SUPABASE_SERVICE_ROLE_KEY was never configured.
+      const { data, error } = await supabase
+        .from('baby_config')
+        .update(update)
+        .eq('id', 1)
+        .select()
+        .single();
+      if (error) throw error;
+      setForm(toFormState(data));
       setMessage({ text: 'Saved', isError: false });
     } catch (err) {
       console.error(err);
