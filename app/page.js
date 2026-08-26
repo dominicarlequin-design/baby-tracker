@@ -23,6 +23,17 @@ const TYPE_LABELS = {
   sleep_end: 'Wake up',
 };
 
+const DIAPER_DETAIL_LABELS = { pee: 'Pee', poop: 'Poop', both: 'Both' };
+const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
+
+// Extra "· 4 oz" / "· Poop" suffix for a Recent Activity row, when the
+// underlying event has feed_ounces / diaper_detail recorded.
+function activityDetailSuffix(raw) {
+  if (raw.type === 'feed' && raw.feed_ounces != null) return ` · ${raw.feed_ounces} oz`;
+  if (raw.type === 'diaper' && raw.diaper_detail) return ` · ${DIAPER_DETAIL_LABELS[raw.diaper_detail] || raw.diaper_detail}`;
+  return '';
+}
+
 // Bounds how much history is fetched/rescanned on every load and 60s tick.
 // 30 days comfortably covers rolling-average sample windows and the two-week
 // Patterns window, without growing unbounded as baby_events accumulates.
@@ -243,6 +254,10 @@ export default function Page() {
   const [now, setNow] = useState(() => new Date());
   const [moreOpen, setMoreOpen] = useState(false);
   const [activityOpen, setActivityOpen] = useState(false);
+  const [feedPickerOpen, setFeedPickerOpen] = useState(false);
+  const [diaperPickerOpen, setDiaperPickerOpen] = useState(false);
+  const [editFeedOunces, setEditFeedOunces] = useState('');
+  const [editDiaperDetail, setEditDiaperDetail] = useState('');
   const toastTimeoutRef = useRef(null);
 
   const fetchAll = useCallback(async () => {
@@ -284,13 +299,13 @@ export default function Page() {
   // supabase-js query builder is a thenable that re-runs the request on
   // every `await`/`.then()`, so without this a fast Undo tap would fire a
   // second insert instead of reusing the first one's result.
-  const logEvent = useCallback((type, label) => {
+  const logEvent = useCallback((type, label, extra = {}) => {
     const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const eventTime = new Date().toISOString();
-    setEvents(prev => [{ id: tempId, type, event_time: eventTime }, ...prev]);
+    setEvents(prev => [{ id: tempId, type, event_time: eventTime, ...extra }, ...prev]);
 
     const insertPromise = Promise.resolve(
-      supabase.from('baby_events').insert({ type, event_time: eventTime }).select().single()
+      supabase.from('baby_events').insert({ type, event_time: eventTime, ...extra }).select().single()
     );
 
     showToast(`Logged: ${label}`, {
@@ -322,12 +337,16 @@ export default function Page() {
     setEditingEvent(event);
     setEditType(event.type);
     setEditValue(isoToLocalDatetimeInputValue(event.event_time, config?.timezone || 'America/New_York'));
+    setEditFeedOunces(event.feed_ounces != null ? String(event.feed_ounces) : '');
+    setEditDiaperDetail(event.diaper_detail || '');
   }, [config]);
 
   const cancelEdit = useCallback(() => {
     setEditingEvent(null);
     setEditValue('');
     setEditType('');
+    setEditFeedOunces('');
+    setEditDiaperDetail('');
   }, []);
 
   const confirmEdit = useCallback(async () => {
@@ -335,13 +354,23 @@ export default function Page() {
     const [datePart, timePart] = editValue.split('T');
     const iso = localDateTimeToUtc(datePart, timePart, config?.timezone || 'America/New_York').toISOString();
     try {
-      const res = await fetch(`/api/events/${editingEvent.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ event_time: iso, type: editType }),
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const { event: updated } = await res.json();
+      // baby_events already has a public RLS update policy (same as its
+      // insert/delete policies below), so this can go straight through the
+      // anon client like the rest of this file — no need to round-trip
+      // through /api/events/[id]'s service-role client, which 500s in
+      // production because SUPABASE_SERVICE_ROLE_KEY was never configured.
+      const { data: updated, error } = await supabase
+        .from('baby_events')
+        .update({
+          event_time: iso,
+          type: editType,
+          feed_ounces: editType === 'feed' && editFeedOunces ? Number(editFeedOunces) : null,
+          diaper_detail: editType === 'diaper' && editDiaperDetail ? editDiaperDetail : null,
+        })
+        .eq('id', editingEvent.id)
+        .select()
+        .single();
+      if (error) throw error;
       setEvents(prev => prev.map(e => (e.id === updated.id ? updated : e)));
       showToast('Entry updated');
       cancelEdit();
@@ -349,7 +378,7 @@ export default function Page() {
       console.error(err);
       showToast('Failed to update — try again');
     }
-  }, [editingEvent, editValue, editType, config, cancelEdit, showToast]);
+  }, [editingEvent, editValue, editType, editFeedOunces, editDiaperDetail, config, cancelEdit, showToast]);
 
   const deleteEdit = useCallback(async () => {
     if (!editingEvent) return;
@@ -418,8 +447,8 @@ export default function Page() {
           )}
 
           <div className="btn-grid">
-            <button className="log-btn log-btn-primary btn-feed" onClick={() => logEvent('feed', 'Fed')}>Fed</button>
-            <button className="log-btn log-btn-primary btn-diaper" onClick={() => logEvent('diaper', 'Diaper')}>Diaper</button>
+            <button className="log-btn log-btn-primary btn-feed" onClick={() => setFeedPickerOpen(true)}>Fed</button>
+            <button className="log-btn log-btn-primary btn-diaper" onClick={() => setDiaperPickerOpen(true)}>Diaper</button>
           </div>
 
           <div className="stateful-grid">
@@ -474,7 +503,7 @@ export default function Page() {
 
           <div className="card">
             <button className="section-title section-toggle" onClick={() => setMoreOpen(o => !o)} aria-expanded={moreOpen}>
-              <span>Everything else</span>
+              <span>Upcoming</span>
               <span className={`chevron ${moreOpen ? 'open' : ''}`}>{'>'}</span>
             </button>
             {moreOpen && (
@@ -522,7 +551,7 @@ export default function Page() {
                             </>
                           ) : (
                             <>
-                              <span className="activity-type">{TYPE_LABELS[item.type] || item.type}</span>
+                              <span className="activity-type">{TYPE_LABELS[item.type] || item.type}{activityDetailSuffix(item.raw)}</span>
                               <span className="activity-time">
                                 {formatLocalTime(item.event_time, timezone)}
                                 {group.label === 'Today' ? ` · ${formatRelative(item.event_time, now)}` : ''}
@@ -564,6 +593,22 @@ export default function Page() {
                 <option key={t} value={t}>{TYPE_LABELS[t]}</option>
               ))}
             </select>
+            {editType === 'feed' && (
+              <select className="modal-select" value={editFeedOunces} onChange={e => setEditFeedOunces(e.target.value)}>
+                <option value="">No amount logged</option>
+                {FEED_OUNCE_OPTIONS.map(oz => (
+                  <option key={oz} value={oz}>{oz} oz</option>
+                ))}
+              </select>
+            )}
+            {editType === 'diaper' && (
+              <select className="modal-select" value={editDiaperDetail} onChange={e => setEditDiaperDetail(e.target.value)}>
+                <option value="">No detail logged</option>
+                <option value="pee">Pee</option>
+                <option value="poop">Poop</option>
+                <option value="both">Both</option>
+              </select>
+            )}
             <input
               type="datetime-local"
               value={editValue}
@@ -574,6 +619,83 @@ export default function Page() {
               <button className="modal-btn-confirm" onClick={confirmEdit}>Save</button>
             </div>
             <button className="modal-btn-delete" onClick={deleteEdit}>Delete entry</button>
+          </div>
+        </div>
+      )}
+
+      {feedPickerOpen && (
+        <div className="modal-overlay" onClick={() => setFeedPickerOpen(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-title">How many ounces?</div>
+            <div className="picker-grid">
+              {FEED_OUNCE_OPTIONS.map(oz => (
+                <button
+                  key={oz}
+                  className="picker-btn"
+                  onClick={() => {
+                    logEvent('feed', 'Fed', { feed_ounces: oz });
+                    setFeedPickerOpen(false);
+                  }}
+                >
+                  {oz} oz
+                </button>
+              ))}
+            </div>
+            <button
+              className="modal-btn-skip"
+              onClick={() => {
+                logEvent('feed', 'Fed');
+                setFeedPickerOpen(false);
+              }}
+            >
+              Skip — just log the time
+            </button>
+          </div>
+        </div>
+      )}
+
+      {diaperPickerOpen && (
+        <div className="modal-overlay" onClick={() => setDiaperPickerOpen(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-title">Diaper</div>
+            <div className="picker-grid-3">
+              <button
+                className="picker-btn"
+                onClick={() => {
+                  logEvent('diaper', 'Diaper', { diaper_detail: 'pee' });
+                  setDiaperPickerOpen(false);
+                }}
+              >
+                Pee
+              </button>
+              <button
+                className="picker-btn"
+                onClick={() => {
+                  logEvent('diaper', 'Diaper', { diaper_detail: 'poop' });
+                  setDiaperPickerOpen(false);
+                }}
+              >
+                Poop
+              </button>
+              <button
+                className="picker-btn"
+                onClick={() => {
+                  logEvent('diaper', 'Diaper', { diaper_detail: 'both' });
+                  setDiaperPickerOpen(false);
+                }}
+              >
+                Both
+              </button>
+            </div>
+            <button
+              className="modal-btn-skip"
+              onClick={() => {
+                logEvent('diaper', 'Diaper');
+                setDiaperPickerOpen(false);
+              }}
+            >
+              Skip — just log the time
+            </button>
           </div>
         </div>
       )}

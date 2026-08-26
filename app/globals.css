@@ -640,6 +640,49 @@ h1 {
   font-family: inherit;
 }
 
+.modal-btn-skip {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--ink-muted);
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 14px 0 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.picker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.picker-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.picker-btn {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.1s ease, opacity 0.15s ease;
+}
+.picker-btn:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+}
+
 .tab-bar {
   position: fixed;
   left: 0;
