@@ -166,11 +166,28 @@ h1 {
   font-weight: 700;
   color: var(--accent-ink);
   cursor: pointer;
-  transition: transform 0.1s ease, opacity 0.15s ease;
+  /* Glossy sheen: a shared highlight gradient painted over whatever flat
+     --btn-* background-color each variant sets below. Variants only ever
+     set background-color (never the background shorthand), so this stays
+     intact for all of them. */
+  background-image: linear-gradient(155deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 55%);
+  /* --glow defaults to transparent so plain .log-btn (no color variant)
+     still gets the depth shadow with no colored halo; each .btn-* variant
+     below overrides just this one custom property. */
+  --glow: transparent;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 3px 8px rgba(44, 42, 38, 0.14),
+    0 8px 16px -6px var(--glow);
+  transition: transform 0.1s ease, opacity 0.15s ease, box-shadow 0.2s ease;
 }
 .log-btn:active {
   transform: scale(0.97);
   opacity: 0.85;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.3) inset,
+    0 1px 3px rgba(44, 42, 38, 0.12),
+    0 3px 8px -4px var(--glow);
 }
 
 .log-btn-primary {
@@ -181,14 +198,16 @@ h1 {
 /* Every palette color here is light/pastel, so every category button uses
    dark-ink text rather than white — safer contrast than forcing white onto
    a pastel fill, and it reads as one cohesive family instead of some
-   buttons being deep and others pale. */
-.btn-feed { background: var(--blush-rose); color: var(--ink); }
-.btn-nap-start { background: var(--muted-lilac); color: var(--ink); }
-.btn-nap-end { background: var(--muted-lilac); color: var(--ink); }
-.btn-diaper { background: var(--orchid); color: var(--ink); }
-.btn-medicine { background: var(--dusty-pink); color: var(--ink); }
-.btn-sleep-start { background: var(--berry); color: var(--ink); }
-.btn-sleep-end { background: var(--butter-yellow); color: var(--ink); }
+   buttons being deep and others pale. Each variant now also sets --glow to
+   a translucent tint of its own color, picked up by .log-btn's box-shadow
+   above, so every button gets a soft colored halo that matches its fill. */
+.btn-feed { background-color: var(--blush-rose); color: var(--ink); --glow: color-mix(in srgb, var(--blush-rose) 65%, transparent); }
+.btn-nap-start { background-color: var(--muted-lilac); color: var(--ink); --glow: color-mix(in srgb, var(--muted-lilac) 65%, transparent); }
+.btn-nap-end { background-color: var(--muted-lilac); color: var(--ink); --glow: color-mix(in srgb, var(--muted-lilac) 65%, transparent); }
+.btn-diaper { background-color: var(--orchid); color: var(--ink); --glow: color-mix(in srgb, var(--orchid) 65%, transparent); }
+.btn-medicine { background-color: var(--dusty-pink); color: var(--ink); --glow: color-mix(in srgb, var(--dusty-pink) 65%, transparent); }
+.btn-sleep-start { background-color: var(--berry); color: var(--ink); --glow: color-mix(in srgb, var(--berry) 65%, transparent); }
+.btn-sleep-end { background-color: var(--butter-yellow); color: var(--ink); --glow: color-mix(in srgb, var(--butter-yellow) 65%, transparent); }
 
 /* Overdue banner: aggregates every currently-overdue category at once, at
    the very top of the page — the Next-up card below only ever shows the
@@ -303,11 +322,14 @@ h1 {
   border-radius: 12px;
   padding: 14px;
   cursor: pointer;
-  transition: transform 0.1s ease, opacity 0.15s ease;
+  --glow: transparent;
+  box-shadow: 0 3px 8px rgba(44, 42, 38, 0.1), 0 8px 16px -6px var(--glow);
+  transition: transform 0.1s ease, opacity 0.15s ease, box-shadow 0.2s ease;
 }
 .stateful-btn:active {
   transform: scale(0.97);
   opacity: 0.85;
+  box-shadow: 0 1px 3px rgba(44, 42, 38, 0.1), 0 3px 8px -4px var(--glow);
 }
 .stateful-label {
   font-size: 15px;
@@ -322,15 +344,16 @@ h1 {
   background: var(--card);
   border: 1.5px solid var(--border);
 }
-.nap-outline { border-color: var(--lilac-deep); color: var(--lilac-deep); }
-.sleep-outline { border-color: var(--berry-deep); color: var(--berry-deep); }
+.nap-outline { border-color: var(--lilac-deep); color: var(--lilac-deep); --glow: color-mix(in srgb, var(--lilac-deep) 35%, transparent); }
+.sleep-outline { border-color: var(--berry-deep); color: var(--berry-deep); --glow: color-mix(in srgb, var(--berry-deep) 35%, transparent); }
 
 .stateful-btn.filled {
   border: none;
   color: var(--ink);
+  background-image: linear-gradient(155deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 55%);
 }
-.nap-filled { background: var(--muted-lilac); }
-.sleep-filled { background: var(--butter-yellow); }
+.nap-filled { background-color: var(--muted-lilac); --glow: color-mix(in srgb, var(--muted-lilac) 65%, transparent); }
+.sleep-filled { background-color: var(--butter-yellow); --glow: color-mix(in srgb, var(--butter-yellow) 65%, transparent); }
 
 .medicine-row {
   display: flex;
@@ -348,6 +371,13 @@ h1 {
   color: var(--ink);
   cursor: pointer;
   font-family: inherit;
+  box-shadow: 0 2px 6px rgba(44, 42, 38, 0.07);
+  transition: transform 0.1s ease, opacity 0.15s ease, box-shadow 0.2s ease;
+}
+.medicine-row:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+  box-shadow: 0 1px 2px rgba(44, 42, 38, 0.06);
 }
 .medicine-detail {
   font-size: 13px;
@@ -508,6 +538,12 @@ h1 {
   color: var(--accent);
   cursor: pointer;
   font-family: inherit;
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--accent) 18%, transparent);
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+.export-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .status-row {
@@ -775,7 +811,14 @@ h1 {
 
 .modal-btn-confirm {
   background: var(--accent);
+  background-image: linear-gradient(155deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0) 55%);
   color: var(--accent-ink);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 45%, transparent), 0 1px 2px rgba(44, 42, 38, 0.1);
+  transition: transform 0.1s ease, opacity 0.15s ease, box-shadow 0.2s ease;
+}
+.modal-btn-confirm:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 
 .modal-btn-delete {
@@ -826,11 +869,13 @@ h1 {
   color: var(--ink);
   cursor: pointer;
   font-family: inherit;
-  transition: transform 0.1s ease, opacity 0.15s ease;
+  box-shadow: 0 2px 6px rgba(44, 42, 38, 0.08);
+  transition: transform 0.1s ease, opacity 0.15s ease, box-shadow 0.2s ease;
 }
 .picker-btn:active {
   transform: scale(0.97);
   opacity: 0.85;
+  box-shadow: 0 1px 2px rgba(44, 42, 38, 0.07);
 }
 
 .tab-bar {
@@ -865,4 +910,6 @@ h1 {
 .tab-active {
   color: var(--accent-ink);
   background: var(--accent);
+  background-image: linear-gradient(155deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0) 60%);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--accent) 40%, transparent);
 }
