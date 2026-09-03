@@ -7,6 +7,7 @@ const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 // writer, and it should never be able to smuggle through an arbitrary
 // column via a malformed request body.
 const FIELD_VALIDATORS = {
+  birth_date: (v) => v === null || (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)),
   timezone: (v) => typeof v === 'string' && v.trim().length > 0,
   medicine_times_local: (v) => Array.isArray(v) && v.length > 0 && v.every(t => typeof t === 'string' && TIME_RE.test(t)),
   medicine_grace_minutes: (v) => Number.isFinite(v) && v >= 0,

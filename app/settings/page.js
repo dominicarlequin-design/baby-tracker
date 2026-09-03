@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
 
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 function toFormState(config) {
   return {
+    birth_date: config.birth_date || '',
     timezone: config.timezone || 'America/New_York',
     medicine_times_local: (config.medicine_times_local || []).join(', '),
     medicine_grace_minutes: String(config.medicine_grace_minutes ?? 15),
@@ -68,7 +70,16 @@ export default function SettingsPage() {
   }, []);
 
   const handleSave = useCallback(async () => {
-    const update = {};
+    // birth_date is optional (unlike everything in FIELDS) and lives
+    // outside that loop below: a blank value clears it rather than
+    // failing validation, since not every family wants the age-based
+    // Patterns comparisons and the field starts empty for them.
+    const birthDateInput = form.birth_date.trim();
+    if (birthDateInput && !DATE_RE.test(birthDateInput)) {
+      setMessage({ text: '"Birth date" isn\'t valid', isError: true });
+      return;
+    }
+    const update = { birth_date: birthDateInput || null };
     for (const { key } of FIELDS) {
       const parsed = parseField(key, form[key]);
       if (parsed == null) {
@@ -113,7 +124,20 @@ export default function SettingsPage() {
         <div className="card"><div className="info-item">Loading{'…'}</div></div>
       ) : (
         <div className="card">
-          <div className="section-title">Tuning</div>
+          <div className="section-title">About her</div>
+          <div className="form-row">
+            <label className="form-label" htmlFor="birth_date">Birth date</label>
+            <input
+              id="birth_date"
+              className="form-input"
+              type="date"
+              value={form.birth_date}
+              onChange={e => setField('birth_date', e.target.value)}
+            />
+            <div className="form-hint">Powers the age-based "How she compares" ranges on Patterns — they move to the next bracket automatically as she grows. Leave blank and it falls back to a generic 3–5 month range.</div>
+          </div>
+
+          <div className="section-title" style={{ marginTop: '20px' }}>Tuning</div>
           {FIELDS.map(f => (
             <div key={f.key} className="form-row">
               <label className="form-label" htmlFor={f.key}>{f.label}</label>
