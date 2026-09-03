@@ -35,6 +35,34 @@ function formatShortDate(dayStr) {
   return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }).format(date);
 }
 
+// Typical ranges for a ~4-month-old, from published pediatric/sleep
+// guidance rather than made up — see the citations in the "How she
+// compares" card below. These are general population ranges, not a
+// diagnosis: real babies vary, and Settings' fallback/target values (which
+// drive the actual due/overdue logic) are what should be tuned to her,
+// not these numbers.
+const REFERENCE_4MO = {
+  feedsPerDay: { low: 8, high: 12, label: '8–12/day' },
+  feedGapHours: { low: 3, high: 4, label: '3–4h (daytime)' },
+  wakeWindowHours: { low: 1.5, high: 2.5, label: '1.5–2.5h' },
+  napsPerDay: { low: 3, high: 4, label: '3–4/day' },
+  totalSleepHours: { low: 12, high: 16, label: '12–16h/day' },
+};
+
+function compareToRange(value, range) {
+  if (value == null || !Number.isFinite(value)) return null;
+  if (value < range.low) return 'below';
+  if (value > range.high) return 'above';
+  return 'within';
+}
+
+function compareLabel(cmp) {
+  if (cmp === 'below') return 'below typical';
+  if (cmp === 'above') return 'above typical';
+  if (cmp === 'within') return 'within typical range';
+  return '—';
+}
+
 // Most notable change over the window, in plain language. Headlines on the
 // longest-night-stretch metric (the example the design review called out)
 // with a supporting line about wake windows; says so plainly if there
@@ -93,6 +121,20 @@ function BarChart({ title, color, days, valueOf, formatValue }) {
         <span>{formatShortDate(days[0].date)}</span>
         <span>{formatShortDate(days[days.length - 1].date)}</span>
       </div>
+    </div>
+  );
+}
+
+function CompareRow({ label, value, formatValue, range }) {
+  const cmp = compareToRange(value, range);
+  const toneClass = cmp === 'below' || cmp === 'above' ? 'due-soon' : 'muted';
+  return (
+    <div className="table-row">
+      <span className="table-label">{label}</span>
+      <span className="table-value">
+        <span>{formatValue(value)} vs. typical {range.label}</span>
+        {cmp && <span className={`more-detail ${toneClass}`} style={{ display: 'block', marginTop: '2px' }}>{compareLabel(cmp)}</span>}
+      </span>
     </div>
   );
 }
@@ -159,6 +201,8 @@ export default function PatternsPage() {
 
     const napsCount = average(recentWindow.map(d => d.naps));
     const napsMinutes = average(recentWindow.map(d => d.napMinutes));
+    const feedsPerDayAvg = average(recentWindow.map(d => d.feeds));
+    const totalSleepHoursAvg = average(recentWindow.map(d => d.totalSleepMinutes / 60));
 
     // "Current" wake window: the most recent 7 days of the displayed window.
     // "Two weeks ago": the 7-day span immediately before the displayed
@@ -188,6 +232,7 @@ export default function PatternsPage() {
     return {
       napsCount, napsMinutes, currentWake, twoWeeksAgoWake, bedtimeMean, bedtimeSpread,
       feedGapMean, feedGapMin, feedGapMax, diaperGapMean, diaperGapMin, diaperGapMax,
+      feedsPerDayAvg, totalSleepHoursAvg,
     };
   }, [recentWindow, priorWindow, timezone]);
 
@@ -272,6 +317,45 @@ export default function PatternsPage() {
                     ? `${formatHoursDecimal(typicalDay.diaperGapMean)} (${typicalDay.diaperGapMin.toFixed(1)}–${typicalDay.diaperGapMax.toFixed(1)}h)`
                     : '—'}
                 </span>
+              </div>
+            </div>
+          )}
+
+          {typicalDay && (
+            <div className="card">
+              <div className="section-title">How she compares (around 4 months)</div>
+              <CompareRow
+                label="Feeds per day"
+                value={typicalDay.feedsPerDayAvg}
+                formatValue={v => (v == null ? '—' : v.toFixed(1))}
+                range={REFERENCE_4MO.feedsPerDay}
+              />
+              <CompareRow
+                label="Feed gap"
+                value={typicalDay.feedGapMean}
+                formatValue={formatHoursDecimal}
+                range={REFERENCE_4MO.feedGapHours}
+              />
+              <CompareRow
+                label="Wake window"
+                value={typicalDay.currentWake}
+                formatValue={formatHoursDecimal}
+                range={REFERENCE_4MO.wakeWindowHours}
+              />
+              <CompareRow
+                label="Naps per day"
+                value={typicalDay.napsCount}
+                formatValue={v => (v == null ? '—' : v.toFixed(1))}
+                range={REFERENCE_4MO.napsPerDay}
+              />
+              <CompareRow
+                label="Total sleep"
+                value={typicalDay.totalSleepHoursAvg}
+                formatValue={formatHoursDecimal}
+                range={REFERENCE_4MO.totalSleepHours}
+              />
+              <div className="form-hint" style={{ marginTop: '10px' }}>
+                General published ranges for babies around 4 months old, not a diagnosis — every baby varies, and "below/above typical" just means outside the common range, not that something's wrong. Check with her pediatrician about anything that concerns you.
               </div>
             </div>
           )}
