@@ -327,9 +327,12 @@ export default function Page() {
     fetchAll();
   }, [fetchAll]);
 
-  // keep "time since" displays fresh without needing a full refetch
+  // keep the header clock and every "time since" display fresh without
+  // needing a full refetch. 10s (not 60s) so the header clock never sits
+  // a stale minute behind, and overdue/asleep-duration text updates
+  // promptly instead of visibly lagging.
   useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 60 * 1000);
+    const t = setInterval(() => setNow(new Date()), 10 * 1000);
     return () => clearInterval(t);
   }, []);
 
