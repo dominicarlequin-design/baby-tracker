@@ -10,7 +10,9 @@
      white card (e.g. the "not yet" outline buttons), so the same 8 hues
      stay legible without introducing new colors. --overdue stays the
      original red rather than a palette pastel, at your call, so missed
-     feeds/diapers/medicine still read as urgent.  */
+     feeds/diapers/medicine still read as urgent. Dusty Pink and Muted Lilac
+     were later swapped to your exact swatches (#F8B8B9, #CCB5D5); -bg/-deep
+     tints below are derived from those two exact hexes. */
   --bg: #fdf6ec;              /* Cream White */
   --card: #ffffff;
   --ink: #2c2a26;
@@ -26,12 +28,12 @@
   --radius: 14px;
 
   --sage: #92a378;            /* Sage Green */
-  --dusty-pink: #e8c4be;      /* Dusty Pink */
-  --dusty-pink-bg: #f6e7e4;
+  --dusty-pink: #f8b8b9;      /* Dusty Pink */
+  --dusty-pink-bg: #fbe1e2;
   --baby-blue: #c7d3e3;       /* Baby Blue / Powder Blue */
   --butter-yellow: #f5dfa0;   /* Butter Yellow */
-  --muted-lilac: #d2c4dc;     /* Muted Lilac */
-  --lilac-deep: #8b6fa0;
+  --muted-lilac: #ccb5d5;     /* Muted Lilac */
+  --lilac-deep: #8a5ea0;
   --latte: #c08a5f;           /* Warm Brown / Latte */
   --latte-deep: #8c5a34;
   --soft-beige-tint: #f7efe0; /* lighter than --border, for input/picker fills */
