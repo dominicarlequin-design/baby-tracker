@@ -100,7 +100,8 @@ function BarChart({ title, color, days, valueOf, formatValue }) {
 function exportCsv(days) {
   const headers = [
     'date', 'feeds', 'diapers', 'naps', 'napMinutes', 'nightSleepMinutes',
-    'totalSleepMinutes', 'longestNightStretchMinutes', 'avgWakeWindowHours', 'avgFeedGapHours', 'bedtime',
+    'totalSleepMinutes', 'longestNightStretchMinutes', 'avgWakeWindowHours', 'avgFeedGapHours',
+    'avgDiaperGapHours', 'bedtime',
   ];
   const rows = days.map(d => headers.map(h => d[h] ?? '').join(','));
   const csv = [headers.join(','), ...rows].join('\n');
@@ -179,7 +180,15 @@ export default function PatternsPage() {
     const feedGapMin = feedGaps.length ? Math.min(...feedGaps) : null;
     const feedGapMax = feedGaps.length ? Math.max(...feedGaps) : null;
 
-    return { napsCount, napsMinutes, currentWake, twoWeeksAgoWake, bedtimeMean, bedtimeSpread, feedGapMean, feedGapMin, feedGapMax };
+    const diaperGaps = recentWindow.map(d => d.avgDiaperGapHours).filter(h => h != null);
+    const diaperGapMean = average(diaperGaps);
+    const diaperGapMin = diaperGaps.length ? Math.min(...diaperGaps) : null;
+    const diaperGapMax = diaperGaps.length ? Math.max(...diaperGaps) : null;
+
+    return {
+      napsCount, napsMinutes, currentWake, twoWeeksAgoWake, bedtimeMean, bedtimeSpread,
+      feedGapMean, feedGapMin, feedGapMax, diaperGapMean, diaperGapMin, diaperGapMax,
+    };
   }, [recentWindow, priorWindow, timezone]);
 
   return (
@@ -216,6 +225,13 @@ export default function PatternsPage() {
                 valueOf={d => d.totalSleepMinutes / 60}
                 formatValue={v => (v == null ? '—' : `${v.toFixed(1)}h/day`)}
               />
+              <BarChart
+                title="Diaper changes per day"
+                color="var(--orchid)"
+                days={recentWindow}
+                valueOf={d => d.diapers}
+                formatValue={v => (v == null ? '—' : `${v.toFixed(1)}/day`)}
+              />
             </>
           )}
 
@@ -246,6 +262,14 @@ export default function PatternsPage() {
                 <span className="table-value">
                   {typicalDay.feedGapMean != null
                     ? `${formatHoursDecimal(typicalDay.feedGapMean)} (${typicalDay.feedGapMin.toFixed(1)}–${typicalDay.feedGapMax.toFixed(1)}h)`
+                    : '—'}
+                </span>
+              </div>
+              <div className="table-row">
+                <span className="table-label">Diaper gap</span>
+                <span className="table-value">
+                  {typicalDay.diaperGapMean != null
+                    ? `${formatHoursDecimal(typicalDay.diaperGapMean)} (${typicalDay.diaperGapMin.toFixed(1)}–${typicalDay.diaperGapMax.toFixed(1)}h)`
                     : '—'}
                 </span>
               </div>
