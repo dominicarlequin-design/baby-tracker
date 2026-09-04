@@ -191,6 +191,10 @@ h1 {
 }
 
 .log-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border: none;
   border-radius: 12px;
   padding: 16px 10px;
@@ -240,6 +244,41 @@ h1 {
 .btn-medicine { background-color: var(--dusty-pink); color: var(--ink); --glow: color-mix(in srgb, var(--dusty-pink) 65%, transparent); }
 .btn-sleep-start { background-color: var(--berry); color: var(--ink); --glow: color-mix(in srgb, var(--berry) 65%, transparent); }
 .btn-sleep-end { background-color: var(--butter-yellow); color: var(--ink); --glow: color-mix(in srgb, var(--butter-yellow) 65%, transparent); }
+
+/* Icon-on-a-disc treatment for the Log buttons: the disc's fill/color come
+   from whichever button it's inside (set below, one rule per variant),
+   never a color hardcoded on the icon itself — the icon markup is the same
+   everywhere, only the disc's context changes. Solid-fill buttons (Fed,
+   Diaper, the "filled" nap/sleep states) get a disc a shade darker than
+   their own background with a white glyph; outlined buttons and Medicine's
+   pale row get a light tint of their own accent color with a matching
+   glyph instead. */
+.icon-disc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+.icon-disc svg {
+  width: 15px;
+  height: 15px;
+  display: block;
+}
+.btn-feed .icon-disc { background: color-mix(in srgb, var(--blush-rose) 55%, var(--ink) 20%); color: #fff; }
+.btn-nap-start .icon-disc,
+.btn-nap-end .icon-disc { background: color-mix(in srgb, var(--muted-lilac) 55%, var(--ink) 20%); color: #fff; }
+.btn-diaper .icon-disc { background: color-mix(in srgb, var(--orchid) 55%, var(--ink) 20%); color: #fff; }
+.btn-medicine .icon-disc { background: color-mix(in srgb, var(--dusty-pink) 55%, var(--ink) 20%); color: #fff; }
+.btn-sleep-start .icon-disc { background: color-mix(in srgb, var(--berry) 55%, var(--ink) 20%); color: #fff; }
+.btn-sleep-end .icon-disc { background: color-mix(in srgb, var(--butter-yellow) 55%, var(--ink) 20%); color: #fff; }
+.nap-outline .icon-disc { background: color-mix(in srgb, var(--lilac-deep) 18%, var(--card)); color: var(--lilac-deep); }
+.nap-filled .icon-disc { background: color-mix(in srgb, var(--muted-lilac) 55%, var(--ink) 20%); color: #fff; }
+.sleep-outline .icon-disc { background: color-mix(in srgb, var(--berry-deep) 18%, var(--card)); color: var(--berry-deep); }
+.sleep-filled .icon-disc { background: color-mix(in srgb, var(--butter-yellow) 55%, var(--ink) 20%); color: #fff; }
+.medicine-row .icon-disc { background: color-mix(in srgb, var(--berry-deep) 22%, var(--dusty-pink-bg)); color: var(--berry-deep); }
 
 /* Overdue banner: aggregates every currently-overdue category at once, at
    the very top of the page — the Next-up card below only ever shows the
@@ -376,9 +415,9 @@ h1 {
 
 .stateful-btn {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  align-items: flex-start;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
   border-radius: 12px;
   padding: 14px;
   cursor: pointer;
@@ -390,6 +429,13 @@ h1 {
   transform: scale(0.97);
   opacity: 0.85;
   box-shadow: 0 1px 3px rgba(44, 42, 38, 0.1), 0 3px 8px -4px var(--glow);
+}
+.stateful-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+  min-width: 0;
 }
 .stateful-label {
   font-size: 15px;
@@ -438,6 +484,11 @@ h1 {
   transform: scale(0.98);
   opacity: 0.9;
   box-shadow: 0 1px 2px rgba(44, 42, 38, 0.06);
+}
+.medicine-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .medicine-detail {
   font-size: 13px;

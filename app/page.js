@@ -26,6 +26,56 @@ const TYPE_LABELS = {
 const DIAPER_DETAIL_LABELS = { pee: 'Pee', poop: 'Poop', both: 'Both' };
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
+// Line-icon paths for the Log buttons, each rendered on a small tinted
+// disc (colored via CSS on the parent button class, see .icon-disc in
+// globals.css) rather than a flat glyph — chosen over emoji so they can be
+// tinted to match each button's own palette and render identically
+// everywhere instead of varying by OS.
+const ICON_PATHS = {
+  feed: (
+    <>
+      <path d="M10 2h4M10.5 2v3.2c0 .5-.2 1-.6 1.4l-1 1c-.6.6-.9 1.4-.9 2.2V19a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2V9.8c0-.8-.3-1.6-.9-2.2l-1-1c-.4-.4-.6-.9-.6-1.4V2" />
+      <path d="M9 13h6" />
+    </>
+  ),
+  diaper: (
+    <>
+      <path d="M4 5h16v4.5c0 5-3.5 8.5-8 9.5-4.5-1-8-4.5-8-9.5V5Z" />
+      <path d="M4 9.5c2 1 5 1 8 1s6 0 8-1" />
+    </>
+  ),
+  nap: <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z" />,
+  bedtime: (
+    <>
+      <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z" />
+      <path d="M17 3.5l.7 1.5 1.5.7-1.5.7-.7 1.5-.7-1.5-1.5-.7 1.5-.7.7-1.5Z" />
+    </>
+  ),
+  wake: (
+    <>
+      <circle cx="12" cy="12" r="4.2" />
+      <path d="M12 3v2.2M12 18.8V21M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M3 12h2.2M18.8 12H21M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6" />
+    </>
+  ),
+  medicine: (
+    <>
+      <path d="M9 3h6M12 3v4" />
+      <path d="M6 8h12l-1 3.2c-.2.6-.2 1.2 0 1.8l1.6 4.6a2 2 0 0 1-1.9 2.4H7.3a2 2 0 0 1-1.9-2.4L7 13c.2-.6.2-1.2 0-1.8L6 8Z" />
+      <path d="M8.5 13.5h7" />
+    </>
+  ),
+};
+
+function Icon({ name }) {
+  return (
+    <span className="icon-disc" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        {ICON_PATHS[name]}
+      </svg>
+    </span>
+  );
+}
+
 // Extra "· 4 oz" / "· Poop" suffix for a Recent Activity row, when the
 // underlying event has feed_ounces / diaper_detail recorded.
 function activityDetailSuffix(raw) {
@@ -579,38 +629,59 @@ export default function Page() {
           )}
 
           <div className="btn-grid">
-            <button className="log-btn log-btn-primary btn-feed" onClick={() => setFeedPickerOpen(true)}>Fed</button>
-            <button className="log-btn log-btn-primary btn-diaper" onClick={() => setDiaperPickerOpen(true)}>Diaper</button>
+            <button className="log-btn log-btn-primary btn-feed" onClick={() => setFeedPickerOpen(true)}>
+              <Icon name="feed" />
+              Fed
+            </button>
+            <button className="log-btn log-btn-primary btn-diaper" onClick={() => setDiaperPickerOpen(true)}>
+              <Icon name="diaper" />
+              Diaper
+            </button>
           </div>
 
           <div className="stateful-grid">
             {status.nap.asleep ? (
               <button className="stateful-btn filled nap-filled" onClick={() => logEvent('nap_end', 'Nap ended')}>
-                <span className="stateful-label">End nap</span>
-                <span className="stateful-sub">asleep {formatHours((now.getTime() - new Date(status.nap.lastEventTime).getTime()) / (1000 * 60 * 60))}</span>
+                <Icon name="nap" />
+                <span className="stateful-text">
+                  <span className="stateful-label">End nap</span>
+                  <span className="stateful-sub">asleep {formatHours((now.getTime() - new Date(status.nap.lastEventTime).getTime()) / (1000 * 60 * 60))}</span>
+                </span>
               </button>
             ) : (
               <button className="stateful-btn outline nap-outline" onClick={() => logEvent('nap_start', 'Nap started')}>
-                <span className="stateful-label">Start nap</span>
-                <span className="stateful-sub">{status.nap.hoursSince != null ? `awake ${formatHours(status.nap.hoursSince)}` : 'no naps yet'}</span>
+                <Icon name="nap" />
+                <span className="stateful-text">
+                  <span className="stateful-label">Start nap</span>
+                  <span className="stateful-sub">{status.nap.hoursSince != null ? `awake ${formatHours(status.nap.hoursSince)}` : 'no naps yet'}</span>
+                </span>
               </button>
             )}
 
             {status.sleep.asleep ? (
               <button className="stateful-btn filled sleep-filled" onClick={() => logEvent('sleep_end', 'Wake up')}>
-                <span className="stateful-label">Wake Up</span>
-                <span className="stateful-sub">asleep {formatHours((now.getTime() - new Date(status.sleep.lastEventTime).getTime()) / (1000 * 60 * 60))}</span>
+                <Icon name="wake" />
+                <span className="stateful-text">
+                  <span className="stateful-label">Wake Up</span>
+                  <span className="stateful-sub">asleep {formatHours((now.getTime() - new Date(status.sleep.lastEventTime).getTime()) / (1000 * 60 * 60))}</span>
+                </span>
               </button>
             ) : (
               <button className="stateful-btn outline sleep-outline" onClick={() => logEvent('sleep_start', 'Bedtime')}>
-                <span className="stateful-label">Bedtime</span>
-                <span className="stateful-sub">usual {formatTimeOfDay(config.target_bedtime_local ?? '19:15')}</span>
+                <Icon name="bedtime" />
+                <span className="stateful-text">
+                  <span className="stateful-label">Bedtime</span>
+                  <span className="stateful-sub">usual {formatTimeOfDay(config.target_bedtime_local ?? '19:15')}</span>
+                </span>
               </button>
             )}
           </div>
 
           <button className="medicine-row" onClick={() => logEvent('medicine', 'Medicine')}>
-            <span>Medicine</span>
+            <span className="medicine-label">
+              <Icon name="medicine" />
+              Medicine
+            </span>
             <span className="medicine-detail">
               {medicineNext ? `next window ${formatLocalTime(medicineNext.toISOString(), timezone)}` : 'no schedule set'}
             </span>
