@@ -188,10 +188,15 @@ function nextUpContent(key, status, config, timezone) {
   const graceMinutes = config.medicine_grace_minutes;
   const minutesPast = Math.round((s.hoursSince ?? 0) * 60);
   if (s.state === 'overdue') {
+    // Eyebrow is just the category name here, not the lateness figure —
+    // that number lives in `lateBy` instead, rendered once inline with the
+    // headline, so it isn't stated twice the way "Late by 17 minutes" /
+    // "That's 17m past bedtime" used to.
     return {
-      eyebrow: `Late by ${formatDurationWords(s.hoursSince)}`,
-      headline: `Bedtime was due ${dueClock}`,
-      sub: `That's ${minutesPast}m past bedtime — beyond the ${graceMinutes}m grace window.`,
+      eyebrow: 'Bedtime',
+      headline: `Was due ${dueClock}`,
+      lateBy: `${formatDurationWords(s.hoursSince)} late`,
+      sub: `Past the ${graceMinutes}-minute grace window from Settings.`,
     };
   }
   if (s.state === 'due-soon') {
@@ -534,6 +539,7 @@ export default function Page() {
                 aria-expanded={overdueOpen}
               >
                 <span className="overdue-banner-title">
+                  <span className="alert-badge" aria-hidden="true">!</span>
                   {overdueItems.length} overdue
                 </span>
                 <span className={`chevron ${overdueOpen ? 'open' : ''}`}>{'>'}</span>
@@ -557,8 +563,11 @@ export default function Page() {
 
           {nextUp ? (
             <div className={`nextup nextup-${nextUpTone}`}>
-              <div className="nextup-eyebrow">{nextUp.eyebrow}</div>
-              <div className="nextup-headline">{nextUp.headline}</div>
+              <div className={`nextup-eyebrow ${nextUp.lateBy ? 'category' : ''}`}>{nextUp.eyebrow}</div>
+              <div className="nextup-headline">
+                {nextUp.headline}
+                {nextUp.lateBy && <span className="nextup-lateby"> · {nextUp.lateBy}</span>}
+              </div>
               <div className="nextup-sub">{nextUp.sub}</div>
             </div>
           ) : (
