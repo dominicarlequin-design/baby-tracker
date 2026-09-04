@@ -154,12 +154,17 @@ function nextUpContent(key, status, config, timezone) {
     };
   }
 
+  // Nap never reaches the 'overdue' state (see napStatus in lib/logic.js —
+  // wake windows swing too much for "late" to mean something was missed),
+  // so 'due-soon' alone has to cover both "getting close" and "well past
+  // her usual window but that's normal" — split by hoursSince vs. avgHours
+  // rather than by state, and kept deliberately non-alarming either way.
   if (key === 'nap') {
-    if (s.state === 'overdue') {
+    if (s.state === 'due-soon' && s.hoursSince >= s.avgHours) {
       return {
-        eyebrow: `Late by ${formatDurationWords(s.hoursSince - s.avgHours)}`,
-        headline: `Nap was due ${dueClock}`,
-        sub: `Awake ${formatHours(s.hoursSince)} — past ${overdueMultiplier}× her usual ${formatHours(s.avgHours)} wake window.`,
+        eyebrow: 'Running long',
+        headline: `Still awake past ${dueClock}`,
+        sub: `Awake ${formatHours(s.hoursSince)} — longer than her usual ${formatHours(s.avgHours)} wake window. That varies night to night, so it's not necessarily overdue.`,
       };
     }
     if (s.state === 'due-soon') {
@@ -229,8 +234,7 @@ function explainStatus(key, status, config, timezone) {
       return `No naps logged yet, so this starts from an assumed wake window of ${formatHours(status.avgHours)} until real history builds up.`;
     }
     const dueSoonAfter = formatHours(status.avgHours * 0.8);
-    const overdueAfter = formatHours(status.avgHours * overdueMultiplier);
-    return `Based on how long she typically stays awake between naps (currently ${formatHours(status.avgHours)}). Awake since ${formatLocalTime(status.lastEventTime, timezone)}, so the next nap is expected around ${formatLocalTime(status.dueAt, timezone)}. "Due soon" kicks in after ${dueSoonAfter} awake, "overdue" after ${overdueAfter} — the usual wake window times the ${overdueMultiplier} overdue multiplier from Settings.`;
+    return `Based on how long she typically stays awake between naps (currently ${formatHours(status.avgHours)}). Awake since ${formatLocalTime(status.lastEventTime, timezone)}, so the next nap is expected around ${formatLocalTime(status.dueAt, timezone)}. "Due soon" kicks in after ${dueSoonAfter} awake. Unlike Feed and Diaper, Nap never turns "overdue" — wake windows swing too much day to day for a late nap to mean something was missed, so it just keeps reading as due until she naps again.`;
   }
 
   if (key === 'sleep') {
