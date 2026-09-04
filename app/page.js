@@ -620,80 +620,82 @@ export default function Page() {
             </div>
           )}
 
-          <div className="card">
-            <button className="section-title section-toggle" onClick={() => setMoreOpen(o => !o)} aria-expanded={moreOpen}>
-              <span>Upcoming</span>
-              <span className={`chevron ${moreOpen ? 'open' : ''}`}>{'>'}</span>
-            </button>
-            {moreOpen && (
-              <>
-                <MoreRow label="Feed" status={status.feed} timezone={timezone} statusKey="feed" onExplain={setExplainKey} />
-                <MoreRow label="Diaper" status={status.diaper} timezone={timezone} statusKey="diaper" onExplain={setExplainKey} />
-                <MoreRow label="Nap" status={status.nap} timezone={timezone} asleepLabel="Napping" statusKey="nap" onExplain={setExplainKey} />
-                <NightSleepRow
-                  status={status.sleep}
-                  timezone={timezone}
-                  pattern={bedtimeInfo}
-                  patternOpen={bedtimePatternOpen}
-                  onTogglePattern={() => setBedtimePatternOpen(o => !o)}
-                  onExplain={setExplainKey}
-                />
-                <div className="status-row">
-                  <div>
-                    <div className="status-label">
-                      Medicine
-                      <button type="button" className="why-btn" onClick={() => setExplainKey('medicine')} aria-label="Why Medicine?">Why?</button>
+          <div className="card-row">
+            <div className="card">
+              <button className="section-title section-toggle" onClick={() => setMoreOpen(o => !o)} aria-expanded={moreOpen}>
+                <span>Upcoming</span>
+                <span className={`chevron ${moreOpen ? 'open' : ''}`}>{'>'}</span>
+              </button>
+              {moreOpen && (
+                <>
+                  <MoreRow label="Feed" status={status.feed} timezone={timezone} statusKey="feed" onExplain={setExplainKey} />
+                  <MoreRow label="Diaper" status={status.diaper} timezone={timezone} statusKey="diaper" onExplain={setExplainKey} />
+                  <MoreRow label="Nap" status={status.nap} timezone={timezone} asleepLabel="Napping" statusKey="nap" onExplain={setExplainKey} />
+                  <NightSleepRow
+                    status={status.sleep}
+                    timezone={timezone}
+                    pattern={bedtimeInfo}
+                    patternOpen={bedtimePatternOpen}
+                    onTogglePattern={() => setBedtimePatternOpen(o => !o)}
+                    onExplain={setExplainKey}
+                  />
+                  <div className="status-row">
+                    <div>
+                      <div className="status-label">
+                        Medicine
+                        <button type="button" className="why-btn" onClick={() => setExplainKey('medicine')} aria-label="Why Medicine?">Why?</button>
+                      </div>
+                      {status.medicine.overdue && <div className="status-detail">Overdue</div>}
                     </div>
-                    {status.medicine.overdue && <div className="status-detail">Overdue</div>}
+                    <span className={`more-detail ${status.medicine.overdue ? 'overdue' : 'muted'}`}>
+                      {medicineNext ? formatLocalTime(medicineNext.toISOString(), timezone) : 'No schedule set'}
+                    </span>
                   </div>
-                  <span className={`more-detail ${status.medicine.overdue ? 'overdue' : 'muted'}`}>
-                    {medicineNext ? formatLocalTime(medicineNext.toISOString(), timezone) : 'No schedule set'}
-                  </span>
-                </div>
-              </>
-            )}
-          </div>
+                </>
+              )}
+            </div>
 
-          <div className="card">
-            <button className="section-title section-toggle" onClick={() => setActivityOpen(o => !o)} aria-expanded={activityOpen}>
-              <span>Recent activity</span>
-              <span className={`chevron ${activityOpen ? 'open' : ''}`}>{'>'}</span>
-            </button>
-            {activityOpen && (
-              <div className="history">
-                {activityGroups.length === 0 ? (
-                  <div className="info-item">Nothing logged yet.</div>
-                ) : (
-                  activityGroups.map(group => (
-                    <div key={group.dayStr} className="activity-group">
-                      <div className="activity-day-label">{group.label}</div>
-                      {group.items.map(item => (
-                        <button key={item.id} className="activity-item" onClick={() => openEdit(item.raw)}>
-                          {item.kind === 'nap' ? (
-                            <>
-                              <span className="activity-type">
-                                Nap · {formatDurationWords((new Date(item.end) - new Date(item.start)) / (1000 * 60 * 60))}
-                              </span>
-                              <span className="activity-time">
-                                {formatLocalTime(item.start, timezone)} – {formatLocalTime(item.end, timezone)}
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="activity-type">{TYPE_LABELS[item.type] || item.type}{activityDetailSuffix(item.raw)}</span>
-                              <span className="activity-time">
-                                {formatLocalTime(item.event_time, timezone)}
-                                {group.label === 'Today' ? ` · ${formatRelative(item.event_time, now)}` : ''}
-                              </span>
-                            </>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
+            <div className="card">
+              <button className="section-title section-toggle" onClick={() => setActivityOpen(o => !o)} aria-expanded={activityOpen}>
+                <span>Recent activity</span>
+                <span className={`chevron ${activityOpen ? 'open' : ''}`}>{'>'}</span>
+              </button>
+              {activityOpen && (
+                <div className="history">
+                  {activityGroups.length === 0 ? (
+                    <div className="info-item">Nothing logged yet.</div>
+                  ) : (
+                    activityGroups.map(group => (
+                      <div key={group.dayStr} className="activity-group">
+                        <div className="activity-day-label">{group.label}</div>
+                        {group.items.map(item => (
+                          <button key={item.id} className="activity-item" onClick={() => openEdit(item.raw)}>
+                            {item.kind === 'nap' ? (
+                              <>
+                                <span className="activity-type">
+                                  Nap · {formatDurationWords((new Date(item.end) - new Date(item.start)) / (1000 * 60 * 60))}
+                                </span>
+                                <span className="activity-time">
+                                  {formatLocalTime(item.start, timezone)} – {formatLocalTime(item.end, timezone)}
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="activity-type">{TYPE_LABELS[item.type] || item.type}{activityDetailSuffix(item.raw)}</span>
+                                <span className="activity-time">
+                                  {formatLocalTime(item.event_time, timezone)}
+                                  {group.label === 'Today' ? ` · ${formatRelative(item.event_time, now)}` : ''}
+                                </span>
+                              </>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </>
       )}
