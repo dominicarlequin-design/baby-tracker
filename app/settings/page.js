@@ -21,9 +21,25 @@ function toFormState(config) {
   };
 }
 
-// Turns the form's strings back into the typed values the API route
-// validates against. Returns null for a field that doesn't parse, so the
-// submit handler can flag it instead of sending garbage.
+// Sanity bounds for the numeric fields below, beyond just "parses as a
+// number" — in particular overdue_multiplier <= 1 reproduces the exact
+// false-overdue bug already fixed once (Feed/Diaper flip to "overdue" the
+// moment a normal gap crosses the average, same as nap used to), and a
+// zero/negative fallback-hours value would quietly disable due/overdue
+// detection for that category instead of erroring.
+const NUMERIC_BOUNDS = {
+  medicine_grace_minutes: (n) => n >= 0,
+  overdue_multiplier: (n) => n > 1,
+  feed_fallback_hours: (n) => n > 0,
+  diaper_fallback_hours: (n) => n > 0,
+  wake_window_fallback_hours: (n) => n > 0,
+};
+
+// Turns the form's strings back into typed values, applying the same
+// bounds this app's server-side route used to enforce before Settings
+// started saving straight through the anon client. Returns null for a
+// field that doesn't parse or falls outside its bounds, so the submit
+// handler can flag it instead of saving garbage.
 function parseField(key, value) {
   if (key === 'medicine_times_local') {
     const times = value.split(',').map(t => t.trim()).filter(Boolean);
@@ -33,7 +49,10 @@ function parseField(key, value) {
     return value.trim() || null;
   }
   const n = Number(value);
-  return Number.isFinite(n) ? n : null;
+  if (!Number.isFinite(n)) return null;
+  const withinBounds = NUMERIC_BOUNDS[key];
+  if (withinBounds && !withinBounds(n)) return null;
+  return n;
 }
 
 const FIELDS = [

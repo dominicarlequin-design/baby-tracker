@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
-import { computeStatus } from '../lib/logic';
+import { computeStatus, lastEventOf } from '../lib/logic';
 import { dailySummaries } from '../lib/summaries';
 import {
   formatLocalTime,
@@ -17,6 +17,21 @@ import {
 } from '../lib/homeUi';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
+
+// Feed/Diaper/Medicine don't change appearance after a tap the way the
+// nap/sleep toggle buttons do (those flip to their "end" state as soon as
+// the optimistic insert lands, so a fast second tap hits a different
+// button). A real double-tap or two caregivers logging the same moment
+// within this window gets a confirm step instead of silently creating a
+// second row that skews the rolling averages.
+const DUPLICATE_GUARD_SECONDS = 60;
+
+function formatSecondsAgo(seconds) {
+  const s = Math.max(0, Math.round(seconds));
+  if (s < 60) return `${s} second${s === 1 ? '' : 's'} ago`;
+  const m = Math.round(s / 60);
+  return `${m} minute${m === 1 ? '' : 's'} ago`;
+}
 
 // Bounds how much history is fetched/rescanned on every load and 60s tick.
 // 30 days comfortably covers rolling-average sample windows without growing
@@ -84,6 +99,7 @@ export default function Page() {
   const [diaperPickerOpen, setDiaperPickerOpen] = useState(false);
   const [explainKey, setExplainKey] = useState(null);
   const [overdueOpen, setOverdueOpen] = useState(true);
+  const [pendingDuplicate, setPendingDuplicate] = useState(null);
   const toastTimeoutRef = useRef(null);
 
   const fetchAll = useCallback(async () => {
@@ -160,6 +176,22 @@ export default function Page() {
       setEvents(prev => prev.map(e => (e.id === tempId ? data : e)));
     });
   }, [showToast]);
+
+  // Gate in front of logEvent for the buttons that don't change appearance
+  // after a tap (Feed, Diaper, Medicine) — if the same type was logged in
+  // the last DUPLICATE_GUARD_SECONDS, ask before creating a second row
+  // instead of silently doing it.
+  const attemptLog = useCallback((type, label, extra = {}) => {
+    const last = lastEventOf(events, type);
+    if (last) {
+      const secondsAgo = (Date.now() - new Date(last.event_time).getTime()) / 1000;
+      if (secondsAgo >= 0 && secondsAgo < DUPLICATE_GUARD_SECONDS) {
+        setPendingDuplicate({ type, label, extra, secondsAgo });
+        return;
+      }
+    }
+    logEvent(type, label, extra);
+  }, [events, logEvent]);
 
   const status = useMemo(() => {
     if (!config) return null;
@@ -324,7 +356,7 @@ export default function Page() {
             )}
           </div>
 
-          <button className="medicine-row" onClick={() => logEvent('medicine', 'Medicine')}>
+          <button className="medicine-row" onClick={() => attemptLog('medicine', 'Medicine')}>
             <span className="medicine-label">
               <Icon name="medicine" />
               Medicine
@@ -378,7 +410,7 @@ export default function Page() {
                   key={oz}
                   className="picker-btn"
                   onClick={() => {
-                    logEvent('feed', 'Fed', { feed_ounces: oz });
+                    attemptLog('feed', 'Fed', { feed_ounces: oz });
                     setFeedPickerOpen(false);
                   }}
                 >
@@ -389,7 +421,7 @@ export default function Page() {
             <button
               className="modal-btn-skip"
               onClick={() => {
-                logEvent('feed', 'Fed');
+                attemptLog('feed', 'Fed');
                 setFeedPickerOpen(false);
               }}
             >
@@ -407,7 +439,7 @@ export default function Page() {
               <button
                 className="picker-btn"
                 onClick={() => {
-                  logEvent('diaper', 'Diaper', { diaper_detail: 'pee' });
+                  attemptLog('diaper', 'Diaper', { diaper_detail: 'pee' });
                   setDiaperPickerOpen(false);
                 }}
               >
@@ -416,7 +448,7 @@ export default function Page() {
               <button
                 className="picker-btn"
                 onClick={() => {
-                  logEvent('diaper', 'Diaper', { diaper_detail: 'poop' });
+                  attemptLog('diaper', 'Diaper', { diaper_detail: 'poop' });
                   setDiaperPickerOpen(false);
                 }}
               >
@@ -425,7 +457,7 @@ export default function Page() {
               <button
                 className="picker-btn"
                 onClick={() => {
-                  logEvent('diaper', 'Diaper', { diaper_detail: 'both' });
+                  attemptLog('diaper', 'Diaper', { diaper_detail: 'both' });
                   setDiaperPickerOpen(false);
                 }}
               >
@@ -435,12 +467,35 @@ export default function Page() {
             <button
               className="modal-btn-skip"
               onClick={() => {
-                logEvent('diaper', 'Diaper');
+                attemptLog('diaper', 'Diaper');
                 setDiaperPickerOpen(false);
               }}
             >
               Skip — just log the time
             </button>
+          </div>
+        </div>
+      )}
+
+      {pendingDuplicate && (
+        <div className="modal-overlay" onClick={() => setPendingDuplicate(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-title">Log {pendingDuplicate.label} again?</div>
+            <div className="explain-body">
+              {pendingDuplicate.label} was already logged {formatSecondsAgo(pendingDuplicate.secondsAgo)}.
+            </div>
+            <div className="modal-actions">
+              <button className="modal-btn-cancel" onClick={() => setPendingDuplicate(null)}>Cancel</button>
+              <button
+                className="modal-btn-confirm"
+                onClick={() => {
+                  logEvent(pendingDuplicate.type, pendingDuplicate.label, pendingDuplicate.extra);
+                  setPendingDuplicate(null);
+                }}
+              >
+                Log anyway
+              </button>
+            </div>
           </div>
         </div>
       )}
