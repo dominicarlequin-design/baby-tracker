@@ -97,8 +97,8 @@ export default function RecentPage() {
     const [datePart, timePart] = editValue.split('T');
     const iso = localDateTimeToUtc(datePart, timePart, config?.timezone || 'America/New_York').toISOString();
     try {
-      // baby_events already has a public RLS update policy, so this goes
-      // straight through the anon client like the rest of this app.
+      // baby_events has a public RLS update policy, so this goes straight
+      // through the anon client like the rest of this app.
       const { data: updated, error } = await supabase
         .from('baby_events')
         .update({

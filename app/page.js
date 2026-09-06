@@ -198,8 +198,12 @@ export default function Page() {
       items.push({ key: 'sleep', label: 'Night sleep', detail: `Late by ${formatDurationWords(status.sleep.hoursSince)}` });
     }
     if (status.medicine.overdue) {
-      const lateHours = status.medicine.graceDeadline
-        ? Math.max(0, (now.getTime() - new Date(status.medicine.graceDeadline).getTime()) / (1000 * 60 * 60))
+      // Measured from the scheduled dose time itself (lastScheduledSlot),
+      // not from graceDeadline — matching how Feed/Diaper/Night sleep all
+      // report lateness from their own due time rather than from whatever
+      // grace/threshold pushed them into "overdue" in the first place.
+      const lateHours = status.medicine.lastScheduledSlot
+        ? Math.max(0, (now.getTime() - new Date(status.medicine.lastScheduledSlot).getTime()) / (1000 * 60 * 60))
         : 0;
       items.push({ key: 'medicine', label: 'Medicine', detail: `Late by ${formatDurationWords(lateHours)}` });
     }

@@ -92,10 +92,8 @@ export default function SettingsPage() {
     setSaving(true);
     setMessage(null);
     try {
-      // baby_config already has a public RLS update policy (same as
-      // baby_events'), so this can go straight through the anon client
-      // instead of /api/config's service-role route, which 500s in
-      // production because SUPABASE_SERVICE_ROLE_KEY was never configured.
+      // baby_config has a public RLS update policy (same as baby_events'),
+      // so this goes straight through the anon client.
       const { data, error } = await supabase
         .from('baby_config')
         .update(update)
