@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
+import { ThemeToggle } from '../lib/theme';
 import { computeStatus, lastEventOf } from '../lib/logic';
 import { dailySummaries } from '../lib/summaries';
 import {
@@ -252,7 +253,10 @@ export default function Page() {
             {' · '}
             {formatLocalTime(now.toISOString(), timezone)}
           </div>
-          <Link href="/settings" className="header-settings-link">Settings</Link>
+          <div className="header-actions">
+            <ThemeToggle />
+            <Link href="/settings" className="header-settings-link">Settings</Link>
+          </div>
         </div>
       </div>
 

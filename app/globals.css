@@ -40,6 +40,78 @@
   --berry: #d98098;           /* Berry — replaces Warm Brown/Latte */
   --berry-deep: #8a3f5c;
   --soft-beige-tint: #f7efe0; /* lighter than --border, for input/picker fills */
+  color-scheme: light;
+
+  /* --accent-text is --accent's twin for plain foreground text sitting
+     directly on --bg/--card (Settings link, "Why?" buttons, Export) — in
+     light mode it's identical to --accent, but dark mode needs a brighter
+     value here since #b8496f alone fails 4.5:1 on a near-black page even
+     though it stays fine as a button fill with white text on top (that
+     pairing doesn't depend on the page background at all). --btn-ink is
+     the mirror case: fixed dark ink for text/toast pills that always sit
+     on a light pastel fill (the category log buttons, the icon-disc tint,
+     the toast pill) regardless of page theme — it deliberately does NOT
+     follow --ink so those labels don't turn light-on-light in dark mode. */
+  --accent-text: var(--accent);
+  --btn-ink: #2c2a26;
+}
+
+/* Dark mode: system preference by default, overridable per-device via the
+   header's sun/moon toggle (lib/theme.js), which stamps data-theme on
+   <html> and persists the choice to localStorage. Every value below was
+   picked to clear 4.5:1 against both --bg and --card (checked with a
+   quick WCAG contrast script), not just eyeballed — this app gets used
+   for nighttime feeds, so the dark theme needs to actually work, not just
+   exist. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #1c1a17;
+    --card: #26221d;
+    --ink: #f3ece2;
+    --ink-muted: #b4a693;
+    --border: #665c4a;
+    --accent-text: #f0839e;
+    --ok: #c98bc4;
+    --ok-bg: #332a3a;
+    --due-soon: #dba848;
+    --overdue: #e87d5f;
+    --overdue-bg: #402a23;
+    --soft-beige-tint: #2f2a24;
+    --lilac-deep: #b98fce;
+    --berry-deep: #d98bab;
+  }
+  :root:not([data-theme="light"]) .overdue-banner,
+  :root:not([data-theme="light"]) .nextup-overdue {
+    border-color: #5a3428;
+  }
+  :root:not([data-theme="light"]) .nextup-due-soon {
+    border-color: #5c4a26;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1c1a17;
+  --card: #26221d;
+  --ink: #f3ece2;
+  --ink-muted: #b4a693;
+  --border: #665c4a;
+  --accent-text: #f0839e;
+  --ok: #c98bc4;
+  --ok-bg: #332a3a;
+  --due-soon: #dba848;
+  --overdue: #e87d5f;
+  --overdue-bg: #402a23;
+  --soft-beige-tint: #2f2a24;
+  --lilac-deep: #b98fce;
+  --berry-deep: #d98bab;
+}
+:root[data-theme="dark"] .overdue-banner,
+:root[data-theme="dark"] .nextup-overdue {
+  border-color: #5a3428;
+}
+:root[data-theme="dark"] .nextup-due-soon {
+  border-color: #5c4a26;
 }
 
 html, body {
@@ -89,8 +161,37 @@ h1 {
 .header-settings-link {
   font-size: 12px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-text);
   text-decoration: none;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--ink-muted);
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.theme-toggle svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+.theme-toggle:active {
+  transform: scale(0.92);
 }
 
 .subtitle {
@@ -205,13 +306,13 @@ h1 {
    buttons being deep and others pale. Each variant now also sets --glow to
    a translucent tint of its own color, picked up by .log-btn's box-shadow
    above, so every button gets a soft colored halo that matches its fill. */
-.btn-feed { background-color: var(--blush-rose); color: var(--ink); --glow: color-mix(in srgb, var(--blush-rose) 65%, transparent); }
-.btn-nap-start { background-color: var(--muted-lilac); color: var(--ink); --glow: color-mix(in srgb, var(--muted-lilac) 65%, transparent); }
-.btn-nap-end { background-color: var(--muted-lilac); color: var(--ink); --glow: color-mix(in srgb, var(--muted-lilac) 65%, transparent); }
-.btn-diaper { background-color: var(--orchid); color: var(--ink); --glow: color-mix(in srgb, var(--orchid) 65%, transparent); }
-.btn-medicine { background-color: var(--dusty-pink); color: var(--ink); --glow: color-mix(in srgb, var(--dusty-pink) 65%, transparent); }
-.btn-sleep-start { background-color: var(--berry); color: var(--ink); --glow: color-mix(in srgb, var(--berry) 65%, transparent); }
-.btn-sleep-end { background-color: var(--butter-yellow); color: var(--ink); --glow: color-mix(in srgb, var(--butter-yellow) 65%, transparent); }
+.btn-feed { background-color: var(--blush-rose); color: var(--btn-ink); --glow: color-mix(in srgb, var(--blush-rose) 65%, transparent); }
+.btn-nap-start { background-color: var(--muted-lilac); color: var(--btn-ink); --glow: color-mix(in srgb, var(--muted-lilac) 65%, transparent); }
+.btn-nap-end { background-color: var(--muted-lilac); color: var(--btn-ink); --glow: color-mix(in srgb, var(--muted-lilac) 65%, transparent); }
+.btn-diaper { background-color: var(--orchid); color: var(--btn-ink); --glow: color-mix(in srgb, var(--orchid) 65%, transparent); }
+.btn-medicine { background-color: var(--dusty-pink); color: var(--btn-ink); --glow: color-mix(in srgb, var(--dusty-pink) 65%, transparent); }
+.btn-sleep-start { background-color: var(--berry); color: var(--btn-ink); --glow: color-mix(in srgb, var(--berry) 65%, transparent); }
+.btn-sleep-end { background-color: var(--butter-yellow); color: var(--btn-ink); --glow: color-mix(in srgb, var(--butter-yellow) 65%, transparent); }
 
 /* Icon-on-a-disc treatment for the Log buttons: the disc's fill/color come
    from whichever button it's inside (set below, one rule per variant),
@@ -235,17 +336,17 @@ h1 {
   height: 15px;
   display: block;
 }
-.btn-feed .icon-disc { background: color-mix(in srgb, var(--blush-rose) 55%, var(--ink) 20%); color: #fff; }
+.btn-feed .icon-disc { background: color-mix(in srgb, var(--blush-rose) 55%, var(--btn-ink) 20%); color: #fff; }
 .btn-nap-start .icon-disc,
-.btn-nap-end .icon-disc { background: color-mix(in srgb, var(--muted-lilac) 55%, var(--ink) 20%); color: #fff; }
-.btn-diaper .icon-disc { background: color-mix(in srgb, var(--orchid) 55%, var(--ink) 20%); color: #fff; }
-.btn-medicine .icon-disc { background: color-mix(in srgb, var(--dusty-pink) 55%, var(--ink) 20%); color: #fff; }
-.btn-sleep-start .icon-disc { background: color-mix(in srgb, var(--berry) 55%, var(--ink) 20%); color: #fff; }
-.btn-sleep-end .icon-disc { background: color-mix(in srgb, var(--butter-yellow) 55%, var(--ink) 20%); color: #fff; }
+.btn-nap-end .icon-disc { background: color-mix(in srgb, var(--muted-lilac) 55%, var(--btn-ink) 20%); color: #fff; }
+.btn-diaper .icon-disc { background: color-mix(in srgb, var(--orchid) 55%, var(--btn-ink) 20%); color: #fff; }
+.btn-medicine .icon-disc { background: color-mix(in srgb, var(--dusty-pink) 55%, var(--btn-ink) 20%); color: #fff; }
+.btn-sleep-start .icon-disc { background: color-mix(in srgb, var(--berry) 55%, var(--btn-ink) 20%); color: #fff; }
+.btn-sleep-end .icon-disc { background: color-mix(in srgb, var(--butter-yellow) 55%, var(--btn-ink) 20%); color: #fff; }
 .nap-outline .icon-disc { background: color-mix(in srgb, var(--lilac-deep) 18%, var(--card)); color: var(--lilac-deep); }
-.nap-filled .icon-disc { background: color-mix(in srgb, var(--muted-lilac) 55%, var(--ink) 20%); color: #fff; }
+.nap-filled .icon-disc { background: color-mix(in srgb, var(--muted-lilac) 55%, var(--btn-ink) 20%); color: #fff; }
 .sleep-outline .icon-disc { background: color-mix(in srgb, var(--berry-deep) 18%, var(--card)); color: var(--berry-deep); }
-.sleep-filled .icon-disc { background: color-mix(in srgb, var(--butter-yellow) 55%, var(--ink) 20%); color: #fff; }
+.sleep-filled .icon-disc { background: color-mix(in srgb, var(--butter-yellow) 55%, var(--btn-ink) 20%); color: #fff; }
 .medicine-row .icon-disc { background: color-mix(in srgb, var(--berry-deep) 22%, var(--dusty-pink-bg)); color: var(--berry-deep); }
 
 /* Overdue banner: aggregates every currently-overdue category at once, at
@@ -423,7 +524,7 @@ h1 {
 
 .stateful-btn.filled {
   border: none;
-  color: var(--ink);
+  color: var(--btn-ink);
   background-image: linear-gradient(155deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 55%);
 }
 .nap-filled { background-color: var(--muted-lilac); --glow: color-mix(in srgb, var(--muted-lilac) 65%, transparent); }
@@ -442,7 +543,7 @@ h1 {
   margin-bottom: 16px;
   font-size: 14.5px;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--btn-ink);
   cursor: pointer;
   font-family: inherit;
   box-shadow: 0 2px 6px rgba(44, 42, 38, 0.07);
@@ -614,7 +715,7 @@ h1 {
   margin-bottom: 16px;
   font-size: 14.5px;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--accent-text);
   cursor: pointer;
   font-family: inherit;
   box-shadow: 0 3px 10px color-mix(in srgb, var(--accent) 18%, transparent);
@@ -646,7 +747,7 @@ h1 {
 .why-btn {
   background: none;
   border: none;
-  color: var(--accent);
+  color: var(--accent-text);
   font-size: 12px;
   font-weight: 700;
   margin-left: 6px;
@@ -690,7 +791,7 @@ h1 {
   font-family: inherit;
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--accent);
+  color: var(--accent-text);
   text-align: left;
 }
 .pattern-toggle .chevron {
@@ -795,7 +896,7 @@ h1 {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: var(--ink);
+  background: var(--btn-ink);
   color: #fff;
   padding: 10px 14px 10px 18px;
   border-radius: 999px;
@@ -866,6 +967,13 @@ h1 {
   border: 1px solid var(--border);
   margin-bottom: 16px;
   font-family: inherit;
+  /* Chromium defaults a bare datetime-local input to a white field with
+     black text — invisible as a bug in light mode (white-on-white modal)
+     but a jarring bright rectangle once the modal itself goes dark, so
+     this needs to be explicit rather than left to rely on the platform
+     default the way .modal-select and the plain text inputs already are. */
+  background: var(--card);
+  color: var(--ink);
 }
 
 .modal-actions {

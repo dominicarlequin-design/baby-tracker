@@ -1,4 +1,5 @@
 import './globals.css';
+import { THEME_INIT_SCRIPT } from '../lib/theme';
 
 export const metadata = {
   title: 'Baby Tracker',
@@ -30,12 +31,27 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#fdf6ec',
+  // Matches the browser/status-bar chrome to whichever theme is active so
+  // it doesn't stay a bright cream bar above a dark page. The media-query
+  // form only covers the system-default case; an explicit override (see
+  // lib/theme.js) is a per-session choice the OS-level chrome color can't
+  // react to without a native app wrapper, so it's a known, accepted gap.
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#fdf6ec' },
+    { media: '(prefers-color-scheme: dark)', color: '#1c1a17' },
+  ],
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    // suppressHydrationWarning: the inline script below sets data-theme on
+    // this element before React hydrates (so an explicit dark/light choice
+    // never flashes the wrong theme first), which otherwise trips React's
+    // "server/client attribute mismatch" warning for this one attribute.
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body>{children}</body>
     </html>
   );

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
+import { ThemeToggle } from '../../lib/theme';
 import { computeStatus } from '../../lib/logic';
 import { bedtimePattern } from '../../lib/summaries';
 import { formatLocalTime, nextMedicineSlot, explainStatus, MoreRow, NightSleepRow } from '../../lib/homeUi';
@@ -56,7 +57,10 @@ export default function UpcomingPage() {
     <div className="wrap">
       <div className="header-row">
         <h1>Upcoming</h1>
-        <Link href="/settings" className="header-settings-link">Settings</Link>
+        <div className="header-actions">
+          <ThemeToggle />
+          <Link href="/settings" className="header-settings-link">Settings</Link>
+        </div>
       </div>
 
       {loading || !status ? (

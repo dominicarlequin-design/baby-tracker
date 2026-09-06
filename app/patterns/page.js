@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
+import { ThemeToggle } from '../../lib/theme';
 import { ageInMonths } from '../../lib/logic';
 import { dailySummaries, bedtimeMinutesLocal, formatMinutesAsClock } from '../../lib/summaries';
 
@@ -379,7 +380,10 @@ export default function PatternsPage() {
     <div className="wrap">
       <div className="header-row">
         <h1>Patterns</h1>
-        <Link href="/settings" className="header-settings-link">Settings</Link>
+        <div className="header-actions">
+          <ThemeToggle />
+          <Link href="/settings" className="header-settings-link">Settings</Link>
+        </div>
       </div>
 
       {loading || !config ? (

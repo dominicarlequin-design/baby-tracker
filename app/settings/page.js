@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
+import { ThemeToggle } from '../../lib/theme';
 
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -134,7 +135,10 @@ export default function SettingsPage() {
     <div className="wrap">
       <div className="header-row">
         <h1>Settings</h1>
-        <Link href="/" className="header-datetime">Back to Log</Link>
+        <div className="header-actions">
+          <ThemeToggle />
+          <Link href="/" className="header-datetime">Back to Log</Link>
+        </div>
       </div>
 
       {loading || !form ? (

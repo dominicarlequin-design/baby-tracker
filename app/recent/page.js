@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
+import { ThemeToggle } from '../../lib/theme';
 import { isoToLocalDatetimeInputValue, localDateTimeToUtc } from '../../lib/logic';
 import {
   formatLocalTime,
@@ -138,7 +139,10 @@ export default function RecentPage() {
     <div className="wrap">
       <div className="header-row">
         <h1>Recent activity</h1>
-        <Link href="/settings" className="header-settings-link">Settings</Link>
+        <div className="header-actions">
+          <ThemeToggle />
+          <Link href="/settings" className="header-settings-link">Settings</Link>
+        </div>
       </div>
 
       {loading ? (
