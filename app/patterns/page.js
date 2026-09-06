@@ -536,6 +536,8 @@ export default function PatternsPage() {
 
       <nav className="tab-bar">
         <Link href="/" className="tab-item">Log</Link>
+        <Link href="/upcoming" className="tab-item">Upcoming</Link>
+        <Link href="/recent" className="tab-item">Recent</Link>
         <span className="tab-item tab-active">Patterns</span>
       </nav>
     </div>
