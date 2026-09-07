@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
 import { ThemeToggle } from '../../lib/theme';
 import { getPushStatus, enablePushAlerts, disablePushAlerts } from '../../lib/push';
+import { SOUND_STYLES, getSoundSettings, setSoundSettings, previewSound } from '../../lib/sound';
 
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -79,6 +80,11 @@ export default function SettingsPage() {
   const [pushBusy, setPushBusy] = useState(false);
   const [pushMessage, setPushMessage] = useState(null);
 
+  // Starts at the same defaults getSoundSettings() falls back to on the
+  // server (no localStorage there), then syncs to whatever's actually
+  // saved on this device once mounted — avoids a hydration mismatch.
+  const [soundSettings, setSoundSettingsState] = useState({ enabled: true, volume: 0.6, style: 'soft' });
+
   useEffect(() => {
     supabase.from('baby_config').select('*').eq('id', 1).single().then(({ data, error }) => {
       if (error) {
@@ -95,6 +101,33 @@ export default function SettingsPage() {
   useEffect(() => {
     getPushStatus().then(setPushStatus);
   }, []);
+
+  useEffect(() => {
+    setSoundSettingsState(getSoundSettings());
+  }, []);
+
+  const updateSound = useCallback((partial) => {
+    setSoundSettingsState(setSoundSettings(partial));
+  }, []);
+
+  const handleToggleSoundEnabled = useCallback(() => {
+    const turningOn = !soundSettings.enabled;
+    updateSound({ enabled: turningOn });
+    if (turningOn) previewSound(soundSettings.style);
+  }, [soundSettings.enabled, soundSettings.style, updateSound]);
+
+  const handleSelectSoundStyle = useCallback((styleId) => {
+    updateSound({ style: styleId });
+    previewSound(styleId);
+  }, [updateSound]);
+
+  const handleVolumeChange = useCallback((e) => {
+    updateSound({ volume: Number(e.target.value) });
+  }, [updateSound]);
+
+  const handleVolumeCommit = useCallback(() => {
+    previewSound(soundSettings.style);
+  }, [soundSettings.style]);
 
   const handleTogglePush = useCallback(async () => {
     setPushBusy(true);
@@ -201,6 +234,47 @@ export default function SettingsPage() {
         {pushMessage && (
           <div className={`form-message ${pushMessage.isError ? 'error' : 'success'}`}>{pushMessage.text}</div>
         )}
+      </div>
+
+      <div className="card">
+        <div className="section-title">Button sounds</div>
+        <div className="form-hint">Plays a short sound whenever you tap a button.</div>
+        <button
+          className="modal-btn-confirm form-save"
+          onClick={handleToggleSoundEnabled}
+          data-skip-click-sound="true"
+          style={{ marginTop: '10px' }}
+        >
+          {soundSettings.enabled ? 'Turn off button sounds' : 'Turn on button sounds'}
+        </button>
+
+        <div className="form-label" style={{ marginTop: '18px' }}>Sound</div>
+        <div className="picker-grid">
+          {SOUND_STYLES.map(s => (
+            <button
+              key={s.id}
+              className={`picker-btn ${soundSettings.style === s.id ? 'selected' : ''}`}
+              data-skip-click-sound="true"
+              onClick={() => handleSelectSoundStyle(s.id)}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+        <div className="form-hint">Tap one to hear it — it plays even if sounds are off, so you can pick before turning them on.</div>
+
+        <div className="form-label" style={{ marginTop: '16px' }}>Volume</div>
+        <input
+          type="range"
+          className="volume-slider"
+          min="0"
+          max="1"
+          step="0.05"
+          value={soundSettings.volume}
+          onChange={handleVolumeChange}
+          onMouseUp={handleVolumeCommit}
+          onTouchEnd={handleVolumeCommit}
+        />
       </div>
 
       {loading || !form ? (

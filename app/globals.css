@@ -1064,6 +1064,30 @@ h1 {
   opacity: 0.85;
   box-shadow: 0 1px 2px rgba(44, 42, 38, 0.07);
 }
+.picker-btn.selected {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--card) 86%);
+  color: var(--accent-text);
+}
+
+.volume-slider {
+  width: 100%;
+  accent-color: var(--accent);
+  margin: 10px 0 2px;
+}
+/* accent-color only themes the filled portion + thumb — the unfilled
+   track still needs its own rule or it renders with the browser's default
+   (stark white), which looks jarring in dark mode. */
+.volume-slider::-webkit-slider-runnable-track {
+  background: var(--border);
+  border-radius: 999px;
+  height: 4px;
+}
+.volume-slider::-moz-range-track {
+  background: var(--border);
+  border-radius: 999px;
+  height: 4px;
+}
 
 .tab-bar {
   position: fixed;
