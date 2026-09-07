@@ -1,5 +1,6 @@
 import './globals.css';
 import { THEME_INIT_SCRIPT } from '../lib/theme';
+import { ClickSoundListener } from '../lib/ClickSoundListener';
 
 export const metadata = {
   title: 'Baby Tracker',
@@ -52,7 +53,10 @@ export default function RootLayout({ children }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <ClickSoundListener />
+        {children}
+      </body>
     </html>
   );
 }
