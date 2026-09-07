@@ -80,14 +80,32 @@ const ICON_PATHS = {
   ),
 };
 
-function Icon({ name }) {
+// `phase` drives the loading-spinner / success-check / error-x swap on top
+// of the normal category icon, once a tap has actually kicked off a save —
+// see the `phase` state and `setButtonPhase` helper in Page() below.
+function Icon({ name, phase }) {
   return (
     <span className="icon-disc" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        {ICON_PATHS[name]}
-      </svg>
+      {phase === 'loading' ? (
+        <span className="btn-spinner" />
+      ) : phase === 'success' ? (
+        <svg className="btn-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>
+      ) : phase === 'error' ? (
+        <svg className="btn-check" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      ) : (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          {ICON_PATHS[name]}
+        </svg>
+      )}
     </span>
   );
+}
+
+// Turns a phase ('loading' | 'success' | 'error' | undefined) into the CSS
+// modifier class that swaps that button's icon-disc color and, for errors,
+// plays a small shake — see the shared rules in globals.css.
+function phaseClass(phase) {
+  return phase ? `is-${phase}` : '';
 }
 
 export default function Page() {
@@ -103,6 +121,27 @@ export default function Page() {
   const [overdueOpen, setOverdueOpen] = useState(true);
   const [pendingDuplicate, setPendingDuplicate] = useState(null);
   const toastTimeoutRef = useRef(null);
+
+  // Per-button loading/success/error state, keyed by category ('feed',
+  // 'diaper', 'nap', 'sleep', 'medicine') rather than by event id — the
+  // button a caregiver is looking at is the category tile itself, which
+  // stays on screen across a tap (even the nap/sleep toggles just swap
+  // which variant of the same slot renders), so keying on that instead of
+  // the underlying event lets the tile show its own save in flight.
+  const [phase, setPhase] = useState({});
+  const phaseTimeoutsRef = useRef({});
+
+  const setButtonPhase = useCallback((key, value, holdMs) => {
+    clearTimeout(phaseTimeoutsRef.current[key]);
+    setPhase(prev => ({ ...prev, [key]: value }));
+    if (holdMs) {
+      phaseTimeoutsRef.current[key] = setTimeout(() => {
+        setPhase(prev => ({ ...prev, [key]: undefined }));
+      }, holdMs);
+    }
+  }, []);
+
+  useEffect(() => () => Object.values(phaseTimeoutsRef.current).forEach(clearTimeout), []);
 
   const fetchAll = useCallback(async () => {
     const since = new Date(Date.now() - HISTORY_DAYS * 24 * 60 * 60 * 1000).toISOString();
@@ -146,10 +185,16 @@ export default function Page() {
   // supabase-js query builder is a thenable that re-runs the request on
   // every `await`/`.then()`, so without this a fast Undo tap would fire a
   // second insert instead of reusing the first one's result.
-  const logEvent = useCallback((type, label, extra = {}) => {
+  // `phaseKey` is optional — passed by the category buttons below so their
+  // own icon can show a spinner while this insert is in flight and a
+  // check (or an x) once it settles. Nothing else about the optimistic
+  // insert/undo flow changes.
+  const logEvent = useCallback((type, label, extra = {}, phaseKey = null) => {
     const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const eventTime = new Date().toISOString();
     setEvents(prev => [{ id: tempId, type, event_time: eventTime, ...extra }, ...prev]);
+
+    if (phaseKey) setButtonPhase(phaseKey, 'loading');
 
     const insertPromise = Promise.resolve(
       supabase.from('baby_events').insert({ type, event_time: eventTime, ...extra }).select().single()
@@ -168,31 +213,41 @@ export default function Page() {
       },
     });
 
-    insertPromise.then(({ data, error }) => {
+    // A floor on how long the spinner stays up, so it's actually visible
+    // even when the insert resolves in well under a tenth of a second —
+    // without this a fast connection would jump straight from tap to
+    // success check with nothing perceptible in between.
+    const MIN_PHASE_MS = 380;
+    const minWait = phaseKey ? new Promise(resolve => setTimeout(resolve, MIN_PHASE_MS)) : null;
+
+    insertPromise.then(async ({ data, error }) => {
+      if (minWait) await minWait;
       if (error) {
         console.error(error);
         setEvents(prev => prev.filter(e => e.id !== tempId));
         showToast('Failed to log — try again');
+        if (phaseKey) setButtonPhase(phaseKey, 'error', 1100);
         return;
       }
       setEvents(prev => prev.map(e => (e.id === tempId ? data : e)));
+      if (phaseKey) setButtonPhase(phaseKey, 'success', 900);
     });
-  }, [showToast]);
+  }, [showToast, setButtonPhase]);
 
   // Gate in front of logEvent for the buttons that don't change appearance
   // after a tap (Feed, Diaper, Medicine) — if the same type was logged in
   // the last DUPLICATE_GUARD_SECONDS, ask before creating a second row
   // instead of silently doing it.
-  const attemptLog = useCallback((type, label, extra = {}) => {
+  const attemptLog = useCallback((type, label, extra = {}, phaseKey = null) => {
     const last = lastEventOf(events, type);
     if (last) {
       const secondsAgo = (Date.now() - new Date(last.event_time).getTime()) / 1000;
       if (secondsAgo >= 0 && secondsAgo < DUPLICATE_GUARD_SECONDS) {
-        setPendingDuplicate({ type, label, extra, secondsAgo });
+        setPendingDuplicate({ type, label, extra, phaseKey, secondsAgo });
         return;
       }
     }
-    logEvent(type, label, extra);
+    logEvent(type, label, extra, phaseKey);
   }, [events, logEvent]);
 
   const status = useMemo(() => {
@@ -313,28 +368,28 @@ export default function Page() {
           )}
 
           <div className="btn-grid">
-            <button className="log-btn log-btn-primary btn-feed" onClick={() => setFeedPickerOpen(true)}>
-              <Icon name="feed" />
+            <button className={`log-btn log-btn-primary btn-feed ${phaseClass(phase.feed)}`} onClick={() => setFeedPickerOpen(true)}>
+              <Icon name="feed" phase={phase.feed} />
               Fed
             </button>
-            <button className="log-btn log-btn-primary btn-diaper" onClick={() => setDiaperPickerOpen(true)}>
-              <Icon name="diaper" />
+            <button className={`log-btn log-btn-primary btn-diaper ${phaseClass(phase.diaper)}`} onClick={() => setDiaperPickerOpen(true)}>
+              <Icon name="diaper" phase={phase.diaper} />
               Diaper
             </button>
           </div>
 
           <div className="stateful-grid">
             {status.nap.asleep ? (
-              <button className="stateful-btn filled nap-filled" onClick={() => logEvent('nap_end', 'Nap ended')}>
-                <Icon name="nap" />
+              <button className={`stateful-btn filled nap-filled ${phaseClass(phase.nap)}`} onClick={() => logEvent('nap_end', 'Nap ended', {}, 'nap')}>
+                <Icon name="nap" phase={phase.nap} />
                 <span className="stateful-text">
                   <span className="stateful-label">End nap</span>
                   <span className="stateful-sub">asleep {formatHours((now.getTime() - new Date(status.nap.lastEventTime).getTime()) / (1000 * 60 * 60))}</span>
                 </span>
               </button>
             ) : (
-              <button className="stateful-btn outline nap-outline" onClick={() => logEvent('nap_start', 'Nap started')}>
-                <Icon name="nap" />
+              <button className={`stateful-btn outline nap-outline ${phaseClass(phase.nap)}`} onClick={() => logEvent('nap_start', 'Nap started', {}, 'nap')}>
+                <Icon name="nap" phase={phase.nap} />
                 <span className="stateful-text">
                   <span className="stateful-label">Start nap</span>
                   <span className="stateful-sub">{status.nap.hoursSince != null ? `awake ${formatHours(status.nap.hoursSince)}` : 'no naps yet'}</span>
@@ -343,16 +398,16 @@ export default function Page() {
             )}
 
             {status.sleep.asleep ? (
-              <button className="stateful-btn filled sleep-filled" onClick={() => logEvent('sleep_end', 'Wake up')}>
-                <Icon name="wake" />
+              <button className={`stateful-btn filled sleep-filled ${phaseClass(phase.sleep)}`} onClick={() => logEvent('sleep_end', 'Wake up', {}, 'sleep')}>
+                <Icon name="wake" phase={phase.sleep} />
                 <span className="stateful-text">
                   <span className="stateful-label">Wake Up</span>
                   <span className="stateful-sub">asleep {formatHours((now.getTime() - new Date(status.sleep.lastEventTime).getTime()) / (1000 * 60 * 60))}</span>
                 </span>
               </button>
             ) : (
-              <button className="stateful-btn outline sleep-outline" onClick={() => logEvent('sleep_start', 'Bedtime')}>
-                <Icon name="bedtime" />
+              <button className={`stateful-btn outline sleep-outline ${phaseClass(phase.sleep)}`} onClick={() => logEvent('sleep_start', 'Bedtime', {}, 'sleep')}>
+                <Icon name="bedtime" phase={phase.sleep} />
                 <span className="stateful-text">
                   <span className="stateful-label">Bedtime</span>
                   <span className="stateful-sub">usual {formatTimeOfDay(config.target_bedtime_local ?? '19:15')}</span>
@@ -361,9 +416,9 @@ export default function Page() {
             )}
           </div>
 
-          <button className="medicine-row" onClick={() => attemptLog('medicine', 'Medicine')}>
+          <button className={`medicine-row ${phaseClass(phase.medicine)}`} onClick={() => attemptLog('medicine', 'Medicine', {}, 'medicine')}>
             <span className="medicine-label">
-              <Icon name="medicine" />
+              <Icon name="medicine" phase={phase.medicine} />
               Medicine
             </span>
             <span className="medicine-detail">
@@ -415,7 +470,7 @@ export default function Page() {
                   key={oz}
                   className="picker-btn"
                   onClick={() => {
-                    attemptLog('feed', 'Fed', { feed_ounces: oz });
+                    attemptLog('feed', 'Fed', { feed_ounces: oz }, 'feed');
                     setFeedPickerOpen(false);
                   }}
                 >
@@ -426,7 +481,7 @@ export default function Page() {
             <button
               className="modal-btn-skip"
               onClick={() => {
-                attemptLog('feed', 'Fed');
+                attemptLog('feed', 'Fed', {}, 'feed');
                 setFeedPickerOpen(false);
               }}
             >
@@ -444,7 +499,7 @@ export default function Page() {
               <button
                 className="picker-btn"
                 onClick={() => {
-                  attemptLog('diaper', 'Diaper', { diaper_detail: 'pee' });
+                  attemptLog('diaper', 'Diaper', { diaper_detail: 'pee' }, 'diaper');
                   setDiaperPickerOpen(false);
                 }}
               >
@@ -453,7 +508,7 @@ export default function Page() {
               <button
                 className="picker-btn"
                 onClick={() => {
-                  attemptLog('diaper', 'Diaper', { diaper_detail: 'poop' });
+                  attemptLog('diaper', 'Diaper', { diaper_detail: 'poop' }, 'diaper');
                   setDiaperPickerOpen(false);
                 }}
               >
@@ -462,7 +517,7 @@ export default function Page() {
               <button
                 className="picker-btn"
                 onClick={() => {
-                  attemptLog('diaper', 'Diaper', { diaper_detail: 'both' });
+                  attemptLog('diaper', 'Diaper', { diaper_detail: 'both' }, 'diaper');
                   setDiaperPickerOpen(false);
                 }}
               >
@@ -472,7 +527,7 @@ export default function Page() {
             <button
               className="modal-btn-skip"
               onClick={() => {
-                attemptLog('diaper', 'Diaper');
+                attemptLog('diaper', 'Diaper', {}, 'diaper');
                 setDiaperPickerOpen(false);
               }}
             >
@@ -494,7 +549,7 @@ export default function Page() {
               <button
                 className="modal-btn-confirm"
                 onClick={() => {
-                  logEvent(pendingDuplicate.type, pendingDuplicate.label, pendingDuplicate.extra);
+                  logEvent(pendingDuplicate.type, pendingDuplicate.label, pendingDuplicate.extra, pendingDuplicate.phaseKey);
                   setPendingDuplicate(null);
                 }}
               >

@@ -265,7 +265,7 @@ h1 {
   justify-content: center;
   gap: 8px;
   border: none;
-  border-radius: 12px;
+  border-radius: 999px;
   padding: 16px 10px;
   font-size: 15px;
   font-weight: 700;
@@ -330,6 +330,7 @@ h1 {
   width: 24px;
   height: 24px;
   border-radius: 50%;
+  transition: background 0.2s ease;
 }
 .icon-disc svg {
   width: 15px;
@@ -487,8 +488,8 @@ h1 {
   flex-direction: row;
   align-items: center;
   gap: 10px;
-  border-radius: 12px;
-  padding: 14px;
+  border-radius: 999px;
+  padding: 14px 18px;
   cursor: pointer;
   --glow: transparent;
   box-shadow: 0 3px 8px rgba(44, 42, 38, 0.1), 0 8px 16px -6px var(--glow);
@@ -538,8 +539,8 @@ h1 {
   width: 100%;
   background: var(--dusty-pink-bg);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px;
+  border-radius: 999px;
+  padding: 14px 18px;
   margin-bottom: 16px;
   font-size: 14.5px;
   font-weight: 700;
@@ -699,6 +700,11 @@ h1 {
 .form-save {
   width: 100%;
   margin-top: 14px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 .form-save:disabled {
   opacity: 0.6;
@@ -710,7 +716,7 @@ h1 {
   width: 100%;
   background: var(--card);
   border: 1.5px solid var(--accent);
-  border-radius: 12px;
+  border-radius: 999px;
   padding: 14px;
   margin-bottom: 16px;
   font-size: 14.5px;
@@ -983,12 +989,20 @@ h1 {
 
 .modal-actions button {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   border: none;
-  border-radius: 10px;
+  border-radius: 999px;
   padding: 13px;
   font-size: 14.5px;
   font-weight: 700;
   cursor: pointer;
+}
+.modal-actions button:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .modal-btn-cancel {
@@ -1049,7 +1063,7 @@ h1 {
 .picker-btn {
   background: var(--soft-beige-tint);
   border: 1.5px solid var(--border);
-  border-radius: 12px;
+  border-radius: 999px;
   padding: 14px 0;
   font-size: 15px;
   font-weight: 700;
@@ -1133,4 +1147,89 @@ h1 {
   background: var(--accent);
   background-image: linear-gradient(155deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0) 60%);
   box-shadow: 0 3px 10px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* ---------------------------------------------------------------------
+   Interactive button language, applied on top of every button's own
+   fill/glow above rather than replacing it: a visible keyboard focus
+   ring, and a brief loading-spinner-then-success-check for anything that
+   actually saves to the database. Modeled after a reference screenshot
+   of default/hover/focus/pressed/loading/success button states — hover
+   doesn't apply on a phone, but the other four do.
+   --------------------------------------------------------------------- */
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus-visible {
+  outline: 2.5px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.is-loading,
+.is-success,
+.is-error {
+  pointer-events: none;
+}
+.is-loading {
+  opacity: 0.82;
+}
+
+.btn-spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  animation: btn-spin 0.6s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes btn-spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn-check {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Icon-disc buttons (Fed/Diaper/Nap/Sleep/Medicine) swap their tinted
+   disc to a spinner, then a green check or a red x, instead of adding a
+   separate element — the layout doesn't shift at all across the phase
+   change. */
+.is-loading .icon-disc {
+  background: color-mix(in srgb, var(--ink) 35%, transparent) !important;
+}
+.is-success .icon-disc {
+  background: #3fa876 !important;
+}
+.is-error .icon-disc {
+  background: var(--overdue) !important;
+}
+
+.is-error {
+  animation: btn-shake 0.32s ease;
+}
+@keyframes btn-shake {
+  0%, 100% { transform: translateX(0); }
+  30% { transform: translateX(-4px); }
+  70% { transform: translateX(4px); }
+}
+
+/* Full-width text CTAs (Save changes, Turn on/off phone alerts) show the
+   same spinner/check inline next to their label instead of swapping an
+   icon-disc, since they don't have one. */
+.form-save.is-success {
+  background: #3fa876 !important;
+  background-image: none !important;
+}
+.form-save.is-error {
+  background: var(--overdue) !important;
+  background-image: none !important;
 }

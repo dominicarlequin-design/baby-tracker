@@ -36,6 +36,8 @@ export default function RecentPage() {
   const [editType, setEditType] = useState('');
   const [editFeedOunces, setEditFeedOunces] = useState('');
   const [editDiaperDetail, setEditDiaperDetail] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [deletingEdit, setDeletingEdit] = useState(false);
   const toastTimeoutRef = useRef(null);
 
   const fetchAll = useCallback(async () => {
@@ -98,6 +100,7 @@ export default function RecentPage() {
     if (!editingEvent || !editValue) return;
     const [datePart, timePart] = editValue.split('T');
     const iso = localDateTimeToUtc(datePart, timePart, config?.timezone || 'America/New_York').toISOString();
+    setSavingEdit(true);
     try {
       // baby_events has a public RLS update policy, so this goes straight
       // through the anon client like the rest of this app.
@@ -119,11 +122,14 @@ export default function RecentPage() {
     } catch (err) {
       console.error(err);
       showToast('Failed to update — try again');
+    } finally {
+      setSavingEdit(false);
     }
   }, [editingEvent, editValue, editType, editFeedOunces, editDiaperDetail, config, cancelEdit, showToast]);
 
   const deleteEdit = useCallback(async () => {
     if (!editingEvent) return;
+    setDeletingEdit(true);
     try {
       const { error } = await supabase.from('baby_events').delete().eq('id', editingEvent.id);
       if (error) throw error;
@@ -133,6 +139,8 @@ export default function RecentPage() {
     } catch (err) {
       console.error(err);
       showToast('Failed to delete — try again');
+    } finally {
+      setDeletingEdit(false);
     }
   }, [editingEvent, cancelEdit, showToast]);
 
@@ -221,10 +229,19 @@ export default function RecentPage() {
               onChange={e => setEditValue(e.target.value)}
             />
             <div className="modal-actions">
-              <button className="modal-btn-cancel" onClick={cancelEdit}>Cancel</button>
-              <button className="modal-btn-confirm" onClick={confirmEdit}>Save</button>
+              <button className="modal-btn-cancel" onClick={cancelEdit} disabled={savingEdit || deletingEdit}>Cancel</button>
+              <button
+                className={`modal-btn-confirm ${savingEdit ? 'is-loading' : ''}`}
+                onClick={confirmEdit}
+                disabled={savingEdit || deletingEdit}
+              >
+                {savingEdit && <span className="btn-spinner" />}
+                Save
+              </button>
             </div>
-            <button className="modal-btn-delete" onClick={deleteEdit}>Delete entry</button>
+            <button className="modal-btn-delete" onClick={deleteEdit} disabled={savingEdit || deletingEdit}>
+              {deletingEdit ? 'Deleting…' : 'Delete entry'}
+            </button>
           </div>
         </div>
       )}

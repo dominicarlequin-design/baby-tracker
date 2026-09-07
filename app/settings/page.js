@@ -79,6 +79,11 @@ export default function SettingsPage() {
   const [pushStatus, setPushStatus] = useState('checking'); // unsupported | ios-needs-install | checking | on | off
   const [pushBusy, setPushBusy] = useState(false);
   const [pushMessage, setPushMessage] = useState(null);
+  const [pushJustSucceeded, setPushJustSucceeded] = useState(false);
+  const [pushFailed, setPushFailed] = useState(false);
+  const [saveJustSucceeded, setSaveJustSucceeded] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(false);
+  const [soundJustToggled, setSoundJustToggled] = useState(false);
 
   // Starts at the same defaults getSoundSettings() falls back to on the
   // server (no localStorage there), then syncs to whatever's actually
@@ -114,6 +119,8 @@ export default function SettingsPage() {
     const turningOn = !soundSettings.enabled;
     updateSound({ enabled: turningOn });
     if (turningOn) previewSound(soundSettings.style);
+    setSoundJustToggled(true);
+    setTimeout(() => setSoundJustToggled(false), 700);
   }, [soundSettings.enabled, soundSettings.style, updateSound]);
 
   const handleSelectSoundStyle = useCallback((styleId) => {
@@ -143,9 +150,13 @@ export default function SettingsPage() {
         setPushStatus('on');
         setPushMessage({ text: 'Phone alerts turned on', isError: false });
       }
+      setPushJustSucceeded(true);
+      setTimeout(() => setPushJustSucceeded(false), 900);
     } catch (err) {
       console.error(err);
       setPushMessage({ text: err.message || 'Something went wrong — try again', isError: true });
+      setPushFailed(true);
+      setTimeout(() => setPushFailed(false), 1100);
     } finally {
       setPushBusy(false);
     }
@@ -189,9 +200,13 @@ export default function SettingsPage() {
       if (error) throw error;
       setForm(toFormState(data));
       setMessage({ text: 'Saved', isError: false });
+      setSaveJustSucceeded(true);
+      setTimeout(() => setSaveJustSucceeded(false), 900);
     } catch (err) {
       console.error(err);
       setMessage({ text: err.message || 'Failed to save — try again', isError: true });
+      setSaveFailed(true);
+      setTimeout(() => setSaveFailed(false), 1100);
     } finally {
       setSaving(false);
     }
@@ -222,11 +237,13 @@ export default function SettingsPage() {
           <>
             <div className="form-hint">Get a notification on this device when something becomes overdue.</div>
             <button
-              className="modal-btn-confirm form-save"
+              className={`modal-btn-confirm form-save ${pushBusy ? 'is-loading' : ''} ${pushJustSucceeded ? 'is-success' : ''} ${pushFailed ? 'is-error' : ''}`}
               onClick={handleTogglePush}
               disabled={pushBusy}
               style={{ marginTop: '10px' }}
             >
+              {pushBusy && <span className="btn-spinner" />}
+              {pushJustSucceeded && <svg className="btn-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>}
               {pushBusy ? 'Working…' : pushStatus === 'on' ? 'Turn off phone alerts' : 'Turn on phone alerts'}
             </button>
           </>
@@ -240,11 +257,12 @@ export default function SettingsPage() {
         <div className="section-title">Button sounds</div>
         <div className="form-hint">Plays a short sound whenever you tap a button.</div>
         <button
-          className="modal-btn-confirm form-save"
+          className={`modal-btn-confirm form-save ${soundJustToggled ? 'is-success' : ''}`}
           onClick={handleToggleSoundEnabled}
           data-skip-click-sound="true"
           style={{ marginTop: '10px' }}
         >
+          {soundJustToggled && <svg className="btn-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>}
           {soundSettings.enabled ? 'Turn off button sounds' : 'Turn on button sounds'}
         </button>
 
@@ -314,7 +332,13 @@ export default function SettingsPage() {
             <div className={`form-message ${message.isError ? 'error' : 'success'}`}>{message.text}</div>
           )}
 
-          <button className="modal-btn-confirm form-save" onClick={handleSave} disabled={saving}>
+          <button
+            className={`modal-btn-confirm form-save ${saving ? 'is-loading' : ''} ${saveJustSucceeded ? 'is-success' : ''} ${saveFailed ? 'is-error' : ''}`}
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving && <span className="btn-spinner" />}
+            {saveJustSucceeded && <svg className="btn-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>}
             {saving ? 'Saving…' : 'Save changes'}
           </button>
         </div>
