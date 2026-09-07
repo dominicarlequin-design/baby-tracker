@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
 import { ThemeToggle } from '../../lib/theme';
+import { getPushStatus, enablePushAlerts, disablePushAlerts } from '../../lib/push';
 
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -73,6 +74,11 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null); // { text, isError }
 
+  const [vapidPublicKey, setVapidPublicKey] = useState(null);
+  const [pushStatus, setPushStatus] = useState('checking'); // unsupported | ios-needs-install | checking | on | off
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushMessage, setPushMessage] = useState(null);
+
   useEffect(() => {
     supabase.from('baby_config').select('*').eq('id', 1).single().then(({ data, error }) => {
       if (error) {
@@ -80,10 +86,37 @@ export default function SettingsPage() {
         setMessage({ text: 'Failed to load settings', isError: true });
       } else if (data) {
         setForm(toFormState(data));
+        setVapidPublicKey(data.vapid_public_key || null);
       }
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    getPushStatus().then(setPushStatus);
+  }, []);
+
+  const handleTogglePush = useCallback(async () => {
+    setPushBusy(true);
+    setPushMessage(null);
+    try {
+      if (pushStatus === 'on') {
+        await disablePushAlerts();
+        setPushStatus('off');
+        setPushMessage({ text: 'Phone alerts turned off', isError: false });
+      } else {
+        if (!vapidPublicKey) throw new Error("Alerts aren't set up yet — try again in a moment");
+        await enablePushAlerts(vapidPublicKey);
+        setPushStatus('on');
+        setPushMessage({ text: 'Phone alerts turned on', isError: false });
+      }
+    } catch (err) {
+      console.error(err);
+      setPushMessage({ text: err.message || 'Something went wrong — try again', isError: true });
+    } finally {
+      setPushBusy(false);
+    }
+  }, [pushStatus, vapidPublicKey]);
 
   const setField = useCallback((key, value) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -139,6 +172,35 @@ export default function SettingsPage() {
           <ThemeToggle />
           <Link href="/" className="header-datetime">Back to Log</Link>
         </div>
+      </div>
+
+      <div className="card">
+        <div className="section-title">Phone alerts</div>
+        {pushStatus === 'unsupported' && (
+          <div className="form-hint">Phone alerts aren't supported in this browser.</div>
+        )}
+        {pushStatus === 'ios-needs-install' && (
+          <div className="form-hint">On iPhone: add this app to your Home Screen (Share → Add to Home Screen), then open it from there to turn alerts on.</div>
+        )}
+        {pushStatus === 'checking' && (
+          <div className="form-hint">Checking{'…'}</div>
+        )}
+        {(pushStatus === 'on' || pushStatus === 'off') && (
+          <>
+            <div className="form-hint">Get a notification on this device when something becomes overdue.</div>
+            <button
+              className="modal-btn-confirm form-save"
+              onClick={handleTogglePush}
+              disabled={pushBusy}
+              style={{ marginTop: '10px' }}
+            >
+              {pushBusy ? 'Working…' : pushStatus === 'on' ? 'Turn off phone alerts' : 'Turn on phone alerts'}
+            </button>
+          </>
+        )}
+        {pushMessage && (
+          <div className={`form-message ${pushMessage.isError ? 'error' : 'success'}`}>{pushMessage.text}</div>
+        )}
       </div>
 
       {loading || !form ? (
