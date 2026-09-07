@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
 import { ThemeToggle } from '../../lib/theme';
+import { TabBar } from '../../lib/TabBar';
 import { ageInMonths } from '../../lib/logic';
 import { dailySummaries, bedtimeMinutesLocal, formatMinutesAsClock } from '../../lib/summaries';
 
@@ -538,12 +539,7 @@ export default function PatternsPage() {
         </div>
       )}
 
-      <nav className="tab-bar">
-        <Link href="/" className="tab-item">Log</Link>
-        <Link href="/upcoming" className="tab-item">Upcoming</Link>
-        <Link href="/recent" className="tab-item">Recent</Link>
-        <span className="tab-item tab-active">Patterns</span>
-      </nav>
+      <TabBar active="patterns" />
     </div>
   );
 }

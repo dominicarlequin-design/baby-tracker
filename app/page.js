@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import { ThemeToggle } from '../lib/theme';
+import { TabBar } from '../lib/TabBar';
 import { computeStatus, lastEventOf } from '../lib/logic';
 import { dailySummaries } from '../lib/summaries';
 import {
@@ -514,12 +515,7 @@ export default function Page() {
         </div>
       )}
 
-      <nav className="tab-bar">
-        <span className="tab-item tab-active">Log</span>
-        <Link href="/upcoming" className="tab-item">Upcoming</Link>
-        <Link href="/recent" className="tab-item">Recent</Link>
-        <Link href="/patterns" className="tab-item">Patterns</Link>
-      </nav>
+      <TabBar active="log" />
     </div>
   );
 }

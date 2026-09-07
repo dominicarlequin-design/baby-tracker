@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
 import { ThemeToggle } from '../../lib/theme';
+import { TabBar } from '../../lib/TabBar';
 import { computeStatus } from '../../lib/logic';
 import { bedtimePattern } from '../../lib/summaries';
 import { formatLocalTime, nextMedicineSlot, explainStatus, MoreRow, NightSleepRow } from '../../lib/homeUi';
@@ -103,12 +104,7 @@ export default function UpcomingPage() {
         </div>
       )}
 
-      <nav className="tab-bar">
-        <Link href="/" className="tab-item">Log</Link>
-        <span className="tab-item tab-active">Upcoming</span>
-        <Link href="/recent" className="tab-item">Recent</Link>
-        <Link href="/patterns" className="tab-item">Patterns</Link>
-      </nav>
+      <TabBar active="upcoming" />
     </div>
   );
 }

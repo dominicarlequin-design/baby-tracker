@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
 import { ThemeToggle } from '../../lib/theme';
+import { TabBar } from '../../lib/TabBar';
 import { isoToLocalDatetimeInputValue, localDateTimeToUtc } from '../../lib/logic';
 import {
   formatLocalTime,
@@ -228,12 +229,7 @@ export default function RecentPage() {
         </div>
       )}
 
-      <nav className="tab-bar">
-        <Link href="/" className="tab-item">Log</Link>
-        <Link href="/upcoming" className="tab-item">Upcoming</Link>
-        <span className="tab-item tab-active">Recent</span>
-        <Link href="/patterns" className="tab-item">Patterns</Link>
-      </nav>
+      <TabBar active="recent" />
     </div>
   );
 }
