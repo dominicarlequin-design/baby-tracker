@@ -38,8 +38,8 @@ export const viewport = {
   // lib/theme.js) is a per-session choice the OS-level chrome color can't
   // react to without a native app wrapper, so it's a known, accepted gap.
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fdf6ec' },
-    { media: '(prefers-color-scheme: dark)', color: '#1c1a17' },
+    { media: '(prefers-color-scheme: light)', color: '#fbeaf1' },
+    { media: '(prefers-color-scheme: dark)', color: '#1b171d' },
   ],
 };
 

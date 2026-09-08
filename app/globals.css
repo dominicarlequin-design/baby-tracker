@@ -7,20 +7,29 @@
      Brown/Latte entirely (your call), replacing them with three new hues
      that stay inside the pink-purple family — Blush Rose, Orchid, and
      Berry — so nothing on the page reads blue, green, or brown anymore.
-     Cream White and Soft Beige stay as the only neutrals; Dusty Pink,
-     Muted Lilac, and Butter Yellow (all originally yours) are unchanged.
      --accent (links, CTAs, active tab) moved from steel-blue to a deep
      raspberry-rose so the app's "chrome" matches the new theme too. --ok
      (the on-track/success color) moved from green to a muted plum, kept
      deliberately distinct in hue from --accent/--due-soon/--overdue so the
      four status colors are still tellable apart at a glance. --overdue
      stays the original red — still the one non-palette color, at your
-     call, so missed feeds/diapers/medicine keep reading as urgent. */
-  --bg: #fdf6ec;              /* Cream White */
+     call, so missed feeds/diapers/medicine keep reading as urgent.
+
+     Cream White and Soft Beige (the page background/border neutrals) were
+     kept through that first redesign, but their yellow undertone was
+     fighting the cool pink-purple palette everywhere else on the page —
+     your call to drop them too. --bg/--border/--soft-beige-tint are now a
+     cool blush-mauve family instead, sampled from the same pink-purple
+     hue range as --blush-rose/--muted-lilac so the neutrals finally read
+     as part of one palette instead of a leftover from the old theme.
+     --ink/--ink-muted got the same small cool nudge; contrast against
+     --bg/--card was re-checked with the same WCAG script used for dark
+     mode below, not eyeballed. */
+  --bg: #fbeaf1;              /* Blush Mist — was Cream White #fdf6ec */
   --card: #ffffff;
-  --ink: #2c2a26;
-  --ink-muted: #7a6f60;
-  --border: #ead9bb;          /* Soft Beige */
+  --ink: #2a262c;
+  --ink-muted: #7a6474;
+  --border: #e6cddb;          /* Soft Mauve — was Soft Beige #ead9bb */
   --accent: #b8496f;          /* deep raspberry-rose — links, CTAs, focus */
   --accent-ink: #ffffff;
   --ok: #7d4f7a;              /* muted plum — was green, kept a distinct hue from accent */
@@ -39,7 +48,7 @@
   --lilac-deep: #8a5ea0;
   --berry: #d98098;           /* Berry — replaces Warm Brown/Latte */
   --berry-deep: #8a3f5c;
-  --soft-beige-tint: #f7efe0; /* lighter than --border, for input/picker fills */
+  --soft-beige-tint: #f8e6ef; /* lighter than --border, for input/picker fills */
   color-scheme: light;
 
   /* --accent-text is --accent's twin for plain foreground text sitting
@@ -53,7 +62,7 @@
      the toast pill) regardless of page theme — it deliberately does NOT
      follow --ink so those labels don't turn light-on-light in dark mode. */
   --accent-text: var(--accent);
-  --btn-ink: #2c2a26;
+  --btn-ink: #2a262c;
 }
 
 /* Dark mode: system preference by default, overridable per-device via the
@@ -66,18 +75,18 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #1c1a17;
-    --card: #26221d;
+    --bg: #1b171d;
+    --card: #241f28;
     --ink: #f3ece2;
-    --ink-muted: #b4a693;
-    --border: #665c4a;
+    --ink-muted: #b19eac;
+    --border: #5c4f5e;
     --accent-text: #f0839e;
     --ok: #c98bc4;
     --ok-bg: #332a3a;
     --due-soon: #dba848;
     --overdue: #e87d5f;
     --overdue-bg: #402a23;
-    --soft-beige-tint: #2f2a24;
+    --soft-beige-tint: #2b2530;
     --lilac-deep: #b98fce;
     --berry-deep: #d98bab;
   }
@@ -91,18 +100,18 @@
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #1c1a17;
-  --card: #26221d;
+  --bg: #1b171d;
+  --card: #241f28;
   --ink: #f3ece2;
-  --ink-muted: #b4a693;
-  --border: #665c4a;
+  --ink-muted: #b19eac;
+  --border: #5c4f5e;
   --accent-text: #f0839e;
   --ok: #c98bc4;
   --ok-bg: #332a3a;
   --due-soon: #dba848;
   --overdue: #e87d5f;
   --overdue-bg: #402a23;
-  --soft-beige-tint: #2f2a24;
+  --soft-beige-tint: #2b2530;
   --lilac-deep: #b98fce;
   --berry-deep: #d98bab;
 }
