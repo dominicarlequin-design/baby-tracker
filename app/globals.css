@@ -94,9 +94,10 @@
   :root:not([data-theme="light"]) .nextup-overdue {
     border-color: #5a3428;
   }
-  :root:not([data-theme="light"]) .nextup-due-soon {
-    border-color: #5c4a26;
-  }
+  /* .nextup-due-soon needs no dark-mode override here: its border-color is
+     now derived from --due-soon/--border via color-mix (see the base rule),
+     both of which are already redefined above for dark mode, so it tracks
+     automatically instead of needing its own hardcoded hex per theme. */
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
@@ -119,9 +120,9 @@
 :root[data-theme="dark"] .nextup-overdue {
   border-color: #5a3428;
 }
-:root[data-theme="dark"] .nextup-due-soon {
-  border-color: #5c4a26;
-}
+/* .nextup-due-soon needs no explicit-dark-mode override here either, for
+   the same reason as the media-query block above: color-mix picks up
+   --due-soon/--border, both already redefined in this same selector. */
 
 html, body {
   margin: 0;
@@ -461,7 +462,14 @@ h1 {
   color: var(--ink-muted);
 }
 .nextup-due-soon {
-  border-color: #e0d3ad;
+  /* Tinted from --due-soon/--border themselves (not a fixed hex) so the
+     card frame always tracks the current palette instead of drifting back
+     to a fixed hue after the next palette change -- this exact drift is
+     what happened here: a leftover Soft Beige/Cream White tan (#e0d3ad)
+     stuck around after --border moved to the cool blush-mauve family,
+     clashing with it the same way the old cream page background used to
+     clash with the pink/purple buttons. */
+  border-color: color-mix(in srgb, var(--due-soon) 25%, var(--border));
 }
 .nextup-due-soon .nextup-eyebrow {
   color: var(--due-soon);
