@@ -621,6 +621,114 @@ h1 {
   border-color: var(--border);
 }
 
+/* Milestones card: a horizontally-scrollable row of age-checkpoint pills
+   (the full timeline) plus the detail for whichever one is selected,
+   defaulting to her current stage. is-current/is-next mark her actual
+   position in the timeline; is-selected marks whichever pill's detail is
+   showing below, which starts on is-current but can be browsed away from
+   it -- the two are independent so "where she is" stays visible even
+   while looking ahead or back. */
+.milestone-stagebar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 2px 4px;
+  margin-bottom: 14px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.milestone-stagebar::-webkit-scrollbar {
+  display: none;
+}
+.milestone-stage-pill {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 56px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  font-family: inherit;
+  cursor: pointer;
+}
+.milestone-stage-age {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.milestone-stage-tag {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+  height: 12px;
+}
+.milestone-stage-pill.is-past {
+  opacity: 0.6;
+}
+.milestone-stage-pill.is-selected {
+  border-color: var(--accent);
+}
+.milestone-stage-pill.is-current {
+  background: var(--ok-bg);
+}
+.milestone-stage-pill.is-current .milestone-stage-tag {
+  color: var(--ok);
+}
+.milestone-stage-pill.is-next .milestone-stage-tag {
+  color: var(--due-soon);
+}
+
+.milestone-domain {
+  margin-top: 16px;
+}
+.milestone-domain:first-of-type {
+  margin-top: 0;
+}
+.milestone-domain-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink-muted);
+  margin-bottom: 7px;
+}
+.milestone-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.milestone-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+.milestone-item::before {
+  content: '';
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-top: 6px;
+  background: var(--accent);
+}
+/* Each domain gets its own dot color, sampled from the app's existing
+   category palette, so the four groups stay visually distinct at a glance
+   the same way the Log page's category dots do. */
+.milestone-domain.social .milestone-item::before { background: var(--blush-rose); }
+.milestone-domain.language .milestone-item::before { background: var(--orchid); }
+.milestone-domain.cognitive .milestone-item::before { background: var(--lilac-deep); }
+.milestone-domain.movement .milestone-item::before { background: var(--berry-deep); }
+
 .chart-header {
   display: flex;
   align-items: baseline;

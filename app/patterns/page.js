@@ -116,6 +116,194 @@ function referenceForAge(ageMonths) {
   return AGE_REFERENCE.find(b => ageMonths < b.maxMonths) || AGE_REFERENCE[AGE_REFERENCE.length - 1];
 }
 
+// Developmental milestones, from the CDC's "Learn the Signs. Act Early."
+// checklists (2022 revision — the current version, which moved from 50th
+// to 75th percentile milestones so a "typical" child is expected to have
+// them by that age, not just half of children). Each stage is a
+// well-child-visit checkpoint age, not a range: these are representative
+// highlights from each checklist (a few per domain), not the complete
+// list — see cdc.gov/act-early/milestones for the full checklists,
+// linked in the card's footnote below. General population milestones,
+// not a diagnosis or a timeline any one baby has to match; the CDC's own
+// guidance is to talk with a pediatrician about anything that concerns
+// you rather than reading a missed milestone as a problem on its own.
+const MILESTONE_STAGES = [
+  {
+    months: 2, ageTag: '2 mo', label: 'By 2 months',
+    domains: {
+      social: ['Calms down when spoken to or picked up', 'Looks at your face', 'Seems happy to see you when you walk up to her', 'Smiles when you talk to or smile at her'],
+      language: ['Makes sounds other than crying', 'Reacts to loud sounds'],
+      cognitive: ['Watches you as you move', 'Looks at a toy for several seconds'],
+      movement: ['Holds head up when on tummy', 'Moves both arms and both legs', 'Opens hands briefly'],
+    },
+  },
+  {
+    months: 4, ageTag: '4 mo', label: 'By 4 months',
+    domains: {
+      social: ['Smiles on her own to get your attention', 'Chuckles (not yet a full laugh) when you try to make her laugh', 'Looks at you, moves, or makes sounds to get or keep your attention'],
+      language: ['Makes sounds like "oooo", "aahh" (cooing)', 'Makes sounds back when you talk to her', 'Turns head towards the sound of your voice'],
+      cognitive: ['If hungry, opens mouth when she sees breast or bottle', 'Looks at her hands with interest'],
+      movement: ['Holds head steady without support when you are holding her', 'Holds a toy when you put it in her hand', 'Uses her arm to swing at toys', 'Brings hands to mouth', 'Pushes up onto elbows/forearms when on tummy'],
+    },
+  },
+  {
+    months: 6, ageTag: '6 mo', label: 'By 6 months',
+    domains: {
+      social: ['Knows familiar people', 'Likes to look at self in a mirror', 'Laughs'],
+      language: ['Takes turns making sounds with you', 'Blows "raspberries" (sticks tongue out and blows)', 'Makes squealing noises'],
+      cognitive: ['Puts things in her mouth to explore them', 'Reaches to grab a toy she wants', 'Closes lips to show she doesn’t want more food'],
+      movement: ['Rolls from tummy to back', 'Pushes up with straight arms when on tummy', 'Leans on hands to support herself when sitting'],
+    },
+  },
+  {
+    months: 9, ageTag: '9 mo', label: 'By 9 months',
+    domains: {
+      social: ['Is shy, clingy, or fearful around strangers', 'Shows several facial expressions, like happy, sad, angry, and surprised', 'Looks when you call her name', 'Reacts when you leave (looks, reaches for you, or cries)', 'Smiles or laughs when you play peek-a-boo'],
+      language: ['Makes a lot of different sounds like "mamamama" and "bababababa"', 'Lifts arms up to be picked up'],
+      cognitive: ['Looks for objects when dropped out of sight (like her spoon or toy)', 'Bangs two things together'],
+      movement: ['Gets to a sitting position by herself', 'Moves things from one hand to her other hand', 'Uses fingers to "rake" food towards herself', 'Sits without support'],
+    },
+  },
+  {
+    months: 12, ageTag: '1 yr', label: 'By 1 year',
+    domains: {
+      social: ['Plays games with you, like pat-a-cake'],
+      language: ['Waves "bye-bye"', 'Calls a parent "mama" or "dada" or another special name', 'Understands "no" (pauses briefly or stops when you say it)'],
+      cognitive: ['Puts something in a container, like a block in a cup', 'Looks for things she sees you hide, like a toy under a blanket'],
+      movement: ['Pulls up to stand', 'Walks, holding on to furniture', 'Drinks from a cup without a lid, as you hold it', 'Picks things up between thumb and pointer finger, like small bits of food'],
+    },
+  },
+  {
+    months: 15, ageTag: '15 mo', label: 'By 15 months',
+    domains: {
+      social: ['Copies other children while playing, like taking toys out of a container when another child does', 'Shows you an object she likes', 'Claps when excited', 'Hugs stuffed doll or other toy', 'Shows you affection (hugs, cuddles, or kisses you)'],
+      language: ['Tries to say one or two words besides "mama" or "dada," like "ba" for ball or "da" for dog', 'Looks at a familiar object when you name it', 'Follows directions given with both a gesture and words', 'Points to ask for something or to get help'],
+      cognitive: ['Tries to use things the right way, like a phone, cup, or book', 'Stacks at least two small objects, like blocks'],
+      movement: ['Takes a few steps on her own', 'Uses fingers to feed herself some food'],
+    },
+  },
+  {
+    months: 18, ageTag: '18 mo', label: 'By 18 months',
+    domains: {
+      social: ['Moves away from you, but looks to make sure you are close by', 'Points to show you something interesting', 'Puts hands out for you to wash them', 'Looks at a few pages in a book with you', 'Helps you dress her by pushing arm through sleeve or lifting up foot'],
+      language: ['Tries to say three or more words besides "mama" or "dada"', 'Follows one-step directions without any gestures, like giving you the toy when you say, "Give it to me."'],
+      cognitive: ['Copies you doing chores, like sweeping with a broom', 'Plays with toys in a simple way, like pushing a toy car'],
+      movement: ['Walks without holding on to anyone or anything', 'Scribbles', 'Drinks from a cup without a lid and may spill sometimes', 'Feeds herself with her fingers', 'Tries to use a spoon', 'Climbs on and off a couch or chair without help'],
+    },
+  },
+  {
+    months: 24, ageTag: '2 yr', label: 'By 2 years',
+    domains: {
+      social: ['Notices when others are hurt or upset, like pausing or looking sad when someone is crying', 'Looks at your face to see how to react in a new situation'],
+      language: ['Points to things in a book when you ask, like "Where is the bear?"', 'Says at least two words together, like "More milk."', 'Points to at least two body parts when you ask her to show you', 'Uses more gestures than just waving and pointing, like blowing a kiss or nodding yes'],
+      cognitive: ['Holds something in one hand while using the other hand, like holding a container and taking the lid off', 'Tries to use switches, knobs, or buttons on a toy', 'Plays with more than one toy at the same time, like putting toy food on a toy plate'],
+      movement: ['Kicks a ball', 'Runs', 'Walks (not climbs) up a few stairs with or without help', 'Eats with a spoon'],
+    },
+  },
+  {
+    months: 30, ageTag: '30 mo', label: 'By 30 months',
+    domains: {
+      social: ['Plays next to other children and sometimes plays with them', 'Shows you what she can do by saying, "Look at me!"', 'Follows simple routines when told, like helping to pick up toys when you say, "It’s clean-up time."'],
+      language: ['Says about 50 words', 'Says two or more words together, with one action word, like "Doggie run"', 'Names things in a book when you point and ask, "What is this?"', 'Says words like "I," "me," or "we"'],
+      cognitive: ['Uses things to pretend, like feeding a block to a doll as if it were food', 'Shows simple problem-solving skills, like standing on a small stool to reach something', 'Follows two-step instructions like "Put the toy down and close the door."', 'Shows she knows at least one color'],
+      movement: ['Uses hands to twist things, like turning doorknobs or unscrewing lids', 'Takes some clothes off by herself, like loose pants or an open jacket', 'Jumps off the ground with both feet', 'Turns book pages, one at a time, when you read to her'],
+    },
+  },
+  {
+    months: 36, ageTag: '3 yr', label: 'By 3 years',
+    domains: {
+      social: ['Calms down within 10 minutes after you leave her, like at a childcare drop off', 'Notices other children and joins them to play'],
+      language: ['Talks with you in conversation using at least two back-and-forth exchanges', 'Asks "who," "what," "where," or "why" questions', 'Says what action is happening in a picture or book when asked', 'Says first name, when asked', 'Talks well enough for others to understand, most of the time'],
+      cognitive: ['Draws a circle, when you show her how', 'Avoids touching hot objects, like a stove, when you warn her'],
+      movement: ['Strings items together, like large beads or macaroni', 'Puts on some clothes by herself, like loose pants or a jacket', 'Uses a fork'],
+    },
+  },
+];
+
+const MILESTONE_DOMAIN_META = [
+  { key: 'social', title: 'Social / Emotional' },
+  { key: 'language', title: 'Language / Communication' },
+  { key: 'cognitive', title: 'Cognitive' },
+  { key: 'movement', title: 'Movement / Physical' },
+];
+
+// Index of the checkpoint she's most recently reached (the last one whose
+// age is at or before hers) — "current stage" means "what's expected by
+// now," not a range she stays in until the next checkup. -1 means she
+// hasn't reached the first checkpoint (2 months) yet; that's fine, the
+// card just highlights the 2-month one as "coming up" instead.
+function currentMilestoneIndex(ageMonths) {
+  if (ageMonths == null) return -1;
+  let idx = -1;
+  for (let i = 0; i < MILESTONE_STAGES.length; i++) {
+    if (ageMonths >= MILESTONE_STAGES[i].months) idx = i;
+  }
+  return idx;
+}
+
+function MilestonesCard({ ageMonths, ageLabel, hasBirthDate }) {
+  const currentIdx = useMemo(() => currentMilestoneIndex(ageMonths), [ageMonths]);
+  const defaultIdx = currentIdx >= 0 ? currentIdx : 0;
+  const [selectedIdx, setSelectedIdx] = useState(null);
+  const activeIdx = selectedIdx ?? defaultIdx;
+  const stage = MILESTONE_STAGES[activeIdx];
+
+  return (
+    <div className="card">
+      <div className="section-title">Milestones{hasBirthDate ? ` (${ageLabel})` : ''}</div>
+      {!hasBirthDate && (
+        <div className="form-hint" style={{ marginBottom: '10px' }}>
+          Add her birth date in <Link href="/settings" className="header-settings-link">Settings</Link> to see her current stage highlighted automatically — showing the full timeline for now.
+        </div>
+      )}
+
+      <div className="milestone-stagebar">
+        {MILESTONE_STAGES.map((s, i) => {
+          const isPast = i < currentIdx;
+          const isCurrent = i === currentIdx;
+          const isNext = i === currentIdx + 1;
+          const isSelected = i === activeIdx;
+          const tag = isCurrent ? 'Now' : isNext ? 'Next' : '';
+          const cls = [
+            'milestone-stage-pill',
+            isPast && 'is-past',
+            isCurrent && 'is-current',
+            isNext && 'is-next',
+            isSelected && 'is-selected',
+          ].filter(Boolean).join(' ');
+          return (
+            <button key={s.months} type="button" className={cls} onClick={() => setSelectedIdx(i)}>
+              <span className="milestone-stage-age">{s.ageTag}</span>
+              <span className="milestone-stage-tag">{tag}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="table-label" style={{ marginBottom: '10px' }}>{stage.label}</div>
+
+      {MILESTONE_DOMAIN_META.map(({ key, title }) => (
+        <div key={key} className={`milestone-domain ${key}`}>
+          <div className="milestone-domain-title">{title}</div>
+          <ul className="milestone-list">
+            {stage.domains[key].map((item, i) => (
+              <li key={i} className="milestone-item">{item}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+
+      <div className="form-hint" style={{ marginTop: '14px' }}>
+        A representative sample from the CDC&apos;s &quot;Learn the Signs. Act Early.&quot; checklists, not the complete list — see{' '}
+        <a href="https://www.cdc.gov/act-early/milestones/index.html" target="_blank" rel="noreferrer" className="header-settings-link">
+          cdc.gov/act-early/milestones
+        </a>{' '}
+        for every item. These are general population milestones, not a diagnosis or a deadline — every baby varies, and it’s worth mentioning anything that concerns you to her pediatrician rather than reading a missed one as a problem on its own.
+      </div>
+    </div>
+  );
+}
+
 function compareToRange(value, range) {
   if (value == null || !Number.isFinite(value)) return null;
   if (value < range.low) return 'below';
@@ -520,6 +708,12 @@ export default function PatternsPage() {
               </div>
             </div>
           )}
+
+          <MilestonesCard
+            ageMonths={age?.decimalMonths ?? null}
+            ageLabel={age ? `${age.months} month${age.months === 1 ? '' : 's'}${age.days ? `, ${age.days}d` : ''} old` : ''}
+            hasBirthDate={!!age}
+          />
 
           {recentWindow.length > 0 && (
             <button className="export-btn" onClick={() => exportCsv(recentWindow)}>
