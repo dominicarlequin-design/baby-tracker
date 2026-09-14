@@ -175,6 +175,19 @@ h1 {
   text-decoration: none;
 }
 
+/* Back-nav for Patterns' sub-pages (Typical day / How she compares /
+   Milestones) — sits above the h1 inside the same header-row flex item,
+   so header-row's existing baseline alignment with header-actions on the
+   right needs no changes. */
+.header-back-link {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent-text);
+  text-decoration: none;
+  margin-bottom: 2px;
+}
+
 .header-actions {
   display: flex;
   align-items: center;
@@ -619,6 +632,57 @@ h1 {
 /* Patterns screen */
 .nextup-headline-card {
   border-color: var(--border);
+}
+
+/* Nav rows on the main Patterns page — Typical day / How she compares /
+   Milestones each moved to its own sub-page, so these are the entry
+   points into them: a settings-list-style tappable row rather than the
+   full pill buttons used for logging actions, since these navigate
+   instead of acting. */
+.pattern-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  box-shadow: 0 2px 6px rgba(44, 42, 38, 0.06);
+  transition: transform 0.1s ease, opacity 0.15s ease;
+}
+.pattern-nav-row:active {
+  transform: scale(0.98);
+  opacity: 0.88;
+}
+.pattern-nav-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.pattern-nav-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.pattern-nav-sub {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pattern-nav-chevron {
+  flex-shrink: 0;
+  color: var(--ink-muted);
 }
 
 /* Milestones card: a horizontally-scrollable row of age-checkpoint pills
