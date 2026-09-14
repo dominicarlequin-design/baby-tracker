@@ -350,7 +350,15 @@ export default function Page() {
             </div>
           )}
 
-          {nextUp ? (
+          {/* Skipped once 2+ things are overdue: the banner above already
+              names every overdue category with its own late-by time and a
+              tap into the same explain modal, so giving just the single
+              worst offender a second, fuller writeup here double-counted
+              it while the others sat at one line each — not wrong, just
+              uneven billing among things that are equally late. With 0 or
+              1 overdue this card is the only place that story gets told,
+              so it stays. */}
+          {overdueItems.length <= 1 && (nextUp ? (
             <div className={`nextup nextup-${nextUpTone}`}>
               <div className={`nextup-eyebrow ${nextUp.lateBy ? 'category' : ''}`}>{nextUp.eyebrow}</div>
               <div className="nextup-headline">
@@ -365,7 +373,7 @@ export default function Page() {
               <div className="nextup-headline">Tap Fed or Diaper to begin</div>
               <div className="nextup-sub">Her patterns will show up here once a bit of history builds up.</div>
             </div>
-          )}
+          ))}
 
           <div className="btn-grid">
             <button className={`log-btn log-btn-primary btn-feed ${phaseClass(phase.feed)}`} onClick={() => setFeedPickerOpen(true)}>
