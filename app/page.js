@@ -331,7 +331,7 @@ export default function Page() {
                   <span className="alert-badge" aria-hidden="true">!</span>
                   {overdueItems.length} overdue
                 </span>
-                <span className={`chevron ${overdueOpen ? 'open' : ''}`}>{'>'}</span>
+                <span className={`chevron ${overdueOpen ? 'open' : ''}`}>{'▾'}</span>
               </button>
               {overdueOpen && (
                 <div className="overdue-banner-list">

@@ -265,6 +265,12 @@ h1 {
   color: var(--overdue);
 }
 
+/* In-place disclosure toggles (overdue banner, bedtime pattern) — a down
+   caret that flips to point up when expanded. Deliberately NOT the same
+   glyph as .pattern-nav-chevron (a sideways "›" used for actual page
+   navigation on the Patterns hub): reusing one glyph for both "unfolds
+   right here" and "takes you to another screen" reads as a broken link
+   the first time someone taps an accordion expecting to navigate. */
 .chevron {
   margin-left: auto;
   flex-shrink: 0;
@@ -272,7 +278,7 @@ h1 {
   transition: transform 0.15s ease;
 }
 .chevron.open {
-  transform: rotate(90deg);
+  transform: rotate(180deg);
 }
 
 .btn-grid {
@@ -939,12 +945,19 @@ h1 {
   font-weight: 600;
 }
 
+/* Deliberately ink-muted, not accent pink: Upcoming stacks five of these
+   next to Bedtime pattern below, and at full accent weight they out-shout
+   the actual due times (the thing this screen exists to show). The
+   underline keeps them legible as tappable without borrowing the app's
+   primary-action color. */
 .why-btn {
   background: none;
   border: none;
-  color: var(--accent-text);
+  color: var(--ink-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   margin-left: 6px;
   padding: 0;
   cursor: pointer;
@@ -974,6 +987,9 @@ h1 {
   padding-bottom: 4px;
 }
 
+/* ink-muted, not accent pink — see .why-btn above: this is the sixth
+   pink tap target competing with the actual times if it matches Why?/
+   Settings. The chevron plus full-width row already signal it's tappable. */
 .pattern-toggle {
   display: flex;
   align-items: center;
@@ -986,7 +1002,7 @@ h1 {
   font-family: inherit;
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--accent-text);
+  color: var(--ink-muted);
   text-align: left;
 }
 .pattern-toggle .chevron {
