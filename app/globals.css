@@ -1308,6 +1308,13 @@ h1 {
   height: 4px;
 }
 
+/* Promoted to its own compositor layer (translateZ/backface-visibility) —
+   without this, iOS's WKWebView (the engine behind an installed
+   home-screen PWA) is known to let a `position: fixed` bar lag behind
+   during a scroll gesture, so it visually floats mid-page over whatever
+   content happens to be there until the scroll settles, instead of
+   staying pinned to the true bottom edge. GPU-compositing the layer up
+   front avoids that repaint lag. */
 .tab-bar {
   position: fixed;
   left: 0;
@@ -1319,6 +1326,10 @@ h1 {
   border-top: 1px solid var(--border);
   padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
   z-index: 10;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 .tab-item {
   flex: 1;
