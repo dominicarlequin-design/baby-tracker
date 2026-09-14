@@ -1089,9 +1089,31 @@ h1 {
 }
 
 .activity-type {
+  display: inline-flex;
+  align-items: center;
   font-size: 14.5px;
   font-weight: 600;
 }
+
+/* Same category palette as the Log screen's button grid (.btn-feed etc.)
+   — Recent is a chronological list of exactly those categories, but was
+   the one screen not drawing on that color system, so a long day's worth
+   of rows read as identical black-on-white text with nothing to scan by
+   besides reading each line. */
+.activity-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+.activity-dot-feed { background: var(--blush-rose); }
+.activity-dot-diaper { background: var(--orchid); }
+.activity-dot-nap { background: var(--muted-lilac); }
+.activity-dot-medicine { background: var(--dusty-pink); }
+.activity-dot-sleep-start { background: var(--berry); }
+.activity-dot-sleep-end { background: var(--butter-yellow); }
 
 .activity-time {
   font-size: 13px;

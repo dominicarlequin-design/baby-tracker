@@ -12,6 +12,7 @@ import {
   formatRelative,
   buildActivityGroups,
   activityDetailSuffix,
+  activityDotClass,
   TYPE_LABELS,
 } from '../../lib/homeUi';
 
@@ -170,6 +171,7 @@ export default function RecentPage() {
                       {item.kind === 'nap' ? (
                         <>
                           <span className="activity-type">
+                            <span className={`activity-dot ${activityDotClass(item)}`} aria-hidden="true" />
                             Nap · {formatDurationWords((new Date(item.end) - new Date(item.start)) / (1000 * 60 * 60))}
                           </span>
                           <span className="activity-time">
@@ -178,7 +180,10 @@ export default function RecentPage() {
                         </>
                       ) : (
                         <>
-                          <span className="activity-type">{TYPE_LABELS[item.type] || item.type}{activityDetailSuffix(item.raw)}</span>
+                          <span className="activity-type">
+                            <span className={`activity-dot ${activityDotClass(item)}`} aria-hidden="true" />
+                            {TYPE_LABELS[item.type] || item.type}{activityDetailSuffix(item.raw)}
+                          </span>
                           <span className="activity-time">
                             {formatLocalTime(item.event_time, timezone)}
                             {group.label === 'Today' ? ` · ${formatRelative(item.event_time, now)}` : ''}
