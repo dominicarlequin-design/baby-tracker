@@ -110,6 +110,21 @@
      (6.93:1). */
   --wake-badge: #422145;
   --soft-beige-tint: #f8e6ef; /* lighter than --border, for input/picker fills */
+
+  /* Deliberate one-off exception to "nothing on the page reads blue,
+     green, or brown" (see the professional-polish note above): Medicine
+     gets its own mint, at your call, because a soft green reads instantly
+     as "health/medical" in a way no pink-purple tint does, and this is the
+     one card on the page where that association is worth more than palette
+     purity. Kept as flat, theme-fixed values (not redefined for dark mode)
+     to match how --dusty-pink-bg worked before it — a light pastel chip
+     that stays put rather than trying to invert into a "dark mint". Text
+     stays on --btn-ink, same fixed-dark-ink pattern as every other pastel
+     chip. --mint-deep verified at 6.98:1 directly on --mint-bg and 4.98:1
+     on the icon-disc's mixed tint (better than the medicine icon's old
+     --berry-deep pairing, 4.18:1). */
+  --mint-bg: #e3f0e6;
+  --mint-deep: #22593b;
   color-scheme: light;
 
   /* --accent-text is --accent's twin for plain foreground text sitting
@@ -204,7 +219,10 @@ button {
 }
 
 h1 {
-  font-size: 26px;
+  font-family: 'Fraunces', 'Georgia', serif;
+  font-weight: 600;
+  font-size: 30px;
+  color: var(--accent-text);
   margin: 0;
 }
 
@@ -445,7 +463,7 @@ h1 {
 .nap-filled .icon-disc { background: #fff; color: var(--lilac-fill); }
 .sleep-outline .icon-disc { background: color-mix(in srgb, var(--berry-deep) 18%, var(--card)); color: var(--berry-deep); }
 .sleep-filled .icon-disc { background: var(--butter-yellow); color: var(--wake-badge); }
-.medicine-row .icon-disc { background: color-mix(in srgb, var(--berry-deep) 22%, var(--dusty-pink-bg)); color: var(--berry-deep); }
+.medicine-row .icon-disc { background: color-mix(in srgb, var(--mint-deep) 22%, var(--mint-bg)); color: var(--mint-deep); }
 
 /* Overdue banner: aggregates every currently-overdue category at once, at
    the very top of the page — the Next-up card below only ever shows the
@@ -548,7 +566,27 @@ h1 {
   font-size: 13px;
   color: var(--ink-muted);
 }
-.nextup-due-soon {
+/* Calm-state category tint: when nothing is due-soon or overdue, the card
+   is tinted by WHICH category it's about (feed/diaper/nap/sleep) instead
+   of sitting on plain --card — matches the reference look's colored
+   "Next feeding" card. Urgency still wins over category: .nextup-due-soon
+   and .nextup-overdue below are written as two-class selectors so they
+   always out-specificity these single-class tints regardless of source
+   order, the same trick used for the Wake Up button earlier. Nap's tint
+   uses a lighter mix (12% vs 18%) than the other three — at 18% its
+   lilac fell just under 4.5:1 against --lilac-deep text; lightening the
+   wash a bit restored it (4.56:1) without changing the color families
+   involved. */
+.nextup-cat-feed { background: color-mix(in srgb, var(--blush-rose) 18%, var(--card)); border-color: color-mix(in srgb, var(--blush-rose) 30%, var(--border)); }
+.nextup-cat-feed .nextup-eyebrow { color: var(--blush-rose-fill); }
+.nextup-cat-diaper { background: color-mix(in srgb, var(--orchid) 18%, var(--card)); border-color: color-mix(in srgb, var(--orchid) 30%, var(--border)); }
+.nextup-cat-diaper .nextup-eyebrow { color: var(--orchid-fill); }
+.nextup-cat-nap { background: color-mix(in srgb, var(--muted-lilac) 12%, var(--card)); border-color: color-mix(in srgb, var(--muted-lilac) 30%, var(--border)); }
+.nextup-cat-nap .nextup-eyebrow { color: var(--lilac-deep); }
+.nextup-cat-sleep { background: color-mix(in srgb, var(--berry) 18%, var(--card)); border-color: color-mix(in srgb, var(--berry) 30%, var(--border)); }
+.nextup-cat-sleep .nextup-eyebrow { color: var(--berry-deep); }
+
+.nextup.nextup-due-soon {
   /* Tinted from --due-soon/--border themselves (not a fixed hex) so the
      card frame always tracks the current palette instead of drifting back
      to a fixed hue after the next palette change -- this exact drift is
@@ -556,12 +594,13 @@ h1 {
      stuck around after --border moved to the cool blush-mauve family,
      clashing with it the same way the old cream page background used to
      clash with the pink/purple buttons. */
+  background: var(--card);
   border-color: color-mix(in srgb, var(--due-soon) 25%, var(--border));
 }
 .nextup-due-soon .nextup-eyebrow {
   color: var(--due-soon);
 }
-.nextup-overdue {
+.nextup.nextup-overdue {
   border-color: #eccbc1;
   background: var(--overdue-bg);
 }
@@ -578,6 +617,30 @@ h1 {
 .nextup-lateby {
   color: var(--overdue);
   font-weight: 800;
+}
+
+/* Progress toward the next expected event — how far "now" has traveled
+   between the last logged event and the predicted due time. Each category
+   tint above sets --nextup-progress-color; due-soon/overdue override it
+   (and win the cascade the same two-class way) since urgency has its own
+   established colors already. */
+.nextup-cat-feed { --nextup-progress-color: var(--blush-rose-fill); }
+.nextup-cat-diaper { --nextup-progress-color: var(--orchid-fill); }
+.nextup-cat-nap { --nextup-progress-color: var(--lilac-deep); }
+.nextup-cat-sleep { --nextup-progress-color: var(--berry-deep); }
+.nextup.nextup-due-soon { --nextup-progress-color: var(--due-soon); }
+.nextup.nextup-overdue { --nextup-progress-color: var(--overdue); }
+.nextup-progress-track {
+  margin-top: 12px;
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--nextup-progress-color, var(--accent)) 20%, var(--card));
+  overflow: hidden;
+}
+.nextup-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--nextup-progress-color, var(--accent));
 }
 
 .stateful-grid {
@@ -624,8 +687,17 @@ h1 {
   background: var(--card);
   border: 1.5px solid var(--border);
 }
-.nap-outline { border-color: var(--lilac-deep); color: var(--lilac-deep); --glow: color-mix(in srgb, var(--lilac-deep) 35%, transparent); }
-.sleep-outline { border-color: var(--berry-deep); color: var(--berry-deep); --glow: color-mix(in srgb, var(--berry-deep) 35%, transparent); }
+/* Tinted-row treatment, matching the reference look's soft-fill Nap/
+   Bedtime rows — a solid category wash instead of a white card with a
+   colored border. Compound selectors (.stateful-btn.nap-outline, not just
+   .nap-outline) so these actually beat .stateful-btn.outline's border
+   above; a single-class selector here would lose that fight regardless of
+   source order, same specificity trick as the buttons above. No chevron
+   was added even though the reference shows one — Start nap/Bedtime are
+   single-tap toggles, not navigation, and a chevron implies "goes
+   somewhere else" that isn't true here. */
+.stateful-btn.nap-outline { background: color-mix(in srgb, var(--muted-lilac) 12%, var(--card)); border-color: transparent; color: var(--lilac-deep); --glow: color-mix(in srgb, var(--lilac-deep) 35%, transparent); }
+.stateful-btn.sleep-outline { background: color-mix(in srgb, var(--berry) 18%, var(--card)); border-color: transparent; color: var(--berry-deep); --glow: color-mix(in srgb, var(--berry-deep) 35%, transparent); }
 
 .stateful-btn.filled {
   border: none;
@@ -664,7 +736,7 @@ h1 {
   justify-content: space-between;
   gap: 10px;
   width: 100%;
-  background: var(--dusty-pink-bg);
+  background: var(--mint-bg);
   border: 1px solid var(--border);
   border-radius: 999px;
   padding: 14px 18px;
@@ -706,6 +778,17 @@ h1 {
   padding: 12px 8px;
   text-align: center;
 }
+/* Category-tinted stat tiles, matching the reference look — same
+   color-mix formulas as the Next-up card above, reused here rather than
+   invented fresh so a "feed pink" reads the same wherever it shows up on
+   the page. Single-class selectors are enough here (no higher-specificity
+   rule to out-rank), unlike the buttons/rows above. */
+.stat-tile-feed { background: color-mix(in srgb, var(--blush-rose) 18%, var(--card)); border-color: transparent; }
+.stat-tile-feed .stat-value { color: var(--blush-rose-fill); }
+.stat-tile-diaper { background: color-mix(in srgb, var(--orchid) 18%, var(--card)); border-color: transparent; }
+.stat-tile-diaper .stat-value { color: var(--orchid-fill); }
+.stat-tile-nap { background: color-mix(in srgb, var(--muted-lilac) 12%, var(--card)); border-color: transparent; }
+.stat-tile-nap .stat-value { color: var(--lilac-deep); }
 .stat-value {
   font-size: 19px;
   font-weight: 700;

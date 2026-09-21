@@ -2,6 +2,14 @@ import './globals.css';
 import { THEME_INIT_SCRIPT } from '../lib/theme';
 import { ClickSoundListener } from '../lib/ClickSoundListener';
 
+// Warm serif for page headings ("Today", etc.) only — everything else
+// stays on the system sans stack. Loaded as a plain stylesheet link
+// (rather than next/font/google, which fetches the font file at BUILD
+// time and has no graceful fallback if that fetch fails) so a flaky or
+// restricted build-time network can never break the whole build over one
+// heading font; worst case here is the browser's own runtime fetch
+// failing, which just falls back to the 'Georgia, serif' stack below.
+
 export const metadata = {
   title: 'Baby Tracker',
   description: 'Tap-to-log baby habit tracker',
@@ -38,7 +46,7 @@ export const viewport = {
   // lib/theme.js) is a per-session choice the OS-level chrome color can't
   // react to without a native app wrapper, so it's a known, accepted gap.
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fbeaf1' },
+    { media: '(prefers-color-scheme: light)', color: '#f7f1f2' },
     { media: '(prefers-color-scheme: dark)', color: '#1b171d' },
   ],
 };
@@ -51,6 +59,9 @@ export default function RootLayout({ children }) {
     // "server/client attribute mismatch" warning for this one attribute.
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&display=swap" rel="stylesheet" />
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body>

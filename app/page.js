@@ -15,6 +15,7 @@ import {
   nextMedicineSlot,
   pickNextUp,
   nextUpContent,
+  nextUpProgress,
   explainStatus,
   overdueSummary,
 } from '../lib/homeUi';
@@ -265,6 +266,7 @@ export default function Page() {
   const nextUpKey = status ? pickNextUp(status, now) : null;
   const nextUp = nextUpKey ? nextUpContent(nextUpKey, status, config, timezone) : null;
   const nextUpTone = nextUpKey ? status[nextUpKey].state : null;
+  const nextUpProgressValue = nextUpKey && status ? nextUpProgress(status, nextUpKey, now) : null;
   const medicineNext = config ? nextMedicineSlot(config, now) : null;
 
   // Every currently-overdue category at once, for the banner at the very
@@ -337,13 +339,18 @@ export default function Page() {
               1 overdue this card is the only place that story gets told,
               so it stays. */}
           {overdueItems.length <= 1 && (nextUp ? (
-            <div className={`nextup nextup-${nextUpTone}`}>
+            <div className={`nextup nextup-${nextUpTone} nextup-cat-${nextUpKey}`}>
               <div className={`nextup-eyebrow ${nextUp.lateBy ? 'category' : ''}`}>{nextUp.eyebrow}</div>
               <div className="nextup-headline">
                 {nextUp.headline}
                 {nextUp.lateBy && <span className="nextup-lateby"> · {nextUp.lateBy}</span>}
               </div>
               <div className="nextup-sub">{nextUp.sub}</div>
+              {nextUpProgressValue != null && (
+                <div className="nextup-progress-track">
+                  <div className="nextup-progress-fill" style={{ width: `${Math.round(nextUpProgressValue * 100)}%` }} />
+                </div>
+              )}
             </div>
           ) : (
             <div className="nextup nextup-on-track">
@@ -414,15 +421,15 @@ export default function Page() {
 
           {today && (
             <div className="stats-row">
-              <div className="stat-tile">
+              <div className="stat-tile stat-tile-feed">
                 <div className="stat-value">{today.feeds}</div>
                 <div className="stat-label">Feeds</div>
               </div>
-              <div className="stat-tile">
+              <div className="stat-tile stat-tile-nap">
                 <div className="stat-value">{formatHours(today.napMinutes / 60) || '0m'}</div>
                 <div className="stat-label">Napped ({today.naps})</div>
               </div>
-              <div className="stat-tile">
+              <div className="stat-tile stat-tile-diaper">
                 <div className="stat-value">{today.diapers}</div>
                 <div className="stat-label">Diapers</div>
               </div>
