@@ -97,6 +97,17 @@
   --lilac-fill: #6b358d;
   --berry-fill: #8f4262;
 
+  /* Text/icon color for feed/diaper content sitting on their own tinted
+     CARD backgrounds (next-up eyebrow + icon, stat-tile value + icon) —
+     as opposed to -fill above, which is for a FIXED white background/text
+     pairing (button fills, white-icon-disc) that doesn't need to move with
+     the theme. --lilac-deep/--berry-deep already split this same way for
+     nap/sleep; blush-rose/orchid needed their own pair once dark mode
+     exposed the gap (see the dark-mode block below — light mode is
+     identical to -fill, already verified 5:1+ there). */
+  --blush-rose-deep: #8d3548;
+  --orchid-deep: #8d3587;
+
   /* Fed/Diaper-only, lighter siblings of the two fills above. Your "new
      look" reference's Fed/Diaper buttons sit on a much softer dusty-rose/
      lavender than these deep jewel tones (~#d89a9e / #bcabce sampled
@@ -182,6 +193,8 @@
     --soft-beige-tint: #2b2530;
     --lilac-deep: #b98fce;
     --berry-deep: #d98bab;
+    --blush-rose-deep: #d97f92;
+    --orchid-deep: #d289cd;
   }
   :root:not([data-theme="light"]) .overdue-banner,
   :root:not([data-theme="light"]) .nextup-overdue {
@@ -208,6 +221,8 @@
   --soft-beige-tint: #2b2530;
   --lilac-deep: #b98fce;
   --berry-deep: #d98bab;
+  --blush-rose-deep: #d97f92;
+  --orchid-deep: #d289cd;
 }
 :root[data-theme="dark"] .overdue-banner,
 :root[data-theme="dark"] .nextup-overdue {
@@ -245,17 +260,45 @@ h1 {
 
 .header-row {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 20px;
+}
+
+.header-heart {
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin-top: 6px;
+  color: var(--accent-text);
+  opacity: 0.7;
 }
 
 .header-right {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 4px;
+  gap: 8px;
+}
+
+.header-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--accent-text);
+  box-shadow: 0 2px 6px rgba(44, 42, 38, 0.12);
+}
+.header-icon-btn svg {
+  width: 19px;
+  height: 19px;
+}
+.header-icon-btn:active {
+  transform: scale(0.95);
 }
 
 .header-datetime {
@@ -617,11 +660,11 @@ h1 {
    wash a bit restored it (4.56:1) without changing the color families
    involved. */
 .nextup-cat-feed { background: color-mix(in srgb, var(--blush-rose) 18%, var(--card)); border-color: color-mix(in srgb, var(--blush-rose) 30%, var(--border)); }
-.nextup-cat-feed .nextup-eyebrow { color: var(--blush-rose-fill); }
-.nextup-cat-feed .icon-disc { background: color-mix(in srgb, var(--blush-rose) 35%, var(--card)); color: var(--blush-rose-fill); }
+.nextup-cat-feed .nextup-eyebrow { color: var(--blush-rose-deep); }
+.nextup-cat-feed .icon-disc { background: color-mix(in srgb, var(--blush-rose) 20%, var(--card)); color: var(--blush-rose-deep); }
 .nextup-cat-diaper { background: color-mix(in srgb, var(--orchid) 18%, var(--card)); border-color: color-mix(in srgb, var(--orchid) 30%, var(--border)); }
-.nextup-cat-diaper .nextup-eyebrow { color: var(--orchid-fill); }
-.nextup-cat-diaper .icon-disc { background: color-mix(in srgb, var(--orchid) 35%, var(--card)); color: var(--orchid-fill); }
+.nextup-cat-diaper .nextup-eyebrow { color: var(--orchid-deep); }
+.nextup-cat-diaper .icon-disc { background: color-mix(in srgb, var(--orchid) 20%, var(--card)); color: var(--orchid-deep); }
 .nextup-cat-nap { background: color-mix(in srgb, var(--muted-lilac) 12%, var(--card)); border-color: color-mix(in srgb, var(--muted-lilac) 30%, var(--border)); }
 .nextup-cat-nap .nextup-eyebrow { color: var(--lilac-deep); }
 .nextup-cat-nap .icon-disc { background: color-mix(in srgb, var(--muted-lilac) 28%, var(--card)); color: var(--lilac-deep); }
@@ -667,8 +710,8 @@ h1 {
    tint above sets --nextup-progress-color; due-soon/overdue override it
    (and win the cascade the same two-class way) since urgency has its own
    established colors already. */
-.nextup-cat-feed { --nextup-progress-color: var(--blush-rose-fill); }
-.nextup-cat-diaper { --nextup-progress-color: var(--orchid-fill); }
+.nextup-cat-feed { --nextup-progress-color: var(--blush-rose-deep); }
+.nextup-cat-diaper { --nextup-progress-color: var(--orchid-deep); }
 .nextup-cat-nap { --nextup-progress-color: var(--lilac-deep); }
 .nextup-cat-sleep { --nextup-progress-color: var(--berry-deep); }
 .nextup.nextup-due-soon { --nextup-progress-color: var(--due-soon); }
@@ -818,6 +861,14 @@ h1 {
   color: var(--ink-muted);
 }
 
+.stats-caption {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  margin: 4px 2px 8px;
+}
 .stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -831,17 +882,23 @@ h1 {
   padding: 12px 8px;
   text-align: center;
 }
+.stat-tile .icon-disc {
+  margin: 0 auto 6px;
+}
 /* Category-tinted stat tiles, matching the reference look — same
    color-mix formulas as the Next-up card above, reused here rather than
    invented fresh so a "feed pink" reads the same wherever it shows up on
    the page. Single-class selectors are enough here (no higher-specificity
    rule to out-rank), unlike the buttons/rows above. */
 .stat-tile-feed { background: color-mix(in srgb, var(--blush-rose) 18%, var(--card)); border-color: transparent; }
-.stat-tile-feed .stat-value { color: var(--blush-rose-fill); }
+.stat-tile-feed .stat-value { color: var(--blush-rose-deep); }
+.stat-tile-feed .icon-disc { background: color-mix(in srgb, var(--blush-rose) 20%, var(--card)); color: var(--blush-rose-deep); }
 .stat-tile-diaper { background: color-mix(in srgb, var(--orchid) 18%, var(--card)); border-color: transparent; }
-.stat-tile-diaper .stat-value { color: var(--orchid-fill); }
+.stat-tile-diaper .stat-value { color: var(--orchid-deep); }
+.stat-tile-diaper .icon-disc { background: color-mix(in srgb, var(--orchid) 20%, var(--card)); color: var(--orchid-deep); }
 .stat-tile-nap { background: color-mix(in srgb, var(--muted-lilac) 12%, var(--card)); border-color: transparent; }
 .stat-tile-nap .stat-value { color: var(--lilac-deep); }
+.stat-tile-nap .icon-disc { background: color-mix(in srgb, var(--muted-lilac) 28%, var(--card)); color: var(--lilac-deep); }
 .stat-value {
   font-size: 19px;
   font-weight: 700;
@@ -850,6 +907,12 @@ h1 {
   font-size: 11.5px;
   color: var(--ink-muted);
   margin-top: 2px;
+}
+.stat-sub {
+  font-size: 10px;
+  color: var(--ink-muted);
+  margin-top: 3px;
+  opacity: 0.8;
 }
 
 .more-detail {
@@ -1570,6 +1633,7 @@ h1 {
   right: 0;
   bottom: 0;
   display: flex;
+  align-items: center;
   gap: 6px;
   background: var(--card);
   border-top: 1px solid var(--border);
@@ -1612,6 +1676,33 @@ h1 {
   background: var(--accent);
   background-image: linear-gradient(155deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0) 60%);
   box-shadow: 0 3px 10px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* Center "+" — a visual match for the reference's raised FAB, not a 5th
+   destination of its own (see the comment in lib/TabBar.js): same target
+   as the Today tab, just pulled up out of the bar on its own circle so it
+   reads as the bar's visual centerpiece the way the reference draws it. */
+.tab-fab {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  margin-top: -22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  background-image: linear-gradient(155deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 55%);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 55%, transparent), 0 0 0 4px var(--card);
+  color: #fff;
+  transition: transform 0.1s ease;
+}
+.tab-fab:active {
+  transform: scale(0.95);
+}
+.tab-fab svg {
+  width: 24px;
+  height: 24px;
 }
 
 /* ---------------------------------------------------------------------

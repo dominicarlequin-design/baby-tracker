@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
 import { ThemeToggle } from '../../lib/theme';
+import { TabBar } from '../../lib/TabBar';
 import { getPushStatus, enablePushAlerts, disablePushAlerts } from '../../lib/push';
 import { SOUND_STYLES, getSoundSettings, setSoundSettings, previewSound } from '../../lib/sound';
 
@@ -343,6 +344,8 @@ export default function SettingsPage() {
           </button>
         </div>
       )}
+
+      <TabBar active="settings" />
     </div>
   );
 }

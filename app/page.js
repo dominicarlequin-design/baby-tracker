@@ -3,9 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
-import { ThemeToggle } from '../lib/theme';
 import { TabBar } from '../lib/TabBar';
-import { computeStatus, lastEventOf } from '../lib/logic';
+import { computeStatus, lastEventOf, localDateStr } from '../lib/logic';
 import { dailySummaries } from '../lib/summaries';
 import {
   formatLocalTime,
@@ -267,6 +266,33 @@ export default function Page() {
     return dailySummaries(events, config, 1)[0];
   }, [events, config, now]);
 
+  // Small, purely-cosmetic stat-tile subcaptions matching the reference
+  // ("Total: 18 oz", "1 Wet · 1 Dirty") — computed straight from `events`
+  // here rather than added to lib/summaries.js's dailySummaries(), which is
+  // shared with Patterns and has its own test coverage; these three numbers
+  // are only ever needed on this one card, so a small local pass over
+  // today's events is lower-risk than growing a shared, tested module for a
+  // display-only detail. "Wet"/"Dirty" follow the same pee/poop/both detail
+  // values the diaper picker already writes, with "both" counting toward
+  // both totals since it's one diaper doing double duty.
+  const todayExtra = useMemo(() => {
+    if (!config) return null;
+    const tz = config.timezone || 'America/New_York';
+    const todayKey = localDateStr(now, tz);
+    let ounces = 0;
+    let wet = 0;
+    let dirty = 0;
+    for (const e of events) {
+      if (localDateStr(new Date(e.event_time), tz) !== todayKey) continue;
+      if (e.type === 'feed' && typeof e.feed_ounces === 'number') ounces += e.feed_ounces;
+      else if (e.type === 'diaper') {
+        if (e.diaper_detail === 'pee' || e.diaper_detail === 'both') wet++;
+        if (e.diaper_detail === 'poop' || e.diaper_detail === 'both') dirty++;
+      }
+    }
+    return { ounces, wet, dirty };
+  }, [events, config, now]);
+
   const timezone = config?.timezone || 'America/New_York';
   const nextUpKey = status ? pickNextUp(status, now) : null;
   const nextUp = nextUpKey ? nextUpContent(nextUpKey, status, config, timezone) : null;
@@ -287,16 +313,31 @@ export default function Page() {
   return (
     <div className="wrap">
       <div className="header-row">
-        <h1>Today</h1>
+        <div>
+          <h1>Today</h1>
+          {/* Purely decorative, matching the reference's heart glyph under
+              "Today" — not a button (no click handler, no hover/press
+              state) since there's no favorites feature behind it. */}
+          <svg className="header-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+            <path d="M12 20.5s-7.5-4.6-10-9.3C.6 8 2 4.5 5.3 3.7c2-.5 4 .3 5.2 2 .3.4.9.4 1.2 0 1.2-1.7 3.2-2.5 5.2-2 3.3.8 4.7 4.3 3.3 7.5-2.5 4.7-10 9.3-10 9.3Z" />
+          </svg>
+        </div>
         <div className="header-right">
+          {/* Reuses the fuller /upcoming schedule page as this icon's
+              destination, matching the reference's calendar glyph with a
+              real place to go instead of a decorative dead button. Theme
+              toggle and Settings moved off this header entirely — Settings
+              is now its own "Profile" tab, and its own page keeps a theme
+              toggle of its own, so nothing is lost by dropping them from
+              here to match the reference's single-icon header. */}
+          <Link href="/upcoming" className="header-icon-btn" aria-label="Upcoming schedule">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="4" y="5.5" width="16" height="15" rx="2.5" />
+              <path d="M4 10h16M8 3.5v3M16 3.5v3" />
+            </svg>
+          </Link>
           <div className="header-datetime" suppressHydrationWarning>
-            {new Intl.DateTimeFormat('en-US', { timeZone: timezone, weekday: 'short', month: 'short', day: 'numeric' }).format(now)}
-            {' · '}
-            {formatLocalTime(now.toISOString(), timezone)}
-          </div>
-          <div className="header-actions">
-            <ThemeToggle />
-            <Link href="/settings" className="header-settings-link">Settings</Link>
+            {new Intl.DateTimeFormat('en-US', { timeZone: timezone, month: 'long', day: 'numeric', year: 'numeric' }).format(now)}
           </div>
         </div>
       </div>
@@ -432,20 +473,29 @@ export default function Page() {
           </button>
 
           {today && (
-            <div className="stats-row">
-              <div className="stat-tile stat-tile-feed">
-                <div className="stat-value">{today.feeds}</div>
-                <div className="stat-label">Feeds</div>
+            <>
+              <div className="stats-caption">Today's stats</div>
+              <div className="stats-row">
+                <div className="stat-tile stat-tile-feed">
+                  <Icon name="feed" />
+                  <div className="stat-value">{today.feeds}</div>
+                  <div className="stat-label">Feedings</div>
+                  {todayExtra && <div className="stat-sub">Total: {todayExtra.ounces} oz</div>}
+                </div>
+                <div className="stat-tile stat-tile-diaper">
+                  <Icon name="diaper" />
+                  <div className="stat-value">{today.diapers}</div>
+                  <div className="stat-label">Diapers</div>
+                  {todayExtra && <div className="stat-sub">{todayExtra.wet} Wet &middot; {todayExtra.dirty} Dirty</div>}
+                </div>
+                <div className="stat-tile stat-tile-nap">
+                  <Icon name="nap" />
+                  <div className="stat-value">{formatHours(today.napMinutes / 60) || '0m'}</div>
+                  <div className="stat-label">Sleep</div>
+                  <div className="stat-sub">{today.naps} {today.naps === 1 ? 'nap' : 'naps'}</div>
+                </div>
               </div>
-              <div className="stat-tile stat-tile-nap">
-                <div className="stat-value">{formatHours(today.napMinutes / 60) || '0m'}</div>
-                <div className="stat-label">Napped ({today.naps})</div>
-              </div>
-              <div className="stat-tile stat-tile-diaper">
-                <div className="stat-value">{today.diapers}</div>
-                <div className="stat-label">Diapers</div>
-              </div>
-            </div>
+            </>
           )}
         </>
       )}
