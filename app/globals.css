@@ -531,14 +531,14 @@ h1 {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   transition: background 0.2s ease;
 }
 .icon-disc svg {
-  width: 19px;
-  height: 19px;
+  width: 26px;
+  height: 26px;
   display: block;
 }
 /* The five buttons that switched to a deep fill + white label text (round 2)
@@ -553,7 +553,7 @@ h1 {
    the button fill, no disc behind it at all, so these two get a literal
    match instead of the shared treatment every other button here uses. */
 .btn-feed .icon-disc, .btn-diaper .icon-disc { background: transparent; color: #fff; width: auto; height: auto; }
-.btn-feed .icon-disc svg, .btn-diaper .icon-disc svg { width: 25px; height: 25px; }
+.btn-feed .icon-disc svg, .btn-diaper .icon-disc svg { width: 34px; height: 34px; }
 .btn-nap-start .icon-disc,
 .btn-nap-end .icon-disc { background: #fff; color: var(--lilac-fill); }
 .btn-medicine .icon-disc { background: #fff; color: var(--dusty-pink-fill); }
@@ -659,13 +659,13 @@ h1 {
   gap: 12px;
 }
 .nextup-row .icon-disc {
-  width: 44px;
-  height: 44px;
+  width: 56px;
+  height: 56px;
   margin-top: 2px;
 }
 .nextup-row .icon-disc svg {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
 }
 .nextup-text {
   flex: 1;
@@ -1765,14 +1765,14 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 32px;
-  border-radius: 10px;
+  width: 48px;
+  height: 38px;
+  border-radius: 12px;
   transition: background 0.15s ease;
 }
 .tab-icon {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
 }
 .tab-label {
@@ -1794,9 +1794,9 @@ h1 {
    reads as the bar's visual centerpiece the way the reference draws it. */
 .tab-fab {
   flex-shrink: 0;
-  width: 54px;
-  height: 54px;
-  margin-top: -20px;
+  width: 62px;
+  height: 62px;
+  margin-top: -24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1813,8 +1813,8 @@ h1 {
   transform: scale(0.95);
 }
 .tab-fab svg {
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
 }
 
 /* ---------------------------------------------------------------------
