@@ -108,18 +108,20 @@
   --blush-rose-deep: #8d3548;
   --orchid-deep: #8d3587;
 
-  /* Fed/Diaper-only siblings of the two fills above, sampled straight off
-     your reference mockup (#d89a9e / #bcabce). Your call, after seeing the
-     accessibility trade-off explained twice: match the reference exactly
-     rather than deepen it for contrast headroom — this pairing only
-     clears ~2.3:1 against white, under the 4.5:1 AA floor the rest of the
-     app holds, but it's your personal app and the reference's own look
-     matters more here than the checker. Used only for these two buttons'
-     fill + glow; the icon-disc glyph, next-up eyebrow, and stat-tile value
-     all still use the darker -fill/-deep variants since those sit on
-     lighter tints that need the extra contrast to read at all. */
-  --blush-rose-btn: #d89a9e;
-  --orchid-btn: #bcabce;
+  /* Fed/Diaper-only siblings of the two fills above, re-sampled off a
+     clearer copy of your reference (#c99599 / #b6a6c7 — a touch more
+     saturated than the first, JPEG-compressed sample this replaced). Your
+     call, after seeing the accessibility trade-off explained: match the
+     reference exactly rather than deepen it for contrast headroom — this
+     pairing only clears ~2.3-2.5:1 against white, under the 4.5:1 AA floor
+     the rest of the app holds, but it's your personal app and the
+     reference's own look matters more here than the checker. Used only for
+     these two buttons' fill + glow; the icon-disc glyph, next-up eyebrow,
+     and stat-tile value all still use the darker -fill/-deep variants
+     since those sit on lighter tints that need the extra contrast to read
+     at all. */
+  --blush-rose-btn: #c99599;
+  --orchid-btn: #b6a6c7;
 
   /* Wake Up's dark badge (below) used flat --btn-ink, a nearly-desaturated
      charcoal — next to Diaper/End nap's saturated violets it read as a
@@ -191,6 +193,14 @@
     --berry-deep: #d98bab;
     --blush-rose-deep: #d97f92;
     --orchid-deep: #d289cd;
+    /* Medicine's mint pair had no dark-mode override at all until this
+       fix — .medicine-row and .quicklog-medicine both use --mint-bg
+       directly as their fill (not color-mixed with --card like every
+       other category row), so without this they stayed a bright light-
+       mode mint card sitting on an otherwise dark page. Same --deep-gets-
+       lighter, --bg-gets-darker swap as the pairs above. */
+    --mint-bg: #23392c;
+    --mint-deep: #7ed9a0;
   }
   :root:not([data-theme="light"]) .overdue-banner,
   :root:not([data-theme="light"]) .nextup-overdue {
@@ -219,6 +229,8 @@
   --berry-deep: #d98bab;
   --blush-rose-deep: #d97f92;
   --orchid-deep: #d289cd;
+  --mint-bg: #23392c;
+  --mint-deep: #7ed9a0;
 }
 :root[data-theme="dark"] .overdue-banner,
 :root[data-theme="dark"] .nextup-overdue {
@@ -1640,6 +1652,50 @@ h1 {
   background: color-mix(in srgb, var(--accent) 14%, var(--card) 86%);
   color: var(--accent-text);
 }
+
+/* The "+" tab's universal quick-log popup (lib/QuickLogSheet.js) — a
+   plain .modal-overlay/.modal like every other picker in this app (Feed
+   ounces, Diaper detail), just with its own menu of 5 rows instead of a
+   single question. Each row reuses the exact tinted-pill language already
+   established for the Nap/Bedtime rows and stat tiles (a soft category
+   wash + that category's -deep color for the icon and label) rather than
+   Fed/Diaper's own loud, bold-white-on-saturated button style — five of
+   those stacked in one popup would be a lot of shouting at once, where
+   this menu's job is just to get out of the way once you've picked one. */
+.quicklog-overlay { z-index: 40; }
+.quicklog-sheet { padding-bottom: 26px; }
+.quicklog-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.quicklog-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 16px;
+  font-family: 'Fraunces', 'Georgia', serif;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.15s ease;
+}
+.quicklog-btn:active { transform: scale(0.98); opacity: 0.85; }
+
+.quicklog-feed { background: color-mix(in srgb, var(--blush-rose) 18%, var(--card)); color: var(--blush-rose-deep); }
+.quicklog-feed .icon-disc { background: color-mix(in srgb, var(--blush-rose) 28%, var(--card)); color: var(--blush-rose-deep); }
+.quicklog-diaper { background: color-mix(in srgb, var(--orchid) 18%, var(--card)); color: var(--orchid-deep); }
+.quicklog-diaper .icon-disc { background: color-mix(in srgb, var(--orchid) 28%, var(--card)); color: var(--orchid-deep); }
+.quicklog-nap { background: color-mix(in srgb, var(--muted-lilac) 12%, var(--card)); color: var(--lilac-deep); }
+.quicklog-nap .icon-disc { background: color-mix(in srgb, var(--muted-lilac) 28%, var(--card)); color: var(--lilac-deep); }
+.quicklog-sleep { background: color-mix(in srgb, var(--berry) 18%, var(--card)); color: var(--berry-deep); }
+.quicklog-sleep .icon-disc { background: color-mix(in srgb, var(--berry) 35%, var(--card)); color: var(--berry-deep); }
+.quicklog-medicine { background: var(--mint-bg); color: var(--mint-deep); }
+.quicklog-medicine .icon-disc { background: color-mix(in srgb, var(--mint-deep) 22%, var(--mint-bg)); color: var(--mint-deep); }
 
 .volume-slider {
   width: 100%;

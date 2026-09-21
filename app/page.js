@@ -17,6 +17,8 @@ import {
   nextUpProgress,
   explainStatus,
   overdueSummary,
+  Icon,
+  phaseClass,
 } from '../lib/homeUi';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -41,90 +43,11 @@ function formatSecondsAgo(seconds) {
 // unbounded as baby_events accumulates.
 const HISTORY_DAYS = 30;
 
-// Line-icon paths for the Log buttons, each rendered on a small tinted
-// disc (colored via CSS on the parent button class, see .icon-disc in
-// globals.css) rather than a flat glyph — chosen over emoji so they can be
-// tinted to match each button's own palette and render identically
-// everywhere instead of varying by OS.
-const ICON_PATHS = {
-  feed: (
-    <>
-      <path d="M10 2h4M10.5 2v3.2c0 .5-.2 1-.6 1.4l-1 1c-.6.6-.9 1.4-.9 2.2V19a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2V9.8c0-.8-.3-1.6-.9-2.2l-1-1c-.4-.4-.6-.9-.6-1.4V2" />
-      <path d="M9 13h6" />
-    </>
-  ),
-  diaper: (
-    <>
-      <path d="M4 5.5h16c0 6.5-2.5 10.5-8 12-5.5-1.5-8-5.5-8-12Z" />
-      <path d="M4 5.5c2.2 1.3 4.8 2 8 2s5.8-.7 8-2" />
-      <path d="M7 9.3c.6 3.4 2.2 6 5 7.4M17 9.3c-.6 3.4-2.2 6-5 7.4" />
-    </>
-  ),
-  // Nap keeps the crescent+star glyph (matches the reference's Nap row);
-  // Bedtime gets an actual bed silhouette instead of reusing the same
-  // moon — the reference draws these two as visibly different icons, not
-  // a moon for both.
-  nap: (
-    <>
-      <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z" />
-      <path d="M17 3.5l.7 1.5 1.5.7-1.5.7-.7 1.5-.7-1.5-1.5-.7 1.5-.7.7-1.5Z" />
-    </>
-  ),
-  bedtime: (
-    <>
-      <path d="M3 17v-4.5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1V17" />
-      <path d="M3 17v2.3M21 17v2.3" />
-      <path d="M4.5 11.5V8a1.5 1.5 0 0 1 1.5-1.5h4A1.5 1.5 0 0 1 11.5 8v3.5" />
-      <path d="M13 11.5V9a1.5 1.5 0 0 1 1.5-1.5h3A2.5 2.5 0 0 1 20 10v1.5" />
-    </>
-  ),
-  wake: (
-    <>
-      <circle cx="12" cy="12" r="4.2" />
-      <path d="M12 3v2.2M12 18.8V21M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M3 12h2.2M18.8 12H21M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6" />
-    </>
-  ),
-  medicine: (
-    <>
-      <path d="M9 3h6M12 3v4" />
-      <path d="M6 8h12l-1 3.2c-.2.6-.2 1.2 0 1.8l1.6 4.6a2 2 0 0 1-1.9 2.4H7.3a2 2 0 0 1-1.9-2.4L7 13c.2-.6.2-1.2 0-1.8L6 8Z" />
-      <path d="M8.5 13.5h7" />
-    </>
-  ),
-};
-
 // Next-up's status key is one of feed/diaper/nap/sleep (matches status.*
-// and the nextup-cat-* CSS classes); ICON_PATHS has no "sleep" glyph of its
-// own (night sleep shares its icon with the Bedtime button), hence the map.
+// and the nextup-cat-* CSS classes); ICON_PATHS (lib/homeUi.js) has no
+// "sleep" glyph of its own (night sleep shares its icon with the Bedtime
+// button), hence the map.
 const NEXTUP_ICON = { feed: 'feed', diaper: 'diaper', nap: 'nap', sleep: 'bedtime' };
-
-// `phase` drives the loading-spinner / success-check / error-x swap on top
-// of the normal category icon, once a tap has actually kicked off a save —
-// see the `phase` state and `setButtonPhase` helper in Page() below.
-function Icon({ name, phase }) {
-  return (
-    <span className="icon-disc" aria-hidden="true">
-      {phase === 'loading' ? (
-        <span className="btn-spinner" />
-      ) : phase === 'success' ? (
-        <svg className="btn-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>
-      ) : phase === 'error' ? (
-        <svg className="btn-check" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" /></svg>
-      ) : (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          {ICON_PATHS[name]}
-        </svg>
-      )}
-    </span>
-  );
-}
-
-// Turns a phase ('loading' | 'success' | 'error' | undefined) into the CSS
-// modifier class that swaps that button's icon-disc color and, for errors,
-// plays a small shake — see the shared rules in globals.css.
-function phaseClass(phase) {
-  return phase ? `is-${phase}` : '';
-}
 
 export default function Page() {
   const [config, setConfig] = useState(null);
