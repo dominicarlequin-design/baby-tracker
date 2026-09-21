@@ -108,22 +108,18 @@
   --blush-rose-deep: #8d3548;
   --orchid-deep: #8d3587;
 
-  /* Fed/Diaper-only, lighter siblings of the two fills above. Your "new
-     look" reference's Fed/Diaper buttons sit on a much softer dusty-rose/
-     lavender than these deep jewel tones (~#d89a9e / #bcabce sampled
-     straight off the mockup) — but that exact mockup color only clears
-     ~2.3:1 against the white icon/label it uses, well under the 4.5:1
-     floor this app holds everywhere else (it's a static comp, not
-     something that has to pass a contrast checker). These split the
-     difference: same hue as --blush-rose-fill/--orchid-fill so they still
-     read as "the same button, just softer" rather than a new color, moved
-     from 38% to 48% lightness — the lightest either can go while still
-     clearing 4.5:1+ with white text (5.49 / 4.94). Used only for these two
-     buttons' fill + glow; the icon-disc glyph, next-up eyebrow, and
-     stat-tile value all keep the darker -fill variant since those are
-     text-on-light and need the extra contrast headroom. */
-  --blush-rose-btn: #b1435b;
-  --orchid-btn: #b143aa;
+  /* Fed/Diaper-only siblings of the two fills above, sampled straight off
+     your reference mockup (#d89a9e / #bcabce). Your call, after seeing the
+     accessibility trade-off explained twice: match the reference exactly
+     rather than deepen it for contrast headroom — this pairing only
+     clears ~2.3:1 against white, under the 4.5:1 AA floor the rest of the
+     app holds, but it's your personal app and the reference's own look
+     matters more here than the checker. Used only for these two buttons'
+     fill + glow; the icon-disc glyph, next-up eyebrow, and stat-tile value
+     all still use the darker -fill/-deep variants since those sit on
+     lighter tints that need the extra contrast to read at all. */
+  --blush-rose-btn: #d89a9e;
+  --orchid-btn: #bcabce;
 
   /* Wake Up's dark badge (below) used flat --btn-ink, a nearly-desaturated
      charcoal — next to Diaper/End nap's saturated violets it read as a
@@ -247,15 +243,30 @@ button {
 .wrap {
   max-width: 480px;
   margin: 0 auto;
-  padding: 24px 16px 116px;
+  padding: 16px 16px 108px;
 }
 
 h1 {
   font-family: 'Fraunces', 'Georgia', serif;
   font-weight: 600;
-  font-size: 30px;
+  font-size: 27px;
   color: var(--accent-text);
   margin: 0;
+}
+
+/* The reference sets almost every piece of card/button copy in this same
+   serif, not just the page heading — button labels, the Next Up headline,
+   stat numbers. Applied selectively below to content text rather than as a
+   blanket body-font change: small all-caps eyebrows (NEXT UP, TODAY'S
+   STATS) and the nav bar stay on the system sans, matching the reference's
+   own split between "content" and "chrome" text. */
+.log-btn-primary,
+.stateful-label,
+.medicine-label,
+.nextup-headline,
+.stat-value,
+.stat-label {
+  font-family: 'Fraunces', 'Georgia', serif;
 }
 
 .header-row {
@@ -263,14 +274,14 @@ h1 {
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .header-heart {
   display: block;
-  width: 20px;
-  height: 20px;
-  margin-top: 6px;
+  width: 18px;
+  height: 18px;
+  margin-top: 4px;
   color: var(--accent-text);
   opacity: 0.7;
 }
@@ -424,7 +435,19 @@ h1 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
+  border-radius: 20px;
+}
+/* Feedback for the nav bar's "+" when it's tapped from the Log screen
+   itself — nowhere new to navigate to, so this is what tells you the tap
+   registered instead of it looking like a dead button (see TabBar.js). */
+.quick-add-pulse {
+  animation: quick-add-pulse 0.9s ease;
+}
+@keyframes quick-add-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+  70% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent); }
 }
 
 .log-btn {
@@ -464,16 +487,17 @@ h1 {
 }
 
 .log-btn-primary {
-  padding: 22px 10px;
-  font-size: 17px;
+  padding: 16px 10px;
+  font-size: 16px;
 }
 
-/* Every palette color here is light/pastel, so every category button uses
-   dark-ink text rather than white — safer contrast than forcing white onto
-   a pastel fill, and it reads as one cohesive family instead of some
-   buttons being deep and others pale. Each variant now also sets --glow to
-   a translucent tint of its own color, picked up by .log-btn's box-shadow
-   above, so every button gets a soft colored halo that matches its fill. */
+/* Fed/Diaper use white text/icon on a lighter pastel fill to match the
+   reference literally (see --blush-rose-btn/--orchid-btn above for the
+   contrast trade-off that comes with that). The rest of this row's
+   variants are deep/saturated fills, where white stays safely above 4.5:1,
+   so they keep it too. Each variant sets --glow to a translucent tint of
+   its own color, picked up by .log-btn's box-shadow above, so every button
+   gets a soft colored halo that matches its fill. */
 .btn-feed { background-color: var(--blush-rose-btn); color: #fff; --glow: color-mix(in srgb, var(--blush-rose-btn) 65%, transparent); }
 .btn-nap-start { background-color: var(--lilac-fill); color: #fff; --glow: color-mix(in srgb, var(--lilac-fill) 65%, transparent); }
 .btn-nap-end { background-color: var(--lilac-fill); color: #fff; --glow: color-mix(in srgb, var(--lilac-fill) 65%, transparent); }
@@ -512,10 +536,14 @@ h1 {
    glyph gives the icon somewhere to actually show up, and reuses the exact
    same hex/contrast pairing already verified for the white button text
    (contrast is symmetric, so these clear 4.5:1+ too). */
-.btn-feed .icon-disc { background: #fff; color: var(--blush-rose-fill); }
+/* Fed/Diaper break from the "white disc, colored glyph" pattern below —
+   the reference draws these two with the icon in plain white directly on
+   the button fill, no disc behind it at all, so these two get a literal
+   match instead of the shared treatment every other button here uses. */
+.btn-feed .icon-disc, .btn-diaper .icon-disc { background: transparent; color: #fff; width: auto; height: auto; }
+.btn-feed .icon-disc svg, .btn-diaper .icon-disc svg { width: 19px; height: 19px; }
 .btn-nap-start .icon-disc,
 .btn-nap-end .icon-disc { background: #fff; color: var(--lilac-fill); }
-.btn-diaper .icon-disc { background: #fff; color: var(--orchid-fill); }
 .btn-medicine .icon-disc { background: #fff; color: var(--dusty-pink-fill); }
 .btn-sleep-start .icon-disc { background: #fff; color: var(--berry-fill); }
 .btn-sleep-end .icon-disc { background: color-mix(in srgb, var(--butter-yellow) 55%, var(--btn-ink) 20%); color: #fff; }
@@ -532,8 +560,8 @@ h1 {
   border-radius: var(--radius);
   border: 1px solid #eccbc1;
   background: var(--overdue-bg);
-  padding: 14px 16px;
-  margin-bottom: 16px;
+  padding: 11px 14px;
+  margin-bottom: 10px;
 }
 .overdue-banner-toggle {
   display: flex;
@@ -604,8 +632,8 @@ h1 {
    due-soon / overdue state from lib/logic.js's classifyState. */
 .nextup {
   border-radius: var(--radius);
-  padding: 16px;
-  margin-bottom: 16px;
+  padding: 13px 14px;
+  margin-bottom: 12px;
   border: 1px solid var(--border);
   background: var(--card);
 }
@@ -661,10 +689,10 @@ h1 {
    involved. */
 .nextup-cat-feed { background: color-mix(in srgb, var(--blush-rose) 18%, var(--card)); border-color: color-mix(in srgb, var(--blush-rose) 30%, var(--border)); }
 .nextup-cat-feed .nextup-eyebrow { color: var(--blush-rose-deep); }
-.nextup-cat-feed .icon-disc { background: color-mix(in srgb, var(--blush-rose) 20%, var(--card)); color: var(--blush-rose-deep); }
+.nextup-cat-feed .icon-disc { background: color-mix(in srgb, var(--blush-rose) 28%, var(--card)); color: var(--blush-rose-deep); }
 .nextup-cat-diaper { background: color-mix(in srgb, var(--orchid) 18%, var(--card)); border-color: color-mix(in srgb, var(--orchid) 30%, var(--border)); }
 .nextup-cat-diaper .nextup-eyebrow { color: var(--orchid-deep); }
-.nextup-cat-diaper .icon-disc { background: color-mix(in srgb, var(--orchid) 20%, var(--card)); color: var(--orchid-deep); }
+.nextup-cat-diaper .icon-disc { background: color-mix(in srgb, var(--orchid) 28%, var(--card)); color: var(--orchid-deep); }
 .nextup-cat-nap { background: color-mix(in srgb, var(--muted-lilac) 12%, var(--card)); border-color: color-mix(in srgb, var(--muted-lilac) 30%, var(--border)); }
 .nextup-cat-nap .nextup-eyebrow { color: var(--lilac-deep); }
 .nextup-cat-nap .icon-disc { background: color-mix(in srgb, var(--muted-lilac) 28%, var(--card)); color: var(--lilac-deep); }
@@ -733,16 +761,16 @@ h1 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .stateful-btn {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   border-radius: 999px;
-  padding: 14px 18px;
+  padding: 12px 14px;
   cursor: pointer;
   --glow: transparent;
   box-shadow: 0 3px 8px rgba(44, 42, 38, 0.1), 0 8px 16px -6px var(--glow);
@@ -756,17 +784,23 @@ h1 {
 .stateful-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   align-items: flex-start;
   min-width: 0;
+  overflow: hidden;
 }
 .stateful-label {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 700;
+  white-space: nowrap;
 }
 .stateful-sub {
-  font-size: 12.5px;
+  font-size: 11.5px;
   opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .stateful-btn.outline {
@@ -835,8 +869,8 @@ h1 {
   background: var(--mint-bg);
   border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 14px 18px;
-  margin-bottom: 16px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
   font-size: 14.5px;
   font-weight: 700;
   color: var(--btn-ink);
@@ -867,23 +901,28 @@ h1 {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--ink-muted);
-  margin: 4px 2px 8px;
+  margin: 2px 2px 6px;
 }
 .stats-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 .stat-tile {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 12px 8px;
-  text-align: center;
+  padding: 10px 8px;
+  text-align: left;
 }
-.stat-tile .icon-disc {
-  margin: 0 auto 6px;
+.stat-tile-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.stat-tile-text {
+  min-width: 0;
 }
 /* Category-tinted stat tiles, matching the reference look — same
    color-mix formulas as the Next-up card above, reused here rather than
@@ -892,26 +931,27 @@ h1 {
    rule to out-rank), unlike the buttons/rows above. */
 .stat-tile-feed { background: color-mix(in srgb, var(--blush-rose) 18%, var(--card)); border-color: transparent; }
 .stat-tile-feed .stat-value { color: var(--blush-rose-deep); }
-.stat-tile-feed .icon-disc { background: color-mix(in srgb, var(--blush-rose) 20%, var(--card)); color: var(--blush-rose-deep); }
+.stat-tile-feed .icon-disc { background: color-mix(in srgb, var(--blush-rose) 28%, var(--card)); color: var(--blush-rose-deep); }
 .stat-tile-diaper { background: color-mix(in srgb, var(--orchid) 18%, var(--card)); border-color: transparent; }
 .stat-tile-diaper .stat-value { color: var(--orchid-deep); }
-.stat-tile-diaper .icon-disc { background: color-mix(in srgb, var(--orchid) 20%, var(--card)); color: var(--orchid-deep); }
+.stat-tile-diaper .icon-disc { background: color-mix(in srgb, var(--orchid) 28%, var(--card)); color: var(--orchid-deep); }
 .stat-tile-nap { background: color-mix(in srgb, var(--muted-lilac) 12%, var(--card)); border-color: transparent; }
 .stat-tile-nap .stat-value { color: var(--lilac-deep); }
 .stat-tile-nap .icon-disc { background: color-mix(in srgb, var(--muted-lilac) 28%, var(--card)); color: var(--lilac-deep); }
 .stat-value {
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 700;
+  line-height: 1.1;
 }
 .stat-label {
-  font-size: 11.5px;
+  font-size: 11px;
   color: var(--ink-muted);
-  margin-top: 2px;
+  line-height: 1.2;
 }
 .stat-sub {
   font-size: 10px;
   color: var(--ink-muted);
-  margin-top: 3px;
+  margin-top: 5px;
   opacity: 0.8;
 }
 
@@ -1644,38 +1684,52 @@ h1 {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
+/* Reference keeps every tab label (not just the active one) in the same
+   dusty-rose accent family rather than a neutral gray, and only pills the
+   ICON on the active tab — the label stays plain text underneath it. */
 .tab-item {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   text-align: center;
-  padding: 8px 2px 7px;
-  border-radius: 12px;
+  padding: 6px 2px 4px;
   font-size: 11px;
   font-weight: 700;
-  color: var(--ink-muted);
+  color: color-mix(in srgb, var(--accent-text) 65%, var(--ink-muted));
   text-decoration: none;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  transition: color 0.15s ease, transform 0.1s ease;
 }
 .tab-item:active {
   transform: scale(0.97);
 }
+.tab-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 26px;
+  border-radius: 10px;
+  transition: background 0.15s ease;
+}
 .tab-icon {
-  width: 22px;
-  height: 22px;
+  width: 21px;
+  height: 21px;
   flex-shrink: 0;
 }
 .tab-label {
   line-height: 1;
 }
 .tab-active {
-  color: var(--accent-ink);
+  color: var(--accent-text);
+}
+.tab-active .tab-icon-wrap {
   background: var(--accent);
   background-image: linear-gradient(155deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0) 60%);
-  box-shadow: 0 3px 10px color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: 0 3px 8px color-mix(in srgb, var(--accent) 40%, transparent);
+  color: var(--accent-ink);
 }
 
 /* Center "+" — a visual match for the reference's raised FAB, not a 5th
@@ -1684,25 +1738,27 @@ h1 {
    reads as the bar's visual centerpiece the way the reference draws it. */
 .tab-fab {
   flex-shrink: 0;
-  width: 52px;
-  height: 52px;
-  margin-top: -22px;
+  width: 48px;
+  height: 48px;
+  margin-top: -18px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
   background: var(--accent);
-  background-image: linear-gradient(155deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 55%);
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 55%, transparent), 0 0 0 4px var(--card);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--accent) 45%, transparent);
   color: #fff;
+  cursor: pointer;
+  font-family: inherit;
   transition: transform 0.1s ease;
 }
 .tab-fab:active {
   transform: scale(0.95);
 }
 .tab-fab svg {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 
 /* ---------------------------------------------------------------------

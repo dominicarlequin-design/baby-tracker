@@ -55,15 +55,27 @@ const ICON_PATHS = {
   ),
   diaper: (
     <>
-      <path d="M4 5h16v4.5c0 5-3.5 8.5-8 9.5-4.5-1-8-4.5-8-9.5V5Z" />
-      <path d="M4 9.5c2 1 5 1 8 1s6 0 8-1" />
+      <path d="M4 5.5h16c0 6.5-2.5 10.5-8 12-5.5-1.5-8-5.5-8-12Z" />
+      <path d="M4 5.5c2.2 1.3 4.8 2 8 2s5.8-.7 8-2" />
+      <path d="M7 9.3c.6 3.4 2.2 6 5 7.4M17 9.3c-.6 3.4-2.2 6-5 7.4" />
     </>
   ),
-  nap: <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z" />,
-  bedtime: (
+  // Nap keeps the crescent+star glyph (matches the reference's Nap row);
+  // Bedtime gets an actual bed silhouette instead of reusing the same
+  // moon — the reference draws these two as visibly different icons, not
+  // a moon for both.
+  nap: (
     <>
       <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5Z" />
       <path d="M17 3.5l.7 1.5 1.5.7-1.5.7-.7 1.5-.7-1.5-1.5-.7 1.5-.7.7-1.5Z" />
+    </>
+  ),
+  bedtime: (
+    <>
+      <path d="M3 17v-4.5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1V17" />
+      <path d="M3 17v2.3M21 17v2.3" />
+      <path d="M4.5 11.5V8a1.5 1.5 0 0 1 1.5-1.5h4A1.5 1.5 0 0 1 11.5 8v3.5" />
+      <path d="M13 11.5V9a1.5 1.5 0 0 1 1.5-1.5h3A2.5 2.5 0 0 1 20 10v1.5" />
     </>
   ),
   wake: (
@@ -477,21 +489,33 @@ export default function Page() {
               <div className="stats-caption">Today's stats</div>
               <div className="stats-row">
                 <div className="stat-tile stat-tile-feed">
-                  <Icon name="feed" />
-                  <div className="stat-value">{today.feeds}</div>
-                  <div className="stat-label">Feedings</div>
+                  <div className="stat-tile-row">
+                    <Icon name="feed" />
+                    <div className="stat-tile-text">
+                      <div className="stat-value">{today.feeds}</div>
+                      <div className="stat-label">Feedings</div>
+                    </div>
+                  </div>
                   {todayExtra && <div className="stat-sub">Total: {todayExtra.ounces} oz</div>}
                 </div>
                 <div className="stat-tile stat-tile-diaper">
-                  <Icon name="diaper" />
-                  <div className="stat-value">{today.diapers}</div>
-                  <div className="stat-label">Diapers</div>
+                  <div className="stat-tile-row">
+                    <Icon name="diaper" />
+                    <div className="stat-tile-text">
+                      <div className="stat-value">{today.diapers}</div>
+                      <div className="stat-label">Diapers</div>
+                    </div>
+                  </div>
                   {todayExtra && <div className="stat-sub">{todayExtra.wet} Wet &middot; {todayExtra.dirty} Dirty</div>}
                 </div>
                 <div className="stat-tile stat-tile-nap">
-                  <Icon name="nap" />
-                  <div className="stat-value">{formatHours(today.napMinutes / 60) || '0m'}</div>
-                  <div className="stat-label">Sleep</div>
+                  <div className="stat-tile-row">
+                    <Icon name="nap" />
+                    <div className="stat-tile-text">
+                      <div className="stat-value">{formatHours(today.napMinutes / 60) || '0m'}</div>
+                      <div className="stat-label">Sleep</div>
+                    </div>
+                  </div>
                   <div className="stat-sub">{today.naps} {today.naps === 1 ? 'nap' : 'naps'}</div>
                 </div>
               </div>
