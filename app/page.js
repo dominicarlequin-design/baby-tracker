@@ -16,6 +16,7 @@ import {
   pickNextUp,
   nextUpContent,
   explainStatus,
+  overdueSummary,
 } from '../lib/homeUi';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -271,33 +272,10 @@ export default function Page() {
   // worst offender, so with two things overdue at the same time (e.g. Feed
   // and Diaper) the second one would otherwise go unnoticed without
   // checking the Upcoming page row by row.
-  const overdueItems = useMemo(() => {
-    if (!status) return [];
-    const items = [];
-    if (status.feed.overdue) {
-      items.push({ key: 'feed', label: 'Feed', detail: `Late by ${formatDurationWords(status.feed.hoursSince - status.feed.avgHours)}` });
-    }
-    if (status.diaper.overdue) {
-      items.push({ key: 'diaper', label: 'Diaper', detail: `Late by ${formatDurationWords(status.diaper.hoursSince - status.diaper.avgHours)}` });
-    }
-    if (status.nap.overdue) {
-      items.push({ key: 'nap', label: 'Nap', detail: `Late by ${formatDurationWords(status.nap.hoursSince - status.nap.avgHours)}` });
-    }
-    if (status.sleep.overdue) {
-      items.push({ key: 'sleep', label: 'Night sleep', detail: `Late by ${formatDurationWords(status.sleep.hoursSince)}` });
-    }
-    if (status.medicine.overdue) {
-      // Measured from the scheduled dose time itself (lastScheduledSlot),
-      // not from graceDeadline — matching how Feed/Diaper/Night sleep all
-      // report lateness from their own due time rather than from whatever
-      // grace/threshold pushed them into "overdue" in the first place.
-      const lateHours = status.medicine.lastScheduledSlot
-        ? Math.max(0, (now.getTime() - new Date(status.medicine.lastScheduledSlot).getTime()) / (1000 * 60 * 60))
-        : 0;
-      items.push({ key: 'medicine', label: 'Medicine', detail: `Late by ${formatDurationWords(lateHours)}` });
-    }
-    return items;
-  }, [status, now]);
+  // Shared with the server-side overdue-check route (app/api/check-overdue)
+  // via lib/homeUi's overdueSummary, so "what counts as overdue" can't drift
+  // between what this screen shows and what triggers a push notification.
+  const overdueItems = useMemo(() => overdueSummary(status, now), [status, now]);
 
   return (
     <div className="wrap">

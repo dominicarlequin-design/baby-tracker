@@ -1,0 +1,20 @@
+name: Check overdue baby-tracker alerts
+
+# Vercel's free (Hobby) plan only allows cron jobs that run once a day with
+# up to an hour of slop — useless for "tell me within minutes of something
+# becoming overdue." GitHub Actions' scheduler is free and runs this every
+# 10 minutes instead (GitHub doesn't guarantee the exact minute either, but
+# it's close enough for this).
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call check-overdue
+        run: |
+          curl -sf -X GET "https://baby-tracker-gamma-two.vercel.app/api/check-overdue" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
