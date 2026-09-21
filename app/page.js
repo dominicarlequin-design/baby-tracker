@@ -82,6 +82,11 @@ const ICON_PATHS = {
   ),
 };
 
+// Next-up's status key is one of feed/diaper/nap/sleep (matches status.*
+// and the nextup-cat-* CSS classes); ICON_PATHS has no "sleep" glyph of its
+// own (night sleep shares its icon with the Bedtime button), hence the map.
+const NEXTUP_ICON = { feed: 'feed', diaper: 'diaper', nap: 'nap', sleep: 'bedtime' };
+
 // `phase` drives the loading-spinner / success-check / error-x swap on top
 // of the normal category icon, once a tap has actually kicked off a save —
 // see the `phase` state and `setButtonPhase` helper in Page() below.
@@ -340,12 +345,17 @@ export default function Page() {
               so it stays. */}
           {overdueItems.length <= 1 && (nextUp ? (
             <div className={`nextup nextup-${nextUpTone} nextup-cat-${nextUpKey}`}>
-              <div className={`nextup-eyebrow ${nextUp.lateBy ? 'category' : ''}`}>{nextUp.eyebrow}</div>
-              <div className="nextup-headline">
-                {nextUp.headline}
-                {nextUp.lateBy && <span className="nextup-lateby"> · {nextUp.lateBy}</span>}
+              <div className="nextup-row">
+                <Icon name={NEXTUP_ICON[nextUpKey] ?? nextUpKey} />
+                <div className="nextup-text">
+                  <div className={`nextup-eyebrow ${nextUp.lateBy ? 'category' : ''}`}>{nextUp.eyebrow}</div>
+                  <div className="nextup-headline">
+                    {nextUp.headline}
+                    {nextUp.lateBy && <span className="nextup-lateby"> · {nextUp.lateBy}</span>}
+                  </div>
+                  <div className="nextup-sub">{nextUp.sub}</div>
+                </div>
               </div>
-              <div className="nextup-sub">{nextUp.sub}</div>
               {nextUpProgressValue != null && (
                 <div className="nextup-progress-track">
                   <div className="nextup-progress-fill" style={{ width: `${Math.round(nextUpProgressValue * 100)}%` }} />
@@ -387,6 +397,7 @@ export default function Page() {
                   <span className="stateful-label">Start nap</span>
                   <span className="stateful-sub">{status.nap.hoursSince != null ? `awake ${formatHours(status.nap.hoursSince)}` : 'no naps yet'}</span>
                 </span>
+                <span className="stateful-chevron" aria-hidden="true">&rsaquo;</span>
               </button>
             )}
 
@@ -405,6 +416,7 @@ export default function Page() {
                   <span className="stateful-label">Bedtime</span>
                   <span className="stateful-sub">usual {formatTimeOfDay(config.target_bedtime_local ?? '19:15')}</span>
                 </span>
+                <span className="stateful-chevron" aria-hidden="true">&rsaquo;</span>
               </button>
             )}
           </div>

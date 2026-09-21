@@ -97,6 +97,23 @@
   --lilac-fill: #6b358d;
   --berry-fill: #8f4262;
 
+  /* Fed/Diaper-only, lighter siblings of the two fills above. Your "new
+     look" reference's Fed/Diaper buttons sit on a much softer dusty-rose/
+     lavender than these deep jewel tones (~#d89a9e / #bcabce sampled
+     straight off the mockup) — but that exact mockup color only clears
+     ~2.3:1 against the white icon/label it uses, well under the 4.5:1
+     floor this app holds everywhere else (it's a static comp, not
+     something that has to pass a contrast checker). These split the
+     difference: same hue as --blush-rose-fill/--orchid-fill so they still
+     read as "the same button, just softer" rather than a new color, moved
+     from 38% to 48% lightness — the lightest either can go while still
+     clearing 4.5:1+ with white text (5.49 / 4.94). Used only for these two
+     buttons' fill + glow; the icon-disc glyph, next-up eyebrow, and
+     stat-tile value all keep the darker -fill variant since those are
+     text-on-light and need the extra contrast headroom. */
+  --blush-rose-btn: #b1435b;
+  --orchid-btn: #b143aa;
+
   /* Wake Up's dark badge (below) used flat --btn-ink, a nearly-desaturated
      charcoal — next to Diaper/End nap's saturated violets it read as a
      completely unrelated color dropped into the row, not "part of the
@@ -414,10 +431,10 @@ h1 {
    buttons being deep and others pale. Each variant now also sets --glow to
    a translucent tint of its own color, picked up by .log-btn's box-shadow
    above, so every button gets a soft colored halo that matches its fill. */
-.btn-feed { background-color: var(--blush-rose-fill); color: #fff; --glow: color-mix(in srgb, var(--blush-rose-fill) 65%, transparent); }
+.btn-feed { background-color: var(--blush-rose-btn); color: #fff; --glow: color-mix(in srgb, var(--blush-rose-btn) 65%, transparent); }
 .btn-nap-start { background-color: var(--lilac-fill); color: #fff; --glow: color-mix(in srgb, var(--lilac-fill) 65%, transparent); }
 .btn-nap-end { background-color: var(--lilac-fill); color: #fff; --glow: color-mix(in srgb, var(--lilac-fill) 65%, transparent); }
-.btn-diaper { background-color: var(--orchid-fill); color: #fff; --glow: color-mix(in srgb, var(--orchid-fill) 65%, transparent); }
+.btn-diaper { background-color: var(--orchid-btn); color: #fff; --glow: color-mix(in srgb, var(--orchid-btn) 65%, transparent); }
 .btn-medicine { background-color: var(--dusty-pink-fill); color: #fff; --glow: color-mix(in srgb, var(--dusty-pink-fill) 65%, transparent); }
 .btn-sleep-start { background-color: var(--berry-fill); color: #fff; --glow: color-mix(in srgb, var(--berry-fill) 65%, transparent); }
 .btn-sleep-end { background-color: var(--butter-yellow); color: var(--btn-ink); --glow: color-mix(in srgb, var(--butter-yellow) 65%, transparent); }
@@ -549,6 +566,28 @@ h1 {
   border: 1px solid var(--border);
   background: var(--card);
 }
+/* Icon disc + text side by side, matching the reference's "Next feeding"
+   card layout — the icon reuses the same .icon-disc component every log
+   button already uses, just tinted per-category below instead of per-
+   button-state. */
+.nextup-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.nextup-row .icon-disc {
+  width: 40px;
+  height: 40px;
+  margin-top: 2px;
+}
+.nextup-row .icon-disc svg {
+  width: 20px;
+  height: 20px;
+}
+.nextup-text {
+  flex: 1;
+  min-width: 0;
+}
 .nextup-eyebrow {
   font-size: 12px;
   font-weight: 700;
@@ -579,12 +618,16 @@ h1 {
    involved. */
 .nextup-cat-feed { background: color-mix(in srgb, var(--blush-rose) 18%, var(--card)); border-color: color-mix(in srgb, var(--blush-rose) 30%, var(--border)); }
 .nextup-cat-feed .nextup-eyebrow { color: var(--blush-rose-fill); }
+.nextup-cat-feed .icon-disc { background: color-mix(in srgb, var(--blush-rose) 35%, var(--card)); color: var(--blush-rose-fill); }
 .nextup-cat-diaper { background: color-mix(in srgb, var(--orchid) 18%, var(--card)); border-color: color-mix(in srgb, var(--orchid) 30%, var(--border)); }
 .nextup-cat-diaper .nextup-eyebrow { color: var(--orchid-fill); }
+.nextup-cat-diaper .icon-disc { background: color-mix(in srgb, var(--orchid) 35%, var(--card)); color: var(--orchid-fill); }
 .nextup-cat-nap { background: color-mix(in srgb, var(--muted-lilac) 12%, var(--card)); border-color: color-mix(in srgb, var(--muted-lilac) 30%, var(--border)); }
 .nextup-cat-nap .nextup-eyebrow { color: var(--lilac-deep); }
+.nextup-cat-nap .icon-disc { background: color-mix(in srgb, var(--muted-lilac) 28%, var(--card)); color: var(--lilac-deep); }
 .nextup-cat-sleep { background: color-mix(in srgb, var(--berry) 18%, var(--card)); border-color: color-mix(in srgb, var(--berry) 30%, var(--border)); }
 .nextup-cat-sleep .nextup-eyebrow { color: var(--berry-deep); }
+.nextup-cat-sleep .icon-disc { background: color-mix(in srgb, var(--berry) 35%, var(--card)); color: var(--berry-deep); }
 
 .nextup.nextup-due-soon {
   /* Tinted from --due-soon/--border themselves (not a fixed hex) so the
@@ -692,12 +735,22 @@ h1 {
    colored border. Compound selectors (.stateful-btn.nap-outline, not just
    .nap-outline) so these actually beat .stateful-btn.outline's border
    above; a single-class selector here would lose that fight regardless of
-   source order, same specificity trick as the buttons above. No chevron
-   was added even though the reference shows one — Start nap/Bedtime are
-   single-tap toggles, not navigation, and a chevron implies "goes
-   somewhere else" that isn't true here. */
+   source order, same specificity trick as the buttons above.
+
+   Reversed an earlier call here: a chevron was first left off because
+   Start nap/Bedtime are single-tap toggles, not navigation, and a chevron
+   usually implies "goes somewhere else." But the reference draws one on
+   both rows regardless, and matching it closely wins out — it's purely
+   decorative (aria-hidden, .stateful-chevron below), so it doesn't claim
+   these buttons navigate anywhere they don't. */
 .stateful-btn.nap-outline { background: color-mix(in srgb, var(--muted-lilac) 12%, var(--card)); border-color: transparent; color: var(--lilac-deep); --glow: color-mix(in srgb, var(--lilac-deep) 35%, transparent); }
 .stateful-btn.sleep-outline { background: color-mix(in srgb, var(--berry) 18%, var(--card)); border-color: transparent; color: var(--berry-deep); --glow: color-mix(in srgb, var(--berry-deep) 35%, transparent); }
+.stateful-chevron {
+  margin-left: auto;
+  font-size: 18px;
+  opacity: 0.55;
+  flex-shrink: 0;
+}
 
 .stateful-btn.filled {
   border: none;
