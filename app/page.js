@@ -270,6 +270,7 @@ export default function Page() {
               <rect x="4" y="5.5" width="16" height="15" rx="2.5" />
               <path d="M4 10h16M8 3.5v3M16 3.5v3" />
             </svg>
+            <span className="header-icon-btn-label">Upcoming</span>
           </Link>
           <div className="header-datetime" suppressHydrationWarning>
             {new Intl.DateTimeFormat('en-US', { timeZone: timezone, month: 'long', day: 'numeric', year: 'numeric' }).format(now)}
