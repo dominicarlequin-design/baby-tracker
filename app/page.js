@@ -240,9 +240,13 @@ export default function Page() {
   // worst offender, so with two things overdue at the same time (e.g. Feed
   // and Diaper) the second one would otherwise go unnoticed without
   // checking the Upcoming page row by row.
-  // Shared with the server-side overdue-check route (app/api/check-overdue)
-  // via lib/homeUi's overdueSummary, so "what counts as overdue" can't drift
-  // between what this screen shows and what triggers a push notification.
+  // This screen's own "what's overdue" judgment (via lib/homeUi's
+  // overdueSummary) — the push-notification side lives entirely in the
+  // Supabase Edge Function (supabase/functions/check-overdue), which keeps
+  // its own embedded copy of lib/logic.js so it can run on its own 2-minute
+  // cron without depending on the Next.js deployment. An earlier Next.js
+  // API route (app/api/check-overdue) tried to share this logic directly
+  // but was never actually wired to anything — removed as dead code.
   const overdueItems = useMemo(() => overdueSummary(status, now), [status, now]);
 
   return (
@@ -270,7 +274,6 @@ export default function Page() {
               <rect x="4" y="5.5" width="16" height="15" rx="2.5" />
               <path d="M4 10h16M8 3.5v3M16 3.5v3" />
             </svg>
-            <span className="header-icon-btn-label">Upcoming</span>
           </Link>
           <div className="header-datetime" suppressHydrationWarning>
             {new Intl.DateTimeFormat('en-US', { timeZone: timezone, month: 'long', day: 'numeric', year: 'numeric' }).format(now)}
