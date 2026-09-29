@@ -579,6 +579,20 @@ h1 {
 .sleep-filled .icon-disc { background: var(--butter-yellow); color: var(--wake-badge); }
 .medicine-row .icon-disc { background: color-mix(in srgb, var(--mint-deep) 22%, var(--mint-bg)); color: var(--mint-deep); }
 
+/* Sticker icon set (see ICON_PATHS in lib/homeUi.js): every glyph draws its
+   own white die-cut halo, so unlike the old line-art icons it doesn't need
+   a background/color pairing here to read — this is just the finishing
+   touch that makes the sticker feel like it's sitting on top of the
+   button instead of printed flat on it. Dimmed (not just re-shadowed) on
+   press so the glossy highlight baked into each icon doesn't look like
+   it's glowing brighter while the button itself is depressing. */
+.icon-glyph { filter: drop-shadow(0 1.4px 1.6px rgba(44, 42, 38, 0.32)); }
+.log-btn:active .icon-glyph,
+.stateful-btn:active .icon-glyph,
+.medicine-row:active .icon-glyph {
+  filter: drop-shadow(0 1.4px 1.6px rgba(44, 42, 38, 0.32)) brightness(0.94);
+}
+
 /* Overdue banner: aggregates every currently-overdue category at once, at
    the very top of the page — the Next-up card below only ever shows the
    single worst offender. */
