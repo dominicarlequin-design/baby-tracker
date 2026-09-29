@@ -39,18 +39,32 @@
      visibly "amber/caution" without clashing. Re-verified with the same
      WCAG script, not eyeballed: ink-muted stays 4.9:1+ on the new --bg,
      due-soon stays 5.1:1+ on white. */
-  --bg: #f7f1f2;              /* was Blush Mist #fbeaf1 — much less saturated */
+  /* MAGENTA ACCENT PASS: --bg moved from a pink-tinted wash to a warm
+     cream so saturated colors have a neutral stage to pop against instead
+     of competing with a same-hue background (they were fighting each
+     other before — a rose button on a rose page has less separation than
+     the same button on a neutral one). --accent moved from a muted
+     raspberry to a true vivid magenta — a distinct hue from every
+     category color already in the app (unlike violet, which would've
+     sat right next to Diaper's own purple), reads as premium rather than
+     "candy," and still checks out at 4.5:1+ against both --bg and white
+     text on its own fill (verified with the same contrast script used
+     throughout this file, not eyeballed). due-soon also moved off a
+     rust-brown that was too close to --overdue's red — they were nearly
+     indistinguishable at a glance before, which defeats the point of
+     having three separate urgency tiers. */
+  --bg: #fdf6f0;
   --card: #ffffff;
-  --ink: #2a262c;
-  --ink-muted: #7a6474;
-  --border: #e6dbe1;          /* was Soft Mauve #e6cddb — softened to match --bg */
-  --accent: #b8496f;          /* deep raspberry-rose — links, CTAs, focus */
+  --ink: #2b2230;
+  --ink-muted: #8a7387;
+  --border: #f3dee6;
+  --accent: #d6207a;          /* vivid magenta — links, CTAs, focus, FAB, active tab */
   --accent-ink: #ffffff;
-  --ok: #7d4f7a;              /* muted plum — was green, kept a distinct hue from accent */
-  --ok-bg: #f3e8f2;
-  --due-soon: #a35a30;        /* was muddy olive #8a6a1e — warm terracotta instead */
-  --overdue: #b3492f;
-  --overdue-bg: #fbeae6;
+  --ok: #8a4a96;              /* muted plum, brightened to match the rest of this pass — 6:1 on white, 5.6:1 on --bg */
+  --ok-bg: #f6e9f5;
+  --due-soon: #9c5c1f;        /* was #a35a30 — same family, shifted toward gold so it's unmistakably not a shade of --overdue; 5.3:1 on white */
+  --overdue: #c8342f;         /* more saturated true red than before; 5.3:1 on white, clearly apart from --due-soon's gold */
+  --overdue-bg: #fceae8;
   --radius: 14px;
 
   /* Deepened from their original pastel values (kept in comments below) as
@@ -66,15 +80,15 @@
      --blush-rose's original lighter value to stay readable there), so they
      were NOT pushed any deeper for round 2 below — a second "go deeper"
      pass on the Log-button grid specifically. */
-  --blush-rose: #e8768f;      /* was #f28fa3 — Blush Rose, replaces Baby Blue */
-  --orchid: #c081a8;          /* was #c98bb0 — Orchid, replaces Sage Green */
-  --dusty-pink: #f0a3a5;      /* was #f8b8b9 — Dusty Pink */
-  --dusty-pink-bg: #fbe1e2;
-  --butter-yellow: #d9b45c;   /* was #e0bd6e — deepened again in round 2 (7.53:1 vs --btn-ink); stays dark-ink text like before since a gold dark enough for white text turns back into the muddy mustard --due-soon was fixed away from earlier this session */
-  --muted-lilac: #b89bc4;     /* was #ccb5d5 — Muted Lilac */
-  --lilac-deep: #8a5ea0;
-  --berry: #ce7590;           /* was #d98098 — Berry, replaces Warm Brown/Latte */
-  --berry-deep: #8a3f5c;
+  --blush-rose: #f0728f;      /* brightened this pass so it reads as vivid on the new cream --bg, not washed out */
+  --orchid: #b565c9;
+  --dusty-pink: #f5a0b0;
+  --dusty-pink-bg: #fde6ea;
+  --butter-yellow: #e8b955;
+  --muted-lilac: #c9a8d6;
+  --lilac-deep: #8a4fa8;
+  --berry: #d97fa0;
+  --berry-deep: #9c3f66;
 
   /* Round 2 "go deeper": the Log-button grid's dark --btn-ink text was the
      ceiling on how saturated these five could get while staying WCAG AA.
@@ -91,11 +105,11 @@
      through crimson -> magenta -> violet as one consistent set, each
      re-verified at 4.5:1+ against #ffffff: --blush-rose-fill 7.68,
      --orchid-fill 7.02, --lilac-fill 8.34. */
-  --blush-rose-fill: #8d3548;
-  --orchid-fill: #8d3587;
-  --dusty-pink-fill: #b8455f;
-  --lilac-fill: #6b358d;
-  --berry-fill: #8f4262;
+  --blush-rose-fill: #b43a5c;
+  --orchid-fill: #8a3d96;
+  --dusty-pink-fill: #cf4568;
+  --lilac-fill: #7a3d99;
+  --berry-fill: #a3456e;
 
   /* Text/icon color for feed/diaper content sitting on their own tinted
      CARD backgrounds (next-up eyebrow + icon, stat-tile value + icon) —
@@ -105,8 +119,8 @@
      nap/sleep; blush-rose/orchid needed their own pair once dark mode
      exposed the gap (see the dark-mode block below — light mode is
      identical to -fill, already verified 5:1+ there). */
-  --blush-rose-deep: #8d3548;
-  --orchid-deep: #8d3587;
+  --blush-rose-deep: #b43a5c;
+  --orchid-deep: #8a3d96;
 
   /* Fed/Diaper-only siblings of the two fills above, re-sampled off a
      clearer copy of your reference (#c99599 / #b6a6c7 — a touch more
@@ -120,8 +134,8 @@
      and stat-tile value all still use the darker -fill/-deep variants
      since those sit on lighter tints that need the extra contrast to read
      at all. */
-  --blush-rose-btn: #c99599;
-  --orchid-btn: #b6a6c7;
+  --blush-rose-btn: #e6879b;
+  --orchid-btn: #c48fd4;
 
   /* Wake Up's dark badge (below) used flat --btn-ink, a nearly-desaturated
      charcoal — next to Diaper/End nap's saturated violets it read as a
@@ -134,8 +148,8 @@
      itself stands out as the intentional accent instead of the whole
      button. Verified: gold #d9b45c still clears 4.5:1+ against this
      (6.93:1). */
-  --wake-badge: #422145;
-  --soft-beige-tint: #f8e6ef; /* lighter than --border, for input/picker fills */
+  --wake-badge: #4a2350;
+  --soft-beige-tint: #fbe9d9; /* lighter than --border, for input/picker fills */
 
   /* Deliberate one-off exception to "nothing on the page reads blue,
      green, or brown" (see the professional-polish note above): Medicine
@@ -149,8 +163,8 @@
      chip. --mint-deep verified at 6.98:1 directly on --mint-bg and 4.98:1
      on the icon-disc's mixed tint (better than the medicine icon's old
      --berry-deep pairing, 4.18:1). */
-  --mint-bg: #e3f0e6;
-  --mint-deep: #22593b;
+  --mint-bg: #dff2e6;
+  --mint-deep: #1f6b45;
   color-scheme: light;
 
   /* --accent-text is --accent's twin for plain foreground text sitting
@@ -182,11 +196,11 @@
     --ink: #f3ece2;
     --ink-muted: #b19eac;
     --border: #5c4f5e;
-    --accent-text: #f0839e;
+    --accent-text: #ff6fb0;    /* bright magenta twin of light-mode --accent — 6.9:1 on --bg, 6.3:1 on --card */
     --ok: #c98bc4;
     --ok-bg: #332a3a;
-    --due-soon: #e0955a;        /* was #dba848 mustard-yellow — warmer amber to match the light-mode fix */
-    --overdue: #e87d5f;
+    --due-soon: #e2a355;        /* nudged a touch more gold so it stays clearly distinct from --overdue below */
+    --overdue: #ef6459;
     --overdue-bg: #402a23;
     --soft-beige-tint: #2b2530;
     --lilac-deep: #b98fce;
@@ -218,11 +232,11 @@
   --ink: #f3ece2;
   --ink-muted: #b19eac;
   --border: #5c4f5e;
-  --accent-text: #f0839e;
+  --accent-text: #ff6fb0;
   --ok: #c98bc4;
   --ok-bg: #332a3a;
-  --due-soon: #e0955a;        /* was #dba848 mustard-yellow — warmer amber to match the light-mode fix */
-  --overdue: #e87d5f;
+  --due-soon: #e2a355;
+  --overdue: #ef6459;
   --overdue-bg: #402a23;
   --soft-beige-tint: #2b2530;
   --lilac-deep: #b98fce;
@@ -309,24 +323,16 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  width: 40px;
   height: 40px;
-  padding: 0 16px 0 13px;
-  border-radius: 999px;
+  border-radius: 50%;
   background: var(--card);
   color: var(--accent-text);
-  text-decoration: none;
   box-shadow: 0 2px 6px rgba(44, 42, 38, 0.12);
 }
 .header-icon-btn svg {
   width: 19px;
   height: 19px;
-  flex-shrink: 0;
-}
-.header-icon-btn-label {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
 }
 .header-icon-btn:active {
   transform: scale(0.95);
@@ -893,7 +899,14 @@ h1 {
   margin-bottom: 12px;
   font-size: 14.5px;
   font-weight: 700;
-  color: var(--btn-ink);
+  /* Was --btn-ink (a fixed near-black used by every OTHER category chip,
+     since those chips' backgrounds stay light in both themes). Medicine's
+     --mint-bg is the one chip background that DOES invert to dark in dark
+     mode, so pinning its text to a theme-invariant dark ink made the word
+     "Medicine" unreadable at night — dark text on a dark green pill.
+     --mint-deep already tracks the theme correctly (it's what the icon
+     next to this label uses), so the label now matches it. */
+  color: var(--mint-deep);
   cursor: pointer;
   font-family: inherit;
   box-shadow: 0 2px 6px rgba(44, 42, 38, 0.07);
