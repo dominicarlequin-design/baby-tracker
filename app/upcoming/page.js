@@ -87,8 +87,17 @@ export default function UpcomingPage() {
               </div>
               {status.medicine.overdue && <div className="status-detail">Overdue</div>}
             </div>
+            {/* When overdue, show the missed scheduled dose time (in the
+                past) rather than the next upcoming slot — showing a future
+                time in the overdue/red style read as "this future dose is
+                already late," which was backwards. This now matches how
+                Feed/Diaper/Night sleep all show their own due time turning
+                red once it's passed, instead of jumping ahead to the next
+                one. */}
             <span className={`more-detail ${status.medicine.overdue ? 'overdue' : 'muted'}`}>
-              {medicineNext ? formatLocalTime(medicineNext.toISOString(), timezone) : 'No schedule set'}
+              {status.medicine.overdue
+                ? (status.medicine.lastScheduledSlot ? formatLocalTime(status.medicine.lastScheduledSlot, timezone) : 'Overdue')
+                : (medicineNext ? formatLocalTime(medicineNext.toISOString(), timezone) : 'No schedule set')}
             </span>
           </div>
         </div>
