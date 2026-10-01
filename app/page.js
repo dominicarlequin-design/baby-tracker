@@ -401,15 +401,25 @@ export default function Page() {
             )}
           </div>
 
-          <button className={`medicine-row ${phaseClass(phase.medicine)}`} onClick={() => attemptLog('medicine', 'Medicine', {}, 'medicine')}>
-            <span className="medicine-label">
-              <Icon name="medicine" phase={phase.medicine} />
-              Medicine
-            </span>
-            <span className="medicine-detail">
-              {medicineNext ? `next window ${formatLocalTime(medicineNext.toISOString(), timezone)}` : 'no schedule set'}
-            </span>
-          </button>
+          <div className="half-row">
+            <button className={`medicine-row medicine-row-half ${phaseClass(phase.medicine)}`} onClick={() => attemptLog('medicine', 'Medicine', {}, 'medicine')}>
+              <span className="medicine-label">
+                <Icon name="medicine" phase={phase.medicine} />
+                Medicine
+              </span>
+              <span className="medicine-detail">
+                {medicineNext ? formatLocalTime(medicineNext.toISOString(), timezone) : 'no schedule'}
+              </span>
+            </button>
+            <Link href="/journal" className="stateful-btn outline journal-btn">
+              <Icon name="journal" />
+              <span className="stateful-text">
+                <span className="stateful-label">Journal</span>
+                <span className="stateful-sub">write a note</span>
+              </span>
+              <span className="stateful-chevron" aria-hidden="true">&rsaquo;</span>
+            </Link>
+          </div>
 
           {today && (
             <>

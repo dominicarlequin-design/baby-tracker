@@ -953,6 +953,53 @@ h1 {
   color: var(--ink-muted);
 }
 
+/* Medicine now shares its row with the new Journal button (app/page.js)
+   instead of spanning the full width alone, so Journal has somewhere to
+   live without pushing the whole button grid taller. */
+.half-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.half-row > * {
+  margin-bottom: 0;
+  width: auto;
+}
+/* At half width "next window 8:00 AM" next to the label has no room to
+   sit on one line (that's why the full-width version used
+   justify-content: space-between) — stacked label-over-detail reads
+   better than wrapping or truncating mid-sentence. */
+.medicine-row-half {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 14px;
+}
+.medicine-row-half .medicine-detail {
+  font-size: 11.5px;
+}
+
+/* Journal is a navigation link (goes to its own page), not a one-tap log
+   like every other button here — reusing the plain .stateful-btn.outline
+   card (white/bordered, chevron) rather than inventing a new filled
+   category color keeps that distinction honest instead of implying
+   Journal is a tracked category the way Fed/Diaper/Medicine are. Sized to
+   match .medicine-row-half's padding so the two halves of this row line
+   up evenly. */
+.journal-btn {
+  padding: 10px 14px;
+  text-decoration: none;
+  /* Every other .stateful-btn is a <button> with no inherited text color
+     to override; this one is a Next <Link> (an <a>), which otherwise
+     leaks the browser's default link-blue into the chevron and anything
+     else that doesn't set its own color explicitly. */
+  color: var(--ink);
+}
+.journal-btn .stateful-sub { color: var(--ink-muted); }
+.journal-btn .icon-disc { background: color-mix(in srgb, var(--accent) 14%, var(--card)); color: var(--accent-text); }
+
 .stats-caption {
   font-size: 11px;
   font-weight: 700;
@@ -1273,6 +1320,27 @@ h1 {
   color: var(--ink-muted);
   margin-top: 4px;
 }
+/* Journal's note field (app/journal/page.js) — same look as .form-input,
+   just taller and vertically resizable instead of single-line. */
+.form-textarea {
+  min-height: 130px;
+  line-height: 1.5;
+  resize: vertical;
+}
+/* Journal's mood picker: unlike the 3/4-option grids above (diaper detail,
+   feed ounces), 5 options don't divide evenly into equal grid columns at
+   phone width, so this wraps instead of forcing a cramped 5-up grid. */
+.mood-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.mood-grid .picker-btn {
+  flex: 1 1 28%;
+  padding: 10px 6px;
+  font-size: 13.5px;
+}
 .form-message {
   font-size: 13.5px;
   font-weight: 600;
@@ -1507,6 +1575,53 @@ h1 {
   font-size: 13px;
   color: var(--ink-muted);
   flex-shrink: 0;
+}
+
+/* Weekly digest (app/journal/digest/page.js) — entries sit inside the same
+   .history/.activity-day-label day-grouping Recent Activity already uses,
+   but each one is multi-line (title + mood + note) instead of a single
+   row, so it gets its own item markup rather than reusing .activity-item. */
+.journal-entry {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.journal-entry:last-child {
+  border-bottom: none;
+}
+.journal-entry-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+.journal-entry-title {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+.journal-entry-mood {
+  margin-top: 4px;
+}
+.journal-entry-note {
+  margin-top: 5px;
+  font-size: 13.5px;
+  color: var(--ink-muted);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+.digest-mood-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.digest-mood-chip {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--accent-text);
+  background: color-mix(in srgb, var(--accent) 13%, var(--card));
+  border-radius: 999px;
+  padding: 3px 9px;
 }
 
 .toast {
@@ -1794,10 +1909,10 @@ h1 {
   bottom: 0;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   background: var(--card);
   border-top: 1px solid var(--border);
-  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  padding: 10px 10px calc(12px + env(safe-area-inset-bottom, 0px));
   z-index: 10;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
@@ -1813,12 +1928,12 @@ h1 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
   text-align: center;
-  padding: 6px 2px 4px;
-  font-size: 11px;
+  padding: 4px 2px 2px;
+  font-size: 10.5px;
   font-weight: 700;
-  color: color-mix(in srgb, var(--accent-text) 65%, var(--ink-muted));
+  color: color-mix(in srgb, var(--accent-text) 55%, var(--ink-muted));
   text-decoration: none;
   transition: color 0.15s ease, transform 0.1s ease;
 }
@@ -1829,15 +1944,21 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 38px;
-  border-radius: 12px;
-  transition: background 0.15s ease;
+  width: 44px;
+  height: 36px;
+  border-radius: 14px;
+  transition: background 0.18s ease;
 }
+/* Sticker icons (lib/TabBar.js) carry their own baked-in colors now, so
+   the active/inactive distinction here is opacity + a scale-up rather
+   than a currentColor swap — a muted sticker still reads as its own
+   icon at a glance, just quieter than the active one. */
 .tab-icon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
+  opacity: 0.78;
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 .tab-label {
   line-height: 1;
@@ -1846,28 +1967,34 @@ h1 {
   color: var(--accent-text);
 }
 .tab-active .tab-icon-wrap {
-  background: var(--accent);
-  background-image: linear-gradient(155deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0) 60%);
-  box-shadow: 0 3px 8px color-mix(in srgb, var(--accent) 40%, transparent);
-  color: var(--accent-ink);
+  background: color-mix(in srgb, var(--accent) 13%, var(--card));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+}
+.tab-active .tab-icon {
+  opacity: 1;
+  transform: scale(1.12);
 }
 
 /* Center "+" — a visual match for the reference's raised FAB, not a 5th
    destination of its own (see the comment in lib/TabBar.js): same target
    as the Today tab, just pulled up out of the bar on its own circle so it
-   reads as the bar's visual centerpiece the way the reference draws it. */
+   reads as the bar's visual centerpiece the way the reference draws it.
+   A card-colored ring plus a soft halo ring (box-shadow's 2nd layer) make
+   it pop more against the bar than the earlier flat-shadow version did. */
 .tab-fab {
   flex-shrink: 0;
-  width: 62px;
-  height: 62px;
-  margin-top: -24px;
+  width: 58px;
+  height: 58px;
+  margin-top: -22px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  background: var(--accent);
-  box-shadow: 0 2px 6px color-mix(in srgb, var(--accent) 45%, transparent);
+  border: 3px solid var(--card);
+  background: linear-gradient(155deg, #ef4b9c, var(--accent) 60%, #a9146a);
+  box-shadow:
+    0 6px 16px -2px color-mix(in srgb, var(--accent) 65%, transparent),
+    0 0 0 6px color-mix(in srgb, var(--accent) 12%, transparent);
   color: #fff;
   cursor: pointer;
   font-family: inherit;
@@ -1877,8 +2004,8 @@ h1 {
   transform: scale(0.95);
 }
 .tab-fab svg {
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
 }
 
 /* ---------------------------------------------------------------------
