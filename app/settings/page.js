@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
 import { ThemeToggle } from '../../lib/theme';
 import { TabBar } from '../../lib/TabBar';
@@ -72,7 +71,6 @@ const FIELDS = [
 ];
 
 export default function SettingsPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -164,12 +162,6 @@ export default function SettingsPage() {
       setPushBusy(false);
     }
   }, [pushStatus, vapidPublicKey]);
-
-  const handleSignOut = useCallback(async () => {
-    await supabase.auth.signOut();
-    router.replace('/login');
-    router.refresh();
-  }, [router]);
 
   const setField = useCallback((key, value) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -352,10 +344,6 @@ export default function SettingsPage() {
           </button>
         </div>
       )}
-
-      <div className="card">
-        <button type="button" className="quiet-btn" onClick={handleSignOut}>Sign out</button>
-      </div>
 
       <TabBar active="settings" />
     </div>
