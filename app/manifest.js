@@ -10,7 +10,7 @@ export default function manifest() {
     description: 'Tap-to-log baby habit tracker',
     start_url: '/',
     display: 'standalone',
-    background_color: '#fbeaf1',
+    background_color: '#ffffff',
     theme_color: '#fbeaf1',
     icons: [
       { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },

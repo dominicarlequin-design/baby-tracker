@@ -53,7 +53,7 @@
      rust-brown that was too close to --overdue's red — they were nearly
      indistinguishable at a glance before, which defeats the point of
      having three separate urgency tiers. */
-  --bg: #fdf6f0;
+  --bg: #ffffff;
   --card: #ffffff;
   --ink: #2b2230;
   --ink-muted: #766075;
@@ -2399,4 +2399,47 @@ button:focus-visible {
   flex: none;
   margin-top: 2px;
   border-radius: 16px;
+}
+
+/* Button depth: raised look at rest (soft shadow + light top edge), sink on press. */
+.tile-icon {
+  box-shadow:
+    0 10px 18px -8px rgba(90, 58, 85, 0.42),
+    inset 0 2px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -4px 0 rgba(90, 50, 80, 0.08);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.tile-btn:active .tile-icon {
+  transform: translateY(3px) scale(0.96);
+  box-shadow:
+    0 3px 6px -4px rgba(90, 58, 85, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.75);
+}
+.stat-tile .tile-icon,
+.nextup-row .tile-icon {
+  box-shadow: 0 4px 8px -4px rgba(90, 58, 85, 0.35), inset 0 1.5px 0 rgba(255, 255, 255, 0.7);
+}
+.form-save {
+  box-shadow:
+    0 8px 16px -8px color-mix(in srgb, var(--accent) 70%, #000),
+    inset 0 2px 0 rgba(255, 255, 255, 0.28);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.form-save:active:not(:disabled) {
+  transform: translateY(2px) scale(0.98);
+  box-shadow:
+    0 2px 5px -3px color-mix(in srgb, var(--accent) 70%, #000),
+    inset 0 2px 0 rgba(255, 255, 255, 0.28);
+}
+.tab-fab {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.tab-fab:active {
+  transform: translateY(2px) scale(0.94);
+  box-shadow:
+    0 2px 6px -2px color-mix(in srgb, var(--accent) 65%, transparent),
+    0 0 0 6px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+@media (prefers-color-scheme: dark) {
+  .tile-icon { box-shadow: 0 10px 18px -8px rgba(0, 0, 0, 0.6), inset 0 2px 0 rgba(255, 255, 255, 0.25); }
 }
