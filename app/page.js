@@ -382,7 +382,7 @@ export default function Page() {
               <button className={`tile-btn ${phaseClass(phase.nap)}`} onClick={() => logEvent('nap_start', 'Nap started', {}, 'nap')}>
                 <TileIcon name="sleep" phase={phase.nap} />
                 <span className="tile-label">Start nap</span>
-                <span className="tile-sub">{status.nap.hoursSince != null ? `awake ${formatHours(status.nap.hoursSince)}` : 'no naps yet'}</span>
+                <span className="tile-sub">{status.nap.hoursSince != null ? `awake ${formatHours(status.nap.hoursSince)}` : status.sleep.asleep ? 'after she wakes' : 'no naps yet'}</span>
               </button>
             )}
             {status.sleep.asleep ? (
