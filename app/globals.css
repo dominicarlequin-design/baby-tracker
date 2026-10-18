@@ -65,7 +65,7 @@
   --due-soon: #9c5c1f;        /* was #a35a30 — same family, shifted toward gold so it's unmistakably not a shade of --overdue; 5.3:1 on white */
   --overdue: #c8342f;         /* more saturated true red than before; 5.3:1 on white, clearly apart from --due-soon's gold */
   --overdue-bg: #fceae8;
-  --radius: 14px;
+  --radius: 22px; /* cards, Next up, banners, Insights rows: matches the Today tiles */
 
   /* Deepened from their original pastel values (kept in comments below) as
      part of the same professional-polish pass — the log-button grid's dark
@@ -2260,4 +2260,14 @@ button:focus-visible {
   padding: 12px 8px;
   font-size: 14.5px;
   white-space: nowrap;
+}
+
+/* Corner family: big surfaces use --radius (22px), the smaller stat tiles
+   use 18px so they don't look puffy, and Journal's Weekly digest link is a
+   card like the rest instead of a full pill. */
+.stat-tile {
+  border-radius: 18px;
+}
+.journal-btn {
+  border-radius: 22px;
 }
