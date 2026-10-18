@@ -467,9 +467,9 @@ h1 {
 
 .btn-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
   border-radius: 20px;
 }
 /* Feedback for the nav bar's "+" when it's tapped from the Log screen
@@ -807,9 +807,9 @@ h1 {
 
 .stateful-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .stateful-btn {
@@ -966,8 +966,8 @@ h1 {
    live without pushing the whole button grid taller. */
 .half-row {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
   margin-bottom: 12px;
 }
 .half-row > * {
@@ -1543,7 +1543,7 @@ h1 {
   background: none;
   border: none;
   border-bottom: 1px solid var(--border);
-  padding: 10px 0;
+  padding: 13px 0;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
@@ -2103,4 +2103,61 @@ button:focus-visible {
 .form-save.is-error {
   background: var(--overdue) !important;
   background-image: none !important;
+}
+
+/* Bigger tap areas, same look. These links/buttons draw at ~14-30px tall,
+   under the 44px a thumb needs. An invisible ::after box around each one
+   grows the clickable area without moving or resizing anything visible. */
+.why-btn,
+.header-settings-link,
+.header-back-link,
+.header-datetime,
+.quiet-btn,
+.theme-toggle,
+.pattern-toggle {
+  position: relative;
+}
+.why-btn::after,
+.header-back-link::after,
+.quiet-btn::after {
+  content: '';
+  position: absolute;
+  inset: -14px -10px;
+}
+/* Settings / "Back to…" sit 10px right of the theme toggle: keep their
+   sideways growth small so the two tap zones don't overlap. */
+.header-settings-link::after,
+.header-datetime::after {
+  content: '';
+  position: absolute;
+  inset: -14px -3px;
+}
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  inset: -7px;
+}
+.pattern-toggle::after {
+  content: '';
+  position: absolute;
+  inset: -10px 0;
+}
+
+/* Today's button grid (Fed, Diaper, Nap, Bedtime, Medicine, Journal).
+   minmax(0, 1fr) above keeps both columns equal even when one label is
+   longer (plain 1fr let Bedtime push End nap narrower). Every tile gets the
+   same 80px height (12px gaps) and softer 22px corners: full pills read puffy at
+   this size. The nap/bedtime row trims its padding so "usual 12:00 AM"
+   still fits at the equal width. */
+.btn-grid > *,
+.stateful-grid > *,
+.half-row > * {
+  height: 80px;
+  min-height: 0;
+  border-radius: 22px;
+  box-sizing: border-box;
+}
+.stateful-grid .stateful-btn {
+  padding: 12px 8px 12px 10px;
+  gap: 6px;
 }
