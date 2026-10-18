@@ -300,6 +300,7 @@ export default function SettingsPage() {
         <input
           type="range"
           className="volume-slider"
+          aria-label="Button sound volume"
           min="0"
           max="1"
           step="0.05"

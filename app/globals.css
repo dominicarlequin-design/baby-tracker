@@ -1474,7 +1474,7 @@ h1 {
   text-align: left;
 }
 .pattern-toggle .chevron {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .pattern-dropdown {
@@ -2122,7 +2122,7 @@ button:focus-visible {
 .quiet-btn::after {
   content: '';
   position: absolute;
-  inset: -14px -10px;
+  inset: -16px -10px;
 }
 /* Settings / "Back to…" sit 10px right of the theme toggle: keep their
    sideways growth small so the two tap zones don't overlap. */
@@ -2459,4 +2459,24 @@ button:focus-visible {
   .stat-tile { padding: 6px 8px; }
   /* Today only: no spare scroll room under the stats (other screens keep it). */
   .wrap:has(.tile-grid) { padding-bottom: 76px; }
+}
+
+/* UX/UI audit pass: 44px minimum touch heights, desktop tab bar width, small
+   text/contrast nits. */
+.mood-grid .picker-btn,
+.form-input,
+.form-save,
+.export-btn,
+.activity-item {
+  min-height: 44px;
+}
+.digest-mood-chip {
+  background: color-mix(in srgb, var(--accent) 7%, var(--card));
+}
+.chevron {
+  font-size: 12px;
+}
+.tab-bar {
+  max-width: 480px;
+  margin-inline: auto;
 }
