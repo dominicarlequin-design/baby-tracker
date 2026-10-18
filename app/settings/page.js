@@ -242,17 +242,21 @@ export default function SettingsPage() {
         )}
         {(pushStatus === 'on' || pushStatus === 'off') && (
           <>
-            <div className="form-hint">Get a notification on this device when something becomes overdue.</div>
-            <button
-              className={`modal-btn-confirm form-save ${pushBusy ? 'is-loading' : ''} ${pushJustSucceeded ? 'is-success' : ''} ${pushFailed ? 'is-error' : ''}`}
-              onClick={handleTogglePush}
-              disabled={pushBusy}
-              style={{ marginTop: '10px' }}
-            >
-              {pushBusy && <span className="btn-spinner" />}
-              {pushJustSucceeded && <svg className="btn-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>}
-              {pushBusy ? 'Working…' : pushStatus === 'on' ? 'Turn off phone alerts' : 'Turn on phone alerts'}
-            </button>
+            <div className="toggle-row">
+              <div className="form-hint toggle-hint">Get a notification on this device when something becomes overdue.</div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={pushStatus === 'on'}
+                aria-label="Phone alerts"
+                aria-busy={pushBusy}
+                className={`switch ${pushFailed ? 'is-error' : ''}`}
+                onClick={handleTogglePush}
+                disabled={pushBusy}
+              >
+                <span className="switch-thumb" />
+              </button>
+            </div>
           </>
         )}
         {pushMessage && (
@@ -262,16 +266,20 @@ export default function SettingsPage() {
 
       <div className="card">
         <div className="section-title">Button sounds</div>
-        <div className="form-hint">Plays a short sound whenever you tap a button.</div>
-        <button
-          className={`modal-btn-confirm form-save ${soundJustToggled ? 'is-success' : ''}`}
-          onClick={handleToggleSoundEnabled}
-          data-skip-click-sound="true"
-          style={{ marginTop: '10px' }}
-        >
-          {soundJustToggled && <svg className="btn-check" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" /></svg>}
-          {soundSettings.enabled ? 'Turn off button sounds' : 'Turn on button sounds'}
-        </button>
+        <div className="toggle-row">
+          <div className="form-hint toggle-hint">Plays a short sound whenever you tap a button.</div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={!!soundSettings.enabled}
+            aria-label="Button sounds"
+            className="switch"
+            onClick={handleToggleSoundEnabled}
+            data-skip-click-sound="true"
+          >
+            <span className="switch-thumb" />
+          </button>
+        </div>
 
         <div className="form-label" style={{ marginTop: '18px' }}>Sound</div>
         <div className="picker-grid sound-grid">
