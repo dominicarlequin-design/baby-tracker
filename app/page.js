@@ -342,6 +342,12 @@ export default function Page() {
                 </div>
               )}
             </div>
+          ) : status?.sleep?.asleep ? (
+            <div className="nextup nextup-on-track">
+              <div className="nextup-eyebrow">Sleeping</div>
+              <div className="nextup-headline">Asleep since {formatLocalTime(status.sleep.lastEventTime, timezone)}</div>
+              <div className="nextup-sub">Feed and diaper alerts are paused until she wakes up.</div>
+            </div>
           ) : (
             <div className="nextup nextup-on-track">
               <div className="nextup-eyebrow">Getting started</div>
