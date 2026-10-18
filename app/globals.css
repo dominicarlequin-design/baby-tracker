@@ -2383,3 +2383,11 @@ button:focus-visible {
 .tile-overlay .btn-check { width: 28px; height: 28px; }
 .tile-overlay.tile-ok { background: #3fa876; }
 .tile-overlay.tile-bad { background: var(--overdue); }
+
+/* Small flat icon tiles inside the Today's stats cards. */
+.stat-tile .tile-icon {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 12px;
+}

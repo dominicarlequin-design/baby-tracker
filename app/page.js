@@ -416,7 +416,7 @@ export default function Page() {
               <div className="stats-row">
                 <div className="stat-tile stat-tile-feed">
                   <div className="stat-tile-row">
-                    <Icon name="feed" />
+                    <TileIcon name="feed" />
                     <div className="stat-tile-text">
                       <div className="stat-value">{today.feeds}</div>
                       <div className="stat-label">Feedings</div>
@@ -426,7 +426,7 @@ export default function Page() {
                 </div>
                 <div className="stat-tile stat-tile-diaper">
                   <div className="stat-tile-row">
-                    <Icon name="diaper" />
+                    <TileIcon name="diaper" />
                     <div className="stat-tile-text">
                       <div className="stat-value">{today.diapers}</div>
                       <div className="stat-label">Diapers</div>
@@ -436,7 +436,7 @@ export default function Page() {
                 </div>
                 <div className="stat-tile stat-tile-nap">
                   <div className="stat-tile-row">
-                    <Icon name="nap" />
+                    <TileIcon name="sleep" />
                     <div className="stat-tile-text">
                       <div className="stat-value">{formatHours(today.napMinutes / 60) || '0m'}</div>
                       <div className="stat-label">Sleep</div>
