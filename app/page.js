@@ -19,6 +19,7 @@ import {
   overdueSummary,
   Icon,
   phaseClass,
+  TileIcon,
 } from '../lib/homeUi';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -362,74 +363,50 @@ export default function Page() {
             </div>
           ))}
 
-          <div className="btn-grid">
-            <button className={`log-btn log-btn-primary btn-feed ${phaseClass(phase.feed)}`} onClick={() => setFeedPickerOpen(true)}>
-              <Icon name="feed" phase={phase.feed} />
-              Fed
+          <div className="tile-grid">
+            <button className={`tile-btn ${phaseClass(phase.feed)}`} onClick={() => setFeedPickerOpen(true)}>
+              <TileIcon name="feed" phase={phase.feed} />
+              <span className="tile-label">Fed</span>
             </button>
-            <button className={`log-btn log-btn-primary btn-diaper ${phaseClass(phase.diaper)}`} onClick={() => setDiaperPickerOpen(true)}>
-              <Icon name="diaper" phase={phase.diaper} />
-              Diaper
+            <button className={`tile-btn ${phaseClass(phase.diaper)}`} onClick={() => setDiaperPickerOpen(true)}>
+              <TileIcon name="diaper" phase={phase.diaper} />
+              <span className="tile-label">Diaper</span>
             </button>
-          </div>
-
-          <div className="stateful-grid">
             {status.nap.asleep ? (
-              <button className={`stateful-btn filled nap-filled ${phaseClass(phase.nap)}`} onClick={() => logEvent('nap_end', 'Nap ended', {}, 'nap')}>
-                <Icon name="nap" phase={phase.nap} />
-                <span className="stateful-text">
-                  <span className="stateful-label">End nap</span>
-                  <span className="stateful-sub">asleep {formatHours((now.getTime() - new Date(status.nap.lastEventTime).getTime()) / (1000 * 60 * 60))}</span>
-                </span>
+              <button className={`tile-btn ${phaseClass(phase.nap)}`} onClick={() => logEvent('nap_end', 'Nap ended', {}, 'nap')}>
+                <TileIcon name="sleep" phase={phase.nap} />
+                <span className="tile-label">End nap</span>
+                <span className="tile-sub">asleep {formatHours((now.getTime() - new Date(status.nap.lastEventTime).getTime()) / (1000 * 60 * 60))}</span>
               </button>
             ) : (
-              <button className={`stateful-btn outline nap-outline ${phaseClass(phase.nap)}`} onClick={() => logEvent('nap_start', 'Nap started', {}, 'nap')}>
-                <Icon name="nap" phase={phase.nap} />
-                <span className="stateful-text">
-                  <span className="stateful-label">Start nap</span>
-                  <span className="stateful-sub">{status.nap.hoursSince != null ? `awake ${formatHours(status.nap.hoursSince)}` : 'no naps yet'}</span>
-                </span>
-                <span className="stateful-chevron" aria-hidden="true">&rsaquo;</span>
+              <button className={`tile-btn ${phaseClass(phase.nap)}`} onClick={() => logEvent('nap_start', 'Nap started', {}, 'nap')}>
+                <TileIcon name="sleep" phase={phase.nap} />
+                <span className="tile-label">Start nap</span>
+                <span className="tile-sub">{status.nap.hoursSince != null ? `awake ${formatHours(status.nap.hoursSince)}` : 'no naps yet'}</span>
               </button>
             )}
-
             {status.sleep.asleep ? (
-              <button className={`stateful-btn filled sleep-filled ${phaseClass(phase.sleep)}`} onClick={() => logEvent('sleep_end', 'Wake up', {}, 'sleep')}>
-                <Icon name="wake" phase={phase.sleep} />
-                <span className="stateful-text">
-                  <span className="stateful-label">Wake Up</span>
-                  <span className="stateful-sub">asleep {formatHours((now.getTime() - new Date(status.sleep.lastEventTime).getTime()) / (1000 * 60 * 60))}</span>
-                </span>
+              <button className={`tile-btn ${phaseClass(phase.sleep)}`} onClick={() => logEvent('sleep_end', 'Wake up', {}, 'sleep')}>
+                <TileIcon name="bedtime" phase={phase.sleep} />
+                <span className="tile-label">Wake Up</span>
+                <span className="tile-sub">asleep {formatHours((now.getTime() - new Date(status.sleep.lastEventTime).getTime()) / (1000 * 60 * 60))}</span>
               </button>
             ) : (
-              <button className={`stateful-btn outline sleep-outline ${phaseClass(phase.sleep)}`} onClick={() => logEvent('sleep_start', 'Bedtime', {}, 'sleep')}>
-                <Icon name="bedtime" phase={phase.sleep} />
-                <span className="stateful-text">
-                  <span className="stateful-label">Bedtime</span>
-                  <span className="stateful-sub">usual {formatTimeOfDay(config.target_bedtime_local ?? '19:15')}</span>
-                </span>
-                <span className="stateful-chevron" aria-hidden="true">&rsaquo;</span>
+              <button className={`tile-btn ${phaseClass(phase.sleep)}`} onClick={() => logEvent('sleep_start', 'Bedtime', {}, 'sleep')}>
+                <TileIcon name="bedtime" phase={phase.sleep} />
+                <span className="tile-label">Bedtime</span>
+                <span className="tile-sub">usual {formatTimeOfDay(config.target_bedtime_local ?? '19:15')}</span>
               </button>
             )}
-          </div>
-
-          <div className="half-row">
-            <button className={`medicine-row medicine-row-half ${phaseClass(phase.medicine)}`} onClick={() => attemptLog('medicine', 'Medicine', {}, 'medicine')}>
-              <span className="medicine-label">
-                <Icon name="medicine" phase={phase.medicine} />
-                Medicine
-              </span>
-              <span className="medicine-detail">
-                {medicineNext ? formatLocalTime(medicineNext.toISOString(), timezone) : 'no schedule'}
-              </span>
+            <button className={`tile-btn ${phaseClass(phase.medicine)}`} onClick={() => attemptLog('medicine', 'Medicine', {}, 'medicine')}>
+              <TileIcon name="medicine" phase={phase.medicine} />
+              <span className="tile-label">Medicine</span>
+              <span className="tile-sub">{medicineNext ? formatLocalTime(medicineNext.toISOString(), timezone) : 'no schedule'}</span>
             </button>
-            <Link href="/journal" className="stateful-btn outline journal-btn">
-              <Icon name="journal" />
-              <span className="stateful-text">
-                <span className="stateful-label">Journal</span>
-                <span className="stateful-sub">write a note</span>
-              </span>
-              <span className="stateful-chevron" aria-hidden="true">&rsaquo;</span>
+            <Link href="/journal" className="tile-btn">
+              <TileIcon name="journal" />
+              <span className="tile-label">Journal</span>
+              <span className="tile-sub">write a note</span>
             </Link>
           </div>
 

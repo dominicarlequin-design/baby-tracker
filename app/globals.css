@@ -2333,3 +2333,53 @@ button:focus-visible {
   position: absolute;
   inset: -7px -4px;
 }
+
+/* Flat pastel tile grid on Today (3 x 2). */
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 10px;
+  margin: 14px 0;
+}
+.tile-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--ink);
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.tile-icon {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease;
+}
+.tile-icon > svg:first-child { width: 72%; height: 72%; }
+.tile-btn:active .tile-icon { transform: scale(0.95); }
+.tile-label { font-weight: 700; font-size: 15px; }
+.tile-sub { font-size: 12px; color: var(--ink-muted); }
+.tile-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--ink) 45%, transparent);
+}
+.tile-overlay .btn-spinner,
+.tile-overlay .btn-check { width: 28px; height: 28px; }
+.tile-overlay.tile-ok { background: #3fa876; }
+.tile-overlay.tile-bad { background: var(--overdue); }
