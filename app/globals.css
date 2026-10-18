@@ -143,7 +143,7 @@
      button. Verified: gold #d9b45c still clears 4.5:1+ against this
      (6.93:1). */
   --wake-badge: #4a2350;
-  --soft-beige-tint: #fbe9d9; /* lighter than --border, for input/picker fills */
+  --soft-beige-tint: #fdf8f9; /* input/picker fill: a faint blush (was peach #fbe9d9, the last leftover from the old beige theme) */
 
   /* Deliberate one-off exception to "nothing on the page reads blue,
      green, or brown" (see the professional-polish note above): Medicine
@@ -1316,9 +1316,9 @@ h1 {
 .form-input {
   width: 100%;
   font-size: 15px;
-  padding: 9px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
   font-family: inherit;
   background: var(--soft-beige-tint);
   color: var(--ink);
@@ -2240,4 +2240,11 @@ button:focus-visible {
 }
 .medicine-row-half {
   column-gap: 6px;
+}
+
+/* Inputs show which field you're typing in: magenta border + soft glow. */
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
 }
