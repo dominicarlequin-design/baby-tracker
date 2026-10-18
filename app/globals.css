@@ -2457,4 +2457,6 @@ button:focus-visible {
   .tile-btn { gap: 2px; }
   .stats-caption { margin-top: 0; }
   .stat-tile { padding: 6px 8px; }
+  /* Today only: no spare scroll room under the stats (other screens keep it). */
+  .wrap:has(.tile-grid) { padding-bottom: 76px; }
 }
