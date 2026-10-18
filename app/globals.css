@@ -2200,3 +2200,26 @@ button:focus-visible {
   grid-column: 2;
   grid-row: 2;
 }
+
+/* Fed + Diaper follow the same pattern as the other Today tiles: icon in a
+   40px disc pinned 12px from the left, label right after it. The disc is a
+   soft white tint so it reads on both the raspberry and violet fills. */
+.btn-grid .log-btn-primary {
+  justify-content: flex-start;
+  padding: 12px 8px 12px 12px;
+  gap: 8px;
+}
+.btn-grid .log-btn-primary .icon-disc {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+}
+.btn-grid .log-btn-primary .icon-disc svg {
+  width: 28px;
+  height: 28px;
+}
