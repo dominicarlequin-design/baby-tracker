@@ -86,7 +86,6 @@ export default function PatternsPage() {
         <h1>Insights</h1>
         <div className="header-actions">
           <ThemeToggle />
-          <Link href="/settings" className="header-settings-link">Profile</Link>
         </div>
       </div>
 

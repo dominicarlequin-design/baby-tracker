@@ -28,7 +28,6 @@ export default function MilestonesPage() {
         </div>
         <div className="header-actions">
           <ThemeToggle />
-          <Link href="/settings" className="header-settings-link">Profile</Link>
         </div>
       </div>
 

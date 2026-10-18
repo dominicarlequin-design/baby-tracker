@@ -101,7 +101,6 @@ export default function JournalPage() {
         <h1>Journal</h1>
         <div className="header-actions">
           <ThemeToggle />
-          <Link href="/" className="header-datetime">Back to Today</Link>
         </div>
       </div>
 

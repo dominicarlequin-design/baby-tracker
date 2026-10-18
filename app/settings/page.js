@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
 import { ThemeToggle } from '../../lib/theme';
@@ -227,7 +226,6 @@ export default function SettingsPage() {
         <h1>Profile</h1>
         <div className="header-actions">
           <ThemeToggle />
-          <Link href="/" className="header-datetime">Back to Today</Link>
         </div>
       </div>
 

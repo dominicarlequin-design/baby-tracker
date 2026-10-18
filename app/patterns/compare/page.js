@@ -110,7 +110,6 @@ export default function ComparePage() {
         </div>
         <div className="header-actions">
           <ThemeToggle />
-          <Link href="/settings" className="header-settings-link">Profile</Link>
         </div>
       </div>
 
