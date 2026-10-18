@@ -105,12 +105,12 @@ export default function ComparePage() {
     <div className="wrap">
       <div className="header-row">
         <div>
-          <Link href="/patterns" className="header-back-link">‹ Patterns</Link>
+          <Link href="/patterns" className="header-back-link">‹ Insights</Link>
           <h1>How she compares</h1>
         </div>
         <div className="header-actions">
           <ThemeToggle />
-          <Link href="/settings" className="header-settings-link">Settings</Link>
+          <Link href="/settings" className="header-settings-link">Profile</Link>
         </div>
       </div>
 
@@ -127,7 +127,7 @@ export default function ComparePage() {
           </div>
           {!age && (
             <div className="form-hint" style={{ marginBottom: '10px' }}>
-              Add her birth date in <Link href="/settings" className="header-settings-link">Settings</Link> so these ranges update automatically as she grows — showing the 3–5 month range for now.
+              Add her birth date in <Link href="/settings" className="header-settings-link">Profile</Link> so these ranges update automatically as she grows — showing the 3–5 month range for now.
             </div>
           )}
           <CompareRow

@@ -224,10 +224,10 @@ export default function SettingsPage() {
   return (
     <div className="wrap">
       <div className="header-row">
-        <h1>Settings</h1>
+        <h1>Profile</h1>
         <div className="header-actions">
           <ThemeToggle />
-          <Link href="/" className="header-datetime">Back to Log</Link>
+          <Link href="/" className="header-datetime">Back to Today</Link>
         </div>
       </div>
 
@@ -318,7 +318,7 @@ export default function SettingsPage() {
               value={form.birth_date}
               onChange={e => setField('birth_date', e.target.value)}
             />
-            <div className="form-hint">Powers the age-based "How she compares" ranges on Patterns — they move to the next bracket automatically as she grows. Leave blank and it falls back to a generic 3–5 month range.</div>
+            <div className="form-hint">Powers the age-based "How she compares" ranges on Insights — they move to the next bracket automatically as she grows. Leave blank and it falls back to a generic 3–5 month range.</div>
           </div>
 
           <div className="section-title" style={{ marginTop: '20px' }}>Tuning</div>

@@ -13,12 +13,12 @@ export default function TypicalDayPage() {
     <div className="wrap">
       <div className="header-row">
         <div>
-          <Link href="/patterns" className="header-back-link">‹ Patterns</Link>
+          <Link href="/patterns" className="header-back-link">‹ Insights</Link>
           <h1>Typical day</h1>
         </div>
         <div className="header-actions">
           <ThemeToggle />
-          <Link href="/settings" className="header-settings-link">Settings</Link>
+          <Link href="/settings" className="header-settings-link">Profile</Link>
         </div>
       </div>
 

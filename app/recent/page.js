@@ -148,10 +148,10 @@ export default function RecentPage() {
   return (
     <div className="wrap">
       <div className="header-row">
-        <h1>Recent activity</h1>
+        <h1>History</h1>
         <div className="header-actions">
           <ThemeToggle />
-          <Link href="/settings" className="header-settings-link">Settings</Link>
+          <Link href="/settings" className="header-settings-link">Profile</Link>
         </div>
       </div>
 

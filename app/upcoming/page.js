@@ -60,7 +60,7 @@ export default function UpcomingPage() {
         <h1>Upcoming</h1>
         <div className="header-actions">
           <ThemeToggle />
-          <Link href="/settings" className="header-settings-link">Settings</Link>
+          <Link href="/settings" className="header-settings-link">Profile</Link>
         </div>
       </div>
 

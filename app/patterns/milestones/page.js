@@ -23,12 +23,12 @@ export default function MilestonesPage() {
     <div className="wrap">
       <div className="header-row">
         <div>
-          <Link href="/patterns" className="header-back-link">‹ Patterns</Link>
+          <Link href="/patterns" className="header-back-link">‹ Insights</Link>
           <h1>Milestones</h1>
         </div>
         <div className="header-actions">
           <ThemeToggle />
-          <Link href="/settings" className="header-settings-link">Settings</Link>
+          <Link href="/settings" className="header-settings-link">Profile</Link>
         </div>
       </div>
 
@@ -39,7 +39,7 @@ export default function MilestonesPage() {
           <div className="section-title">{hasBirthDate ? ageShortLabel : 'Timeline'}</div>
           {!hasBirthDate && (
             <div className="form-hint" style={{ marginBottom: '10px' }}>
-              Add her birth date in <Link href="/settings" className="header-settings-link">Settings</Link> to see her current stage highlighted automatically — showing the full timeline for now.
+              Add her birth date in <Link href="/settings" className="header-settings-link">Profile</Link> to see her current stage highlighted automatically — showing the full timeline for now.
             </div>
           )}
 

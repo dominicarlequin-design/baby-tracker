@@ -83,10 +83,10 @@ export default function PatternsPage() {
   return (
     <div className="wrap">
       <div className="header-row">
-        <h1>Patterns</h1>
+        <h1>Insights</h1>
         <div className="header-actions">
           <ThemeToggle />
-          <Link href="/settings" className="header-settings-link">Settings</Link>
+          <Link href="/settings" className="header-settings-link">Profile</Link>
         </div>
       </div>
 
