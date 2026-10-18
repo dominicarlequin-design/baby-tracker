@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node lib/logic.test.js && node lib/summaries.test.js"
+    "test": "node lib/logic.test.js && node lib/summaries.test.js && node lib/edgeSync.test.js",
+    "sync:edge": "node scripts/sync-edge-logic.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
