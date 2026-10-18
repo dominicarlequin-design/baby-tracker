@@ -48,7 +48,7 @@ const HISTORY_DAYS = 30;
 // and the nextup-cat-* CSS classes); ICON_PATHS (lib/homeUi.js) has no
 // "sleep" glyph of its own (night sleep shares its icon with the Bedtime
 // button), hence the map.
-const NEXTUP_ICON = { feed: 'feed', diaper: 'diaper', nap: 'nap', sleep: 'bedtime' };
+const NEXTUP_ICON = { feed: 'feed', diaper: 'diaper', nap: 'sleep', sleep: 'bedtime', medicine: 'medicine' };
 
 export default function Page() {
   const [config, setConfig] = useState(null);
@@ -333,7 +333,7 @@ export default function Page() {
           ) : nextUp ? (
             <div className={`nextup nextup-${nextUpTone} nextup-cat-${nextUpKey}`}>
               <div className="nextup-row">
-                <Icon name={NEXTUP_ICON[nextUpKey] ?? nextUpKey} />
+                {NEXTUP_ICON[nextUpKey] ? <TileIcon name={NEXTUP_ICON[nextUpKey]} /> : <Icon name={nextUpKey} />}
                 <div className="nextup-text">
                   <div className={`nextup-eyebrow ${nextUp.lateBy ? 'category' : ''}`}>{nextUp.eyebrow}</div>
                   <div className="nextup-headline">

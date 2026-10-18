@@ -2391,3 +2391,12 @@ button:focus-visible {
   flex: none;
   border-radius: 12px;
 }
+
+/* Flat icon tile in the Next Up card. */
+.nextup-row .tile-icon {
+  width: 56px;
+  height: 56px;
+  flex: none;
+  margin-top: 2px;
+  border-radius: 16px;
+}
