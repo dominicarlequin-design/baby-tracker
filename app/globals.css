@@ -364,6 +364,20 @@ h1 {
   margin-bottom: 2px;
 }
 
+/* Plain-text button for a low-emphasis secondary action (e.g. "Use a
+   different email", "Sign out") — same visual weight as .header-datetime
+   but reset as a real <button> instead of a <Link>. */
+.quiet-btn {
+  display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
 .header-actions {
   display: flex;
   align-items: center;
