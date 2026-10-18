@@ -2248,3 +2248,16 @@ button:focus-visible {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
 }
+
+/* Profile's Sound picker: 4 circles at ~70px each squeezed "Soft tap" to
+   the edge and wrapped "Crisp click" onto two lines. A 2x2 grid of pills
+   (same style as Journal's Mood chips) gives every label one clean line. */
+.picker-grid.sound-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 8px;
+}
+.sound-grid .picker-btn {
+  padding: 12px 8px;
+  font-size: 14.5px;
+  white-space: nowrap;
+}

@@ -276,7 +276,7 @@ export default function SettingsPage() {
         </button>
 
         <div className="form-label" style={{ marginTop: '18px' }}>Sound</div>
-        <div className="picker-grid">
+        <div className="picker-grid sound-grid">
           {SOUND_STYLES.map(s => (
             <button
               key={s.id}
