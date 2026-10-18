@@ -122,20 +122,14 @@
   --blush-rose-deep: #b43a5c;
   --orchid-deep: #8a3d96;
 
-  /* Fed/Diaper-only siblings of the two fills above, re-sampled off a
-     clearer copy of your reference (#c99599 / #b6a6c7 — a touch more
-     saturated than the first, JPEG-compressed sample this replaced). Your
-     call, after seeing the accessibility trade-off explained: match the
-     reference exactly rather than deepen it for contrast headroom — this
-     pairing only clears ~2.3-2.5:1 against white, under the 4.5:1 AA floor
-     the rest of the app holds, but it's your personal app and the
-     reference's own look matters more here than the checker. Used only for
-     these two buttons' fill + glow; the icon-disc glyph, next-up eyebrow,
-     and stat-tile value all still use the darker -fill/-deep variants
-     since those sit on lighter tints that need the extra contrast to read
-     at all. */
-  --blush-rose-btn: #e6879b;
-  --orchid-btn: #c48fd4;
+  /* Fed/Diaper-only button fills. Originally matched a soft reference
+     (#e6879b / #c48fd4), which only cleared ~2.5:1 against the white label.
+     Deepened in the same hues so the white text passes 4.5:1 AA
+     (#d53859 4.63:1, #a453bd 4.61:1). Used only for these two buttons'
+     fill + glow; icon discs, eyebrows and stat values keep the -fill/-deep
+     variants. */
+  --blush-rose-btn: #d53859;
+  --orchid-btn: #a453bd;
 
   /* Wake Up's dark badge (below) used flat --btn-ink, a nearly-desaturated
      charcoal — next to Diaper/End nap's saturated violets it read as a
