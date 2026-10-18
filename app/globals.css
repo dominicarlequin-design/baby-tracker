@@ -2443,3 +2443,18 @@ button:focus-visible {
 @media (prefers-color-scheme: dark) {
   .tile-icon { box-shadow: 0 10px 18px -8px rgba(0, 0, 0, 0.6), inset 0 2px 0 rgba(255, 255, 255, 0.25); }
 }
+
+/* Short phones (about 740px tall or less): tighten Today so the whole screen,
+   stats included, sits above the tab bar without scrolling. Taller phones
+   keep the roomier layout. */
+@media (max-height: 740px) {
+  .wrap { padding-top: 10px; }
+  .header-row { margin-bottom: 6px; }
+  .nextup { padding: 9px 12px; margin-bottom: 8px; }
+  .nextup-row .tile-icon { width: 44px; height: 44px; }
+  .tile-grid { gap: 8px 10px; margin: 8px 0; }
+  .tile-grid .tile-icon { width: clamp(72px, 12vh, 104px); margin-inline: auto; }
+  .tile-btn { gap: 2px; }
+  .stats-caption { margin-top: 0; }
+  .stat-tile { padding: 6px 8px; }
+}
