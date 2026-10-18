@@ -323,7 +323,13 @@ export default function Page() {
               uneven billing among things that are equally late. With 0 or
               1 overdue this card is the only place that story gets told,
               so it stays. */}
-          {overdueItems.length <= 1 && (nextUp ? (
+          {overdueItems.length <= 1 && (status?.nap?.asleep ? (
+            <div className="nextup nextup-on-track">
+              <div className="nextup-eyebrow">Napping</div>
+              <div className="nextup-headline">Asleep since {formatLocalTime(status.nap.lastEventTime, timezone)}</div>
+              <div className="nextup-sub">Feed and diaper alerts are paused until she wakes up.</div>
+            </div>
+          ) : nextUp ? (
             <div className={`nextup nextup-${nextUpTone} nextup-cat-${nextUpKey}`}>
               <div className="nextup-row">
                 <Icon name={NEXTUP_ICON[nextUpKey] ?? nextUpKey} />
