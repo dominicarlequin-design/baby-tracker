@@ -2480,3 +2480,24 @@ button:focus-visible {
   max-width: 480px;
   margin-inline: auto;
 }
+
+/* Today, premium spacing (phones taller than 740px): 20px side gutters, a
+   consistent 24px rhythm between sections, slightly smaller icon tiles so the
+   extra white space still leaves the stats above the tab bar. Shorter phones
+   use the compact block above. */
+@media (min-height: 741px) {
+  .wrap:has(.tile-grid) {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 96px;
+  }
+  .wrap:has(.tile-grid) .header-row { margin-bottom: 12px; }
+  .wrap:has(.tile-grid) .nextup { padding: 14px 16px; margin-bottom: 0; }
+  .tile-grid { margin: 24px 0 0; gap: 18px 12px; }
+  .tile-grid .tile-icon { width: min(100%, 94px); margin-inline: auto; }
+  .tile-btn { gap: 5px; }
+  .stats-caption { margin: 26px 0 8px; }
+  .stats-row { gap: 10px; margin-bottom: 0; }
+  .stat-tile { padding: 10px; }
+}
