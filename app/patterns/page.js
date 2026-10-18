@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ThemeToggle } from '../../lib/theme';
 import { TabBar } from '../../lib/TabBar';
 import {
-  usePatternsData, formatShortDate, average, currentMilestoneIndex, MILESTONE_STAGES,
+  usePatternsData, formatShortDate, average, currentMilestoneIndex, MILESTONE_STAGES, formatHoursDecimal,
 } from '../../lib/patterns';
 
 function BarChart({ title, color, days, valueOf, formatValue }) {
@@ -107,21 +107,21 @@ export default function PatternsPage() {
                 color="var(--accent)"
                 days={recentWindow}
                 valueOf={d => d.feeds}
-                formatValue={v => (v == null ? '—' : `${v.toFixed(1)}/day`)}
+                formatValue={v => (v == null ? '—' : `${Math.round(v)}/day`)}
               />
               <BarChart
                 title="Total sleep per day"
                 color="var(--berry-deep)"
                 days={recentWindow}
                 valueOf={d => d.totalSleepMinutes / 60}
-                formatValue={v => (v == null ? '—' : `${v.toFixed(1)}h/day`)}
+                formatValue={v => (v == null ? '—' : `${formatHoursDecimal(v)}/day`)}
               />
               <BarChart
                 title="Diaper changes per day"
                 color="var(--orchid)"
                 days={recentWindow}
                 valueOf={d => d.diapers}
-                formatValue={v => (v == null ? '—' : `${v.toFixed(1)}/day`)}
+                formatValue={v => (v == null ? '—' : `${Math.round(v)}/day`)}
               />
             </>
           )}

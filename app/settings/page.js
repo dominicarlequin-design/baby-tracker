@@ -64,7 +64,7 @@ const FIELDS = [
   { key: 'medicine_times_local', label: 'Medicine times', type: 'text', hint: 'Comma-separated 24h times, e.g. 08:00, 16:00, 00:00' },
   { key: 'medicine_grace_minutes', label: 'Medicine grace (minutes)', type: 'number', step: '1' },
   { key: 'target_bedtime_local', label: 'Target bedtime', type: 'time' },
-  { key: 'overdue_multiplier', label: 'Overdue multiplier', type: 'number', step: '0.05', hint: 'e.g. 1.25 = overdue at 125% of the usual gap' },
+  { key: 'overdue_multiplier', label: 'Overdue multiplier', type: 'number', step: '0.05', hint: 'How far past her usual gap before something counts as overdue. 1.25 means 25% longer than usual (a 3h gap turns overdue after 3h 45m).' },
   { key: 'feed_fallback_hours', label: 'Feed fallback (hours)', type: 'number', step: '0.1', hint: 'Used until enough feed history exists' },
   { key: 'diaper_fallback_hours', label: 'Diaper fallback (hours)', type: 'number', step: '0.1' },
   { key: 'wake_window_fallback_hours', label: 'Wake window fallback (hours)', type: 'number', step: '0.1' },

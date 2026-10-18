@@ -32,7 +32,7 @@ export default function TypicalDayPage() {
           <div className="section-title">Last two weeks</div>
           <div className="table-row">
             <span className="table-label">Naps</span>
-            <span className="table-value">{typicalDay.napsCount.toFixed(1)} · {formatMinutesDuration(typicalDay.napsMinutes)} total</span>
+            <span className="table-value">{Math.round(typicalDay.napsCount)} · {formatMinutesDuration(typicalDay.napsMinutes)} total</span>
           </div>
           <div className="table-row">
             <span className="table-label">Wake window</span>
@@ -53,7 +53,7 @@ export default function TypicalDayPage() {
             <span className="table-label">Feed gap</span>
             <span className="table-value">
               {typicalDay.feedGapMean != null
-                ? `${formatHoursDecimal(typicalDay.feedGapMean)} (${typicalDay.feedGapMin.toFixed(1)}–${typicalDay.feedGapMax.toFixed(1)}h)`
+                ? `${formatHoursDecimal(typicalDay.feedGapMean)} (${formatHoursDecimal(typicalDay.feedGapMin)}–${formatHoursDecimal(typicalDay.feedGapMax)})`
                 : '—'}
             </span>
           </div>
@@ -61,7 +61,7 @@ export default function TypicalDayPage() {
             <span className="table-label">Diaper gap</span>
             <span className="table-value">
               {typicalDay.diaperGapMean != null
-                ? `${formatHoursDecimal(typicalDay.diaperGapMean)} (${typicalDay.diaperGapMin.toFixed(1)}–${typicalDay.diaperGapMax.toFixed(1)}h)`
+                ? `${formatHoursDecimal(typicalDay.diaperGapMean)} (${formatHoursDecimal(typicalDay.diaperGapMin)}–${formatHoursDecimal(typicalDay.diaperGapMax)})`
                 : '—'}
             </span>
           </div>

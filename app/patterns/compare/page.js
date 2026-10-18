@@ -46,17 +46,17 @@ function compareVerdictNote(cmp) {
 function explainCompare(key, typicalDay, reference, ageLabel) {
   if (key === 'feedsPerDay') {
     const v = typicalDay.feedsPerDayAvg;
-    const cmp = compareToRange(v, reference.feedsPerDay);
+    const cmp = compareToRange(v == null ? v : Math.round(v), reference.feedsPerDay);
     const gapCheck = typicalDay.feedGapMean != null
-      ? ` At her average feed gap of ${formatHoursDecimal(typicalDay.feedGapMean)}, feeding roughly every ${typicalDay.feedGapMean.toFixed(1)} hours works out to about ${(24 / typicalDay.feedGapMean).toFixed(1)} feeds across a full day — close to the ${v.toFixed(1)}/day shown here, so the two numbers agree with each other.`
+      ? ` At her average feed gap of ${formatHoursDecimal(typicalDay.feedGapMean)}, feeding roughly every ${formatHoursDecimal(typicalDay.feedGapMean)} works out to about ${Math.round(24 / typicalDay.feedGapMean)} feeds across a full day — close to the ${Math.round(v)}/day shown here, so the two numbers agree with each other.`
       : '';
-    return `Averaging ${v.toFixed(1)} feeds per day over the last ${WINDOW_DAYS} days (total Fed taps in the window ÷ ${WINDOW_DAYS}).${gapCheck} The typical range for ${ageLabel} is ${reference.feedsPerDay.label}, from Huckleberry's age-by-age feeding guide. ${compareVerdictNote(cmp)}`;
+    return `Averaging about ${Math.round(v)} feeds per day over the last ${WINDOW_DAYS} days (total Fed taps in the window ÷ ${WINDOW_DAYS}).${gapCheck} The typical range for ${ageLabel} is ${reference.feedsPerDay.label}, from Huckleberry's age-by-age feeding guide. ${compareVerdictNote(cmp)}`;
   }
 
   if (key === 'feedGap') {
     const cmp = compareToRange(typicalDay.feedGapMean, reference.feedGapHours);
     if (typicalDay.feedGapMean == null) return compareVerdictNote(null);
-    return `This is the average time between consecutive Fed taps each day, then averaged across the last ${WINDOW_DAYS} days — so a day with a long overnight stretch and otherwise-frequent daytime feeds still counts every gap, not just the extremes. The range shown next to it (${typicalDay.feedGapMin.toFixed(1)}–${typicalDay.feedGapMax.toFixed(1)}h) is her single shortest and single longest day-average across those two weeks. The typical daytime gap for ${ageLabel} is ${reference.feedGapHours.label}, from Huckleberry. ${compareVerdictNote(cmp)}`;
+    return `This is the average time between consecutive Fed taps each day, then averaged across the last ${WINDOW_DAYS} days — so a day with a long overnight stretch and otherwise-frequent daytime feeds still counts every gap, not just the extremes. The range shown next to it (${formatHoursDecimal(typicalDay.feedGapMin)}–${formatHoursDecimal(typicalDay.feedGapMax)}) is her single shortest and single longest day-average across those two weeks. The typical daytime gap for ${ageLabel} is ${reference.feedGapHours.label}, from Huckleberry. ${compareVerdictNote(cmp)}`;
   }
 
   if (key === 'wakeWindow') {
@@ -67,8 +67,8 @@ function explainCompare(key, typicalDay, reference, ageLabel) {
 
   if (key === 'napsPerDay') {
     const v = typicalDay.napsCount;
-    const cmp = compareToRange(v, reference.napsPerDay);
-    return `Averaging ${v.toFixed(1)} naps per day over the last ${WINDOW_DAYS} days, counted from Nap started/Nap ended pairs — a nap that was started but never logged as ended doesn't count toward this. The typical nap count for ${ageLabel} is ${reference.napsPerDay.label}, from Huckleberry. ${compareVerdictNote(cmp)}`;
+    const cmp = compareToRange(v == null ? v : Math.round(v), reference.napsPerDay);
+    return `Averaging about ${Math.round(v)} naps per day over the last ${WINDOW_DAYS} days, counted from Nap started/Nap ended pairs — a nap that was started but never logged as ended doesn't count toward this. The typical nap count for ${ageLabel} is ${reference.napsPerDay.label}, from Huckleberry. ${compareVerdictNote(cmp)}`;
   }
 
   if (key === 'totalSleep') {
@@ -80,8 +80,10 @@ function explainCompare(key, typicalDay, reference, ageLabel) {
   return '';
 }
 
-function CompareRow({ label, metricKey, value, formatValue, range, onExplain }) {
-  const cmp = compareToRange(value, range);
+function CompareRow({ label, metricKey, value, formatValue, range, onExplain, wholeNumber }) {
+  // Counts are shown as whole numbers, so judge the same whole number
+  // you see (5.6 shows as "6" and reads "within 6-8", not "below").
+  const cmp = compareToRange(wholeNumber && value != null ? Math.round(value) : value, range);
   const toneClass = cmp === 'below' || cmp === 'above' ? 'due-soon' : 'muted';
   return (
     <div className="table-row">
@@ -133,7 +135,8 @@ export default function ComparePage() {
             label="Feeds per day"
             metricKey="feedsPerDay"
             value={typicalDay.feedsPerDayAvg}
-            formatValue={v => (v == null ? '—' : v.toFixed(1))}
+            formatValue={v => (v == null ? '—' : String(Math.round(v)))}
+            wholeNumber
             range={reference.feedsPerDay}
             onExplain={setExplainCompareKey}
           />
@@ -157,7 +160,8 @@ export default function ComparePage() {
             label="Naps per day"
             metricKey="napsPerDay"
             value={typicalDay.napsCount}
-            formatValue={v => (v == null ? '—' : v.toFixed(1))}
+            formatValue={v => (v == null ? '—' : String(Math.round(v)))}
+            wholeNumber
             range={reference.napsPerDay}
             onExplain={setExplainCompareKey}
           />
