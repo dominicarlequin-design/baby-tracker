@@ -1370,6 +1370,10 @@ h1 {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  padding: 13px;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
 }
 .form-save:disabled {
   opacity: 0.6;
