@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ThemeToggle } from '../../lib/theme';
 import { TabBar } from '../../lib/TabBar';
 import { SwipeChart } from '../../lib/SwipeChart';
+import { dailyMilkTarget } from '../../lib/milk';
 import {
   usePatternsData, currentMilestoneIndex, MILESTONE_STAGES,
 } from '../../lib/patterns';
@@ -72,7 +73,7 @@ export default function PatternsPage() {
             </div>
           )}
 
-          {chartWindow.length > 0 && <SwipeChart days={chartWindow} />}
+          {chartWindow.length > 0 && <SwipeChart days={chartWindow} milkGoal={dailyMilkTarget(config.weight_lbs)} />}
 
           <NavRow
             href="/patterns/typical-day"

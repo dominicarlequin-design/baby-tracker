@@ -7,6 +7,7 @@ import { ThemeToggle } from '../../lib/theme';
 import { TabBar } from '../../lib/TabBar';
 import { getPushStatus, enablePushAlerts, disablePushAlerts } from '../../lib/push';
 import { SOUND_STYLES, getSoundSettings, setSoundSettings, previewSound } from '../../lib/sound';
+import { dailyMilkTarget } from '../../lib/milk';
 
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -14,6 +15,7 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 function toFormState(config) {
   return {
     birth_date: config.birth_date || '',
+    weight_lbs: config.weight_lbs != null ? String(config.weight_lbs) : '',
     timezone: config.timezone || 'America/New_York',
     medicine_times_local: (config.medicine_times_local || []).join(', '),
     medicine_grace_minutes: String(config.medicine_grace_minutes ?? 15),
@@ -184,7 +186,15 @@ export default function SettingsPage() {
       setMessage({ text: '"Birth date" isn\'t valid', isError: true });
       return;
     }
-    const update = { birth_date: birthDateInput || null };
+    // weight_lbs is optional like birth_date: blank clears it (and hides
+    // the daily milk target), otherwise it has to be a sensible weight.
+    const weightInput = form.weight_lbs.trim();
+    const weight = Number(weightInput);
+    if (weightInput && !(Number.isFinite(weight) && weight > 0 && weight < 60)) {
+      setMessage({ text: '"Weight" isn\'t valid', isError: true });
+      return;
+    }
+    const update = { birth_date: birthDateInput || null, weight_lbs: weightInput ? weight : null };
     for (const { key } of FIELDS) {
       const parsed = parseField(key, form[key]);
       if (parsed == null) {
@@ -326,6 +336,33 @@ export default function SettingsPage() {
               onChange={e => setField('birth_date', e.target.value)}
             />
             <div className="form-hint">Powers the age-based "How she compares" ranges on Insights — they move to the next bracket automatically as she grows. Leave blank and it falls back to a generic 3–5 month range.</div>
+          </div>
+          <div className="form-row">
+            <label className="form-label" htmlFor="weight_lbs">Weight</label>
+            <div className="form-input-suffix">
+              <input
+                id="weight_lbs"
+                className="form-input"
+                type="number"
+                inputMode="decimal"
+                step="0.1"
+                min="0"
+                value={form.weight_lbs}
+                onChange={e => setField('weight_lbs', e.target.value)}
+                aria-describedby="weight_hint"
+              />
+              <span className="form-suffix" aria-hidden="true">lbs</span>
+            </div>
+            {(() => {
+              const goal = dailyMilkTarget(form.weight_lbs);
+              return goal ? (
+                <div className="milk-preview" aria-live="polite">
+                  <span className="milk-preview-pill">Daily target: {goal.target} oz</span>
+                  {goal.capped && <span className="milk-preview-note">{goal.raw} oz, capped at 32</span>}
+                </div>
+              ) : null;
+            })()}
+            <div className="form-hint" id="weight_hint">Weight x 2.5 oz, up to 32 oz a day. Update it after weigh-ins.</div>
           </div>
 
           <div className="section-title" style={{ marginTop: '20px' }}>Tuning</div>

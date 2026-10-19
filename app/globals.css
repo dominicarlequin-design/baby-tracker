@@ -2662,3 +2662,228 @@ button:focus-visible {
   color: var(--ink-muted);
   white-space: nowrap;
 }
+
+/* ---------- Daily milk target (lib/milk.js) ----------
+   Three calm states, never red: pink (the Feedings card's own tone) when
+   under 90% of target, soft green when on track, soft amber when over.
+   The colors also step in lightness so they stay apart for colorblind
+   eyes, and every state is spelled out in text (aria-label, sheet). */
+:root {
+  --milk-under: #e0789c;
+  --milk-ok: #5fb487;
+  --milk-over: #e6ae48;
+  --milk-track: rgba(255, 255, 255, 0.85);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --milk-under: #e991ae;
+    --milk-ok: #7fd3a4;
+    --milk-over: #f0c46e;
+    --milk-track: rgba(255, 255, 255, 0.14);
+  }
+}
+:root[data-theme="dark"] {
+  --milk-under: #e991ae;
+  --milk-ok: #7fd3a4;
+  --milk-over: #f0c46e;
+  --milk-track: rgba(255, 255, 255, 0.14);
+}
+.milk-under { --milk-fill: var(--milk-under); }
+.milk-ontrack { --milk-fill: var(--milk-ok); }
+.milk-over { --milk-fill: var(--milk-over); }
+
+/* Feedings stat tile becomes a button when a target is set. */
+.stat-tile-btn {
+  display: block;
+  width: 100%;
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease;
+}
+.stat-tile-btn:active { transform: scale(0.97); }
+.stat-tile-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.milk-bar {
+  height: 5px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--milk-track);
+  overflow: hidden;
+}
+.milk-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--milk-fill, var(--milk-under));
+  transition: width 0.3s ease;
+}
+.milk-bar-lg { height: 14px; margin-top: 0; }
+
+/* Evening banner: same card as Napping, plus an X to dismiss for today. */
+.milk-nudge { position: relative; padding-right: 52px; }
+.milk-nudge-close,
+.milk-sheet-close {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--ink-muted);
+  background: transparent;
+}
+.milk-nudge-close { position: absolute; top: 6px; right: 6px; }
+.milk-nudge-close svg,
+.milk-sheet-close svg { width: 18px; height: 18px; }
+
+/* Daily Milk bottom sheet (opens from the Feedings tile). */
+.modal.milk-sheet {
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-radius: 28px 28px 0 0;
+  padding: 10px 20px calc(24px + env(safe-area-inset-bottom));
+}
+.milk-sheet-grabber {
+  align-self: center;
+  width: 40px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--border);
+}
+.milk-sheet-head { display: flex; align-items: center; justify-content: space-between; }
+.milk-sheet-title {
+  margin: 0;
+  font-family: 'Fraunces', 'Georgia', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--accent-text, var(--accent));
+}
+.milk-sheet-close { background: var(--card); box-shadow: 0 4px 12px rgba(90, 58, 85, 0.16); color: var(--accent-text, var(--accent)); }
+
+.milk-progress-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--blush-rose) 18%, var(--card));
+}
+.milk-progress-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.milk-progress-head {
+  font-family: 'Fraunces', 'Georgia', serif;
+  font-size: 20px;
+  font-weight: 600;
+}
+.milk-progress-left { font-size: 14px; font-weight: 700; color: var(--blush-rose-deep); white-space: nowrap; }
+.milk-progress-note { font-size: 13px; color: var(--ink-muted); }
+
+.milk-bottles {
+  list-style: none;
+  margin: -6px 0 0;
+  padding: 2px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+.milk-bottles-empty { padding: 14px; font-size: 14px; color: var(--ink-muted); }
+.milk-bottle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  border-bottom: 1px solid var(--border);
+}
+.milk-bottle:last-child { border-bottom: none; }
+.milk-bottle .tile-icon { width: 32px; height: 32px; flex: none; border-radius: 10px; box-shadow: none; }
+.milk-bottle-time { flex: 1; font-size: 15px; font-weight: 600; }
+.milk-bottle-oz { font-size: 15px; font-weight: 700; color: var(--blush-rose-deep); }
+
+.milk-next {
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--butter-yellow) 22%, var(--card));
+}
+.milk-next-head { font-family: 'Fraunces', 'Georgia', serif; font-size: 18px; font-weight: 600; }
+.milk-next-sub { font-size: 13px; color: var(--ink-muted); margin-top: 2px; }
+.milk-caption { margin: 0; text-align: center; font-size: 13px; color: var(--ink-muted); }
+
+/* Insights: Milk tab bars take their color from the same three states. */
+.swipe-bar.milk-under,
+.swipe-bar.milk-ontrack,
+.swipe-bar.milk-over { background: var(--milk-fill); }
+.swipe-bar.is-today.milk-under,
+.swipe-bar.is-today.milk-ontrack,
+.swipe-bar.is-today.milk-over {
+  background: repeating-linear-gradient(135deg, var(--milk-fill) 0 4px, var(--card) 4px 8px);
+  border: 1.5px dashed var(--milk-fill);
+}
+.swipe-target {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2px dotted var(--ok);
+  opacity: 0.7;
+  pointer-events: none;
+}
+.swipe-target-label {
+  position: absolute;
+  right: 0;
+  transform: translateY(-100%);
+  padding: 0 2px 2px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ok);
+  background: var(--card);
+  pointer-events: none;
+}
+.swipe-milk {
+  --c-top: var(--milk-under);
+  --c-bottom: var(--milk-under);
+  --c-soft: color-mix(in srgb, var(--milk-under) 30%, var(--card));
+  --c-ink: var(--blush-rose-deep);
+  --c-glow: rgba(224, 120, 156, 0.35);
+}
+.milk-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.milk-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.milk-legend i { width: 10px; height: 10px; border-radius: 3px; background: var(--milk-fill); }
+.milk-legend i.is-today { background: repeating-linear-gradient(135deg, var(--milk-under) 0 3px, var(--card) 3px 6px); }
+
+/* Profile: weight field with a "lbs" suffix and live milk target preview. */
+.form-input-suffix { position: relative; }
+.form-input-suffix .form-input { padding-right: 48px; }
+.form-suffix {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  pointer-events: none;
+}
+.milk-preview { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 10px; }
+.milk-preview-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--blush-rose) 18%, var(--card));
+  color: var(--blush-rose-deep);
+  font-size: 14px;
+  font-weight: 700;
+}
+.milk-preview-note { font-size: 12.5px; color: var(--ink-muted); }

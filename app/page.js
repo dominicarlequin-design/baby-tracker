@@ -21,6 +21,9 @@ import {
   phaseClass,
   TileIcon,
 } from '../lib/homeUi';
+import {
+  dailyMilkTarget, milkStatus, milkStatusText, usualFeedsPerDay, nextBottle, showEveningNudge,
+} from '../lib/milk';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -31,6 +34,10 @@ const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 // within this window gets a confirm step instead of silently creating a
 // second row that skews the rolling averages.
 const DUPLICATE_GUARD_SECONDS = 60;
+
+// Remembers (per device) which local day the evening milk banner was
+// dismissed on, so the X hides it for the rest of that day only.
+const MILK_NUDGE_KEY = 'milkNudgeDismissedDay';
 
 function formatSecondsAgo(seconds) {
   const s = Math.max(0, Math.round(seconds));
@@ -62,6 +69,8 @@ export default function Page() {
   const [explainKey, setExplainKey] = useState(null);
   const [overdueOpen, setOverdueOpen] = useState(true);
   const [pendingDuplicate, setPendingDuplicate] = useState(null);
+  const [milkSheetOpen, setMilkSheetOpen] = useState(false);
+  const [nudgeDismissedDay, setNudgeDismissedDay] = useState(null);
   const toastTimeoutRef = useRef(null);
 
   // Per-button loading/success/error state, keyed by category ('feed',
@@ -112,6 +121,10 @@ export default function Page() {
   }, []);
 
   useEffect(() => () => clearTimeout(toastTimeoutRef.current), []);
+
+  useEffect(() => {
+    try { setNudgeDismissedDay(localStorage.getItem(MILK_NUDGE_KEY)); } catch (e) {}
+  }, []);
 
   const showToast = useCallback((message, opts = {}) => {
     clearTimeout(toastTimeoutRef.current);
@@ -218,16 +231,50 @@ export default function Page() {
     let ounces = 0;
     let wet = 0;
     let dirty = 0;
+    const bottles = [];
     for (const e of events) {
       if (localDateStr(new Date(e.event_time), tz) !== todayKey) continue;
-      if (e.type === 'feed' && typeof e.feed_ounces === 'number') ounces += e.feed_ounces;
-      else if (e.type === 'diaper') {
+      if (e.type === 'feed' && typeof e.feed_ounces === 'number') {
+        ounces += e.feed_ounces;
+        bottles.push({ id: e.id, time: e.event_time, ounces: e.feed_ounces });
+      } else if (e.type === 'diaper') {
         if (e.diaper_detail === 'pee' || e.diaper_detail === 'both') wet++;
         if (e.diaper_detail === 'poop' || e.diaper_detail === 'both') dirty++;
       }
     }
-    return { ounces, wet, dirty };
+    bottles.sort((a, b) => new Date(a.time) - new Date(b.time));
+    return { ounces, wet, dirty, bottles, todayKey };
   }, [events, config, now]);
+
+  // Daily milk target (lib/milk.js): weight x 2.5 oz, capped at 32 oz.
+  // Everything milk-related stays hidden until a weight is set on Profile,
+  // so the Feedings card falls back to its plain "Total: N oz" line.
+  const milk = useMemo(() => {
+    if (!config || !todayExtra || !today) return null;
+    const goal = dailyMilkTarget(config.weight_lbs);
+    if (!goal) return null;
+    const oz = todayExtra.ounces;
+    const status = milkStatus(oz, goal.target);
+    const pastDays = dailySummaries(events, config, 8).slice(0, -1);
+    const next = nextBottle(oz, goal.target, today.feeds, usualFeedsPerDay(pastDays));
+    const tz = config.timezone || 'America/New_York';
+    const hour = Number(new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', hourCycle: 'h23' }).format(now));
+    return {
+      ...goal,
+      oz,
+      status,
+      statusText: milkStatusText(status, goal.capped),
+      pct: Math.min(oz / goal.target, 1) * 100,
+      next,
+      nudge: showEveningNudge(oz, goal.target, hour) && nudgeDismissedDay !== todayExtra.todayKey,
+    };
+  }, [config, todayExtra, today, events, now, nudgeDismissedDay]);
+
+  const dismissNudge = useCallback(() => {
+    if (!todayExtra) return;
+    setNudgeDismissedDay(todayExtra.todayKey);
+    try { localStorage.setItem(MILK_NUDGE_KEY, todayExtra.todayKey); } catch (e) {}
+  }, [todayExtra]);
 
   const timezone = config?.timezone || 'America/New_York';
   const nextUpKey = status ? pickNextUp(status, now) : null;
@@ -313,6 +360,17 @@ export default function Page() {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {milk?.nudge && (
+            <div className="nextup nextup-on-track milk-nudge">
+              <div className="nextup-eyebrow">Milk today</div>
+              <div className="nextup-headline">{milk.oz} / {milk.target} oz so far</div>
+              <div className="nextup-sub">Under 70% of today's target. Offer another bottle if she's hungry.</div>
+              <button type="button" className="milk-nudge-close" aria-label="Dismiss for today" onClick={dismissNudge}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+              </button>
             </div>
           )}
 
@@ -414,16 +472,37 @@ export default function Page() {
             <>
               <div className="stats-caption">Today's stats</div>
               <div className="stats-row">
-                <div className="stat-tile stat-tile-feed">
-                  <div className="stat-tile-row">
-                    <TileIcon name="feed" />
-                    <div className="stat-tile-text">
-                      <div className="stat-value">{today.feeds}</div>
-                      <div className="stat-label">Feedings</div>
+                {milk ? (
+                  <button
+                    type="button"
+                    className="stat-tile stat-tile-feed stat-tile-btn"
+                    onClick={() => setMilkSheetOpen(true)}
+                    aria-label={`${today.feeds} feedings, ${milk.oz} of ${milk.target} ounces, ${milk.statusText}. Open Daily Milk.`}
+                  >
+                    <div className="stat-tile-row">
+                      <TileIcon name="feed" />
+                      <div className="stat-tile-text">
+                        <div className="stat-value">{today.feeds}</div>
+                        <div className="stat-label">Feedings</div>
+                      </div>
                     </div>
+                    <div className="stat-sub">{milk.oz} / {milk.target} oz</div>
+                    <div className={`milk-bar milk-${milk.status}`} aria-hidden="true">
+                      <div className="milk-bar-fill" style={{ width: `${milk.pct}%` }} />
+                    </div>
+                  </button>
+                ) : (
+                  <div className="stat-tile stat-tile-feed">
+                    <div className="stat-tile-row">
+                      <TileIcon name="feed" />
+                      <div className="stat-tile-text">
+                        <div className="stat-value">{today.feeds}</div>
+                        <div className="stat-label">Feedings</div>
+                      </div>
+                    </div>
+                    {todayExtra && <div className="stat-sub">Total: {todayExtra.ounces} oz</div>}
                   </div>
-                  {todayExtra && <div className="stat-sub">Total: {todayExtra.ounces} oz</div>}
-                </div>
+                )}
                 <div className="stat-tile stat-tile-diaper">
                   <div className="stat-tile-row">
                     <TileIcon name="diaper" />
@@ -538,6 +617,75 @@ export default function Page() {
             >
               Skip — just log the time
             </button>
+          </div>
+        </div>
+      )}
+
+      {milkSheetOpen && milk && (
+        <div className="modal-overlay" onClick={() => setMilkSheetOpen(false)}>
+          <div className="modal milk-sheet" role="dialog" aria-label="Daily Milk" onClick={e => e.stopPropagation()}>
+            <div className="milk-sheet-grabber" aria-hidden="true" />
+            <div className="milk-sheet-head">
+              <h2 className="milk-sheet-title">Daily Milk</h2>
+              <button type="button" className="milk-sheet-close" aria-label="Close" onClick={() => setMilkSheetOpen(false)}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+              </button>
+            </div>
+
+            <div className="milk-progress-card">
+              <div className="milk-progress-top">
+                <span className="milk-progress-head">{milk.oz} oz of {milk.target} oz today</span>
+                <span className="milk-progress-left">
+                  {milk.oz > milk.target ? `${Math.round((milk.oz - milk.target) * 10) / 10} oz over` : `${Math.round(milk.next.left * 10) / 10} oz to go`}
+                </span>
+              </div>
+              <div
+                className={`milk-bar milk-bar-lg milk-${milk.status}`}
+                role="progressbar"
+                aria-label="Milk today"
+                aria-valuemin={0}
+                aria-valuemax={milk.target}
+                aria-valuenow={milk.oz}
+              >
+                <div className="milk-bar-fill" style={{ width: `${milk.pct}%` }} />
+              </div>
+              <div className="milk-progress-note">
+                Target: {config.weight_lbs} lbs × 2.5 oz{milk.capped ? ', capped at 32 oz' : ''}
+              </div>
+            </div>
+
+            <div className="stats-caption">Today's bottles</div>
+            {todayExtra.bottles.length ? (
+              <ul className="milk-bottles">
+                {todayExtra.bottles.map(b => (
+                  <li key={b.id} className="milk-bottle">
+                    <TileIcon name="feed" />
+                    <span className="milk-bottle-time">{formatLocalTime(b.time, timezone)}</span>
+                    <span className="milk-bottle-oz">{b.ounces} oz</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="milk-bottles milk-bottles-empty">No bottles with ounces logged yet today.</div>
+            )}
+
+            <div className="milk-next">
+              {milk.next.left > 0 ? (
+                <>
+                  <div className="milk-next-head">Next bottle: about {milk.next.ounces} oz</div>
+                  <div className="milk-next-sub">
+                    {Math.round(milk.next.left * 10) / 10} oz left over her usual {milk.next.feedsLeft} more {milk.next.feedsLeft === 1 ? 'feed' : 'feeds'}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="milk-next-head">Target reached for today</div>
+                  <div className="milk-next-sub">Keep following her hunger cues.</div>
+                </>
+              )}
+            </div>
+
+            <p className="milk-caption">A guide, not a rule. Hunger cues come first.</p>
           </div>
         </div>
       )}
