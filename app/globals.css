@@ -716,7 +716,7 @@ h1 {
   color: var(--ok);
 }
 .nextup-headline {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   margin-bottom: 4px;
 }
@@ -2002,12 +2002,9 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid var(--card);
-  background: linear-gradient(155deg, #ef4b9c, var(--accent) 60%, #a9146a);
-  box-shadow:
-    0 6px 16px -2px color-mix(in srgb, var(--accent) 65%, transparent),
-    0 0 0 6px color-mix(in srgb, var(--accent) 12%, transparent);
-  color: #fff;
+  border: 2px solid var(--accent);
+  background: var(--card);
+  color: var(--accent-text);
   cursor: pointer;
   font-family: inherit;
   transition: transform 0.1s ease;
@@ -2436,9 +2433,6 @@ button:focus-visible {
 }
 .tab-fab:active {
   transform: translateY(2px) scale(0.94);
-  box-shadow:
-    0 2px 6px -2px color-mix(in srgb, var(--accent) 65%, transparent),
-    0 0 0 6px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 @media (prefers-color-scheme: dark) {
   .tile-icon { box-shadow: 0 10px 18px -8px rgba(0, 0, 0, 0.6), inset 0 2px 0 rgba(255, 255, 255, 0.25); }
@@ -2493,7 +2487,7 @@ button:focus-visible {
     padding-bottom: 84px;
   }
   .wrap:has(.tile-grid) .header-row { margin-bottom: 12px; }
-  .wrap:has(.tile-grid) .nextup { padding: 14px 16px; margin-bottom: 0; }
+  .wrap:has(.tile-grid) .nextup { padding: 18px 18px; margin-bottom: 0; }
   .tile-grid { margin: 24px 0 0; gap: 18px 12px; }
   .tile-grid .tile-icon { width: min(100%, 94px); margin-inline: auto; }
   .tile-btn { gap: 5px; }
