@@ -2516,3 +2516,16 @@ button:focus-visible {
 @media (display-mode: standalone) and (max-height: 740px) {
   .wrap:has(.tile-grid) { padding-bottom: 92px; }
 }
+
+/* Today: the left and right icon tiles sit flush with the Next Up card and the
+   stat cards (same 20px margins), with the middle tile centered between them. */
+.tile-grid {
+  --tile-size: 94px;
+  grid-template-columns: repeat(3, var(--tile-size));
+  justify-content: space-between;
+}
+.tile-btn { white-space: nowrap; }
+.tile-grid .tile-icon { width: var(--tile-size); margin-inline: 0; }
+@media (max-height: 740px) {
+  .tile-grid { --tile-size: clamp(72px, 12vh, 104px); }
+}
