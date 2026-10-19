@@ -1018,7 +1018,7 @@ h1 {
 }
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   margin-bottom: 10px;
 }
@@ -2490,7 +2490,7 @@ button:focus-visible {
     padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
     padding-left: 20px;
     padding-right: 20px;
-    padding-bottom: 96px;
+    padding-bottom: 84px;
   }
   .wrap:has(.tile-grid) .header-row { margin-bottom: 12px; }
   .wrap:has(.tile-grid) .nextup { padding: 14px 16px; margin-bottom: 0; }
