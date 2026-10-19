@@ -284,8 +284,7 @@ h1 {
 .stateful-label,
 .medicine-label,
 .nextup-headline,
-.stat-value,
-.stat-label {
+.stat-value {
   font-family: 'Fraunces', 'Georgia', serif;
 }
 
@@ -2514,12 +2513,12 @@ button:focus-visible {
 /* Today: the left and right icon tiles sit flush with the Next Up card and the
    stat cards (same 20px margins), with the middle tile centered between them. */
 .tile-grid {
-  --tile-size: 94px;
+  --tile-size: 80px;
   grid-template-columns: repeat(3, var(--tile-size));
   justify-content: space-between;
 }
 .tile-btn { white-space: nowrap; }
 .tile-grid .tile-icon { width: var(--tile-size); margin-inline: 0; }
 @media (max-height: 740px) {
-  .tile-grid { --tile-size: clamp(72px, 12vh, 104px); }
+  .tile-grid { --tile-size: clamp(68px, 10vh, 84px); }
 }
