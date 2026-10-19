@@ -2887,3 +2887,156 @@ button:focus-visible {
   font-weight: 700;
 }
 .milk-preview-note { font-size: 12.5px; color: var(--ink-muted); }
+
+/* ---------- Recipes (Insights -> Recipes for her age) ----------
+   lib/recipes.js holds the content. Pastel tints reuse the category
+   colors already on the page; the allergen box uses the soft amber of
+   the milk "over" state so it reads as "take care", never as an alarm. */
+.recipe-nav-row { justify-content: flex-start; border-color: color-mix(in srgb, var(--blush-rose) 40%, var(--border)); background: color-mix(in srgb, var(--blush-rose) 8%, var(--card)); }
+.recipe-nav-row .pattern-nav-text { flex: 1; }
+
+.recipe-art {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 -4px 0 rgba(120, 80, 100, 0.06);
+}
+.recipe-art svg { width: 64%; height: 64%; }
+.recipe-art-sm { width: 44px; height: 44px; border-radius: 14px; }
+.recipe-art-md { width: 60px; height: 60px; border-radius: 18px; }
+.recipe-art-lg { width: 84px; height: 84px; border-radius: 26px; box-shadow: 0 10px 18px -8px rgba(90, 58, 85, 0.35), inset 0 -5px 0 rgba(120, 80, 100, 0.06); }
+
+.recipe-intro { margin: -4px 2px 12px; font-size: 15px; color: var(--ink-muted); }
+.recipe-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ok);
+  margin-bottom: 8px;
+}
+
+.recipe-stages {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 12px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--ink) 6%, var(--card));
+}
+.recipe-stage {
+  min-height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  cursor: pointer;
+}
+.recipe-stage.is-on {
+  background: var(--card);
+  color: var(--accent-text, var(--accent));
+  box-shadow: 0 1px 4px rgba(42, 34, 48, 0.12);
+}
+.recipe-stage-badge { font-size: 10.5px; font-weight: 600; color: var(--ink-muted); min-height: 13px; }
+
+.recipe-stage-card,
+.recipe-callout {
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+.recipe-stage-card p,
+.recipe-callout p { margin: 0; font-size: 14.5px; line-height: 1.45; }
+.recipe-callout p + p { margin-top: 6px; }
+.recipe-stage-purees { background: color-mix(in srgb, var(--blush-rose) 14%, var(--card)); }
+.recipe-stage-mashes { background: color-mix(in srgb, var(--muted-lilac) 22%, var(--card)); }
+.recipe-stage-finger { background: var(--mint-bg); }
+.recipe-stage-finger .recipe-eyebrow { color: var(--mint-deep); }
+.recipe-callout-info { background: var(--ok-bg); }
+.recipe-callout-soft { background: color-mix(in srgb, var(--muted-lilac) 14%, var(--card)); }
+.recipe-callout-storage { background: color-mix(in srgb, var(--butter-yellow) 22%, var(--card)); }
+.recipe-callout-storage .recipe-eyebrow { color: var(--due-soon); }
+.recipe-callout-allergen {
+  background: color-mix(in srgb, var(--milk-over) 18%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--milk-over) 55%, var(--border));
+}
+.recipe-callout-allergen .recipe-eyebrow { color: var(--due-soon); }
+
+.recipe-dots { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.recipe-dots li { position: relative; padding-left: 16px; font-size: 14.5px; line-height: 1.4; }
+.recipe-dots li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--blush-rose);
+}
+
+.recipe-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px 12px 12px;
+  margin-bottom: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  text-decoration: none;
+  transition: transform 0.12s ease;
+}
+.recipe-row:active { transform: scale(0.98); }
+.recipe-row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.recipe-row-title { font-family: 'Fraunces', 'Georgia', serif; font-size: 17px; font-weight: 600; line-height: 1.2; }
+.recipe-row-meta { font-size: 13px; color: var(--ink-muted); }
+.recipe-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 3px; }
+.recipe-tag { display: inline-flex; align-items: center; min-height: 22px; padding: 0 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+.recipe-tag-ok { background: var(--mint-bg); color: var(--mint-deep); }
+.recipe-tag-iron { background: color-mix(in srgb, var(--muted-lilac) 30%, var(--card)); color: var(--lilac-deep); }
+.recipe-tag-pink { background: color-mix(in srgb, var(--blush-rose) 18%, var(--card)); color: var(--blush-rose-deep); }
+.recipe-tag-allergen { background: color-mix(in srgb, var(--milk-over) 22%, var(--card)); color: var(--due-soon); }
+
+.recipe-footnote { margin: 8px 4px 16px; text-align: center; font-size: 13px; color: var(--ink-muted); line-height: 1.45; }
+
+.recipe-hero { display: flex; align-items: center; gap: 16px; margin: 4px 0 16px; }
+.recipe-hero .recipe-eyebrow { margin-bottom: 4px; }
+.recipe-title { font-size: 28px; line-height: 1.1; }
+
+.recipe-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+.recipe-fact { border-radius: 16px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.recipe-fact span { font-size: 12px; color: var(--ink-muted); }
+.recipe-fact b { font-size: 14.5px; }
+.recipe-fact-time { background: color-mix(in srgb, var(--blush-rose) 14%, var(--card)); }
+.recipe-fact-makes { background: color-mix(in srgb, var(--butter-yellow) 20%, var(--card)); }
+.recipe-fact-good { background: var(--mint-bg); }
+
+.recipe-steps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.recipe-steps li { display: flex; gap: 12px; }
+.recipe-step-num {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--blush-rose) 22%, var(--card));
+  color: var(--blush-rose-deep);
+}
+.recipe-step-head { display: block; font-size: 15px; font-weight: 700; line-height: 1.35; }
+.recipe-step-body { display: block; margin-top: 2px; font-size: 14px; line-height: 1.45; color: var(--ink-muted); }

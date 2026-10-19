@@ -5,6 +5,8 @@ import { ThemeToggle } from '../../lib/theme';
 import { TabBar } from '../../lib/TabBar';
 import { SwipeChart } from '../../lib/SwipeChart';
 import { dailyMilkTarget } from '../../lib/milk';
+import { STAGES, stageIndexForAge } from '../../lib/recipes';
+import { RecipeArt } from '../../lib/RecipeArt';
 import {
   usePatternsData, currentMilestoneIndex, MILESTONE_STAGES,
 } from '../../lib/patterns';
@@ -90,6 +92,18 @@ export default function PatternsPage() {
             title="Milestones"
             sub={milestoneSub}
           />
+          <Link href="/patterns/recipes" className="pattern-nav-row recipe-nav-row">
+            <RecipeArt name="bowl" size="sm" />
+            <span className="pattern-nav-text">
+              <span className="pattern-nav-title">Recipes for her age</span>
+              <span className="pattern-nav-sub">
+                {age ? `Now: ${STAGES[stageIndexForAge(age.decimalMonths)].name} · ${STAGES[stageIndexForAge(age.decimalMonths)].texture.toLowerCase()}` : 'Purées, mashes & finger foods, 6–12 months'}
+              </span>
+            </span>
+            <svg className="pattern-nav-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </Link>
 
           {recentWindow.length > 0 && (
             <button className="export-btn" onClick={() => exportCsv(recentWindow)}>
