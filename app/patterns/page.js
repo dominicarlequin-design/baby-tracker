@@ -3,38 +3,10 @@
 import Link from 'next/link';
 import { ThemeToggle } from '../../lib/theme';
 import { TabBar } from '../../lib/TabBar';
+import { SwipeChart } from '../../lib/SwipeChart';
 import {
-  usePatternsData, formatShortDate, average, currentMilestoneIndex, MILESTONE_STAGES, formatHoursDecimal,
+  usePatternsData, currentMilestoneIndex, MILESTONE_STAGES,
 } from '../../lib/patterns';
-
-function BarChart({ title, color, days, valueOf, formatValue }) {
-  const values = days.map(valueOf);
-  const max = Math.max(1, ...values.map(v => v || 0));
-  const avg = average(values.filter(v => v != null));
-
-  return (
-    <div className="card">
-      <div className="chart-header">
-        <div className="section-title chart-title">{title}</div>
-        <div className="chart-avg">avg {formatValue(avg)}</div>
-      </div>
-      <div className="bars">
-        {days.map((d, i) => (
-          <div
-            key={d.date}
-            className="bar"
-            style={{ height: `${max ? ((values[i] || 0) / max) * 100 : 0}%`, background: color }}
-            title={`${d.date}: ${formatValue(values[i])}`}
-          />
-        ))}
-      </div>
-      <div className="chart-footer">
-        <span>{formatShortDate(days[0].date)}</span>
-        <span>{formatShortDate(days[days.length - 1].date)}</span>
-      </div>
-    </div>
-  );
-}
 
 function exportCsv(days) {
   const headers = [
@@ -71,7 +43,7 @@ function NavRow({ href, title, sub }) {
 
 export default function PatternsPage() {
   const {
-    loading, config, age, ageShortLabel, recentWindow, headline, typicalDay,
+    loading, config, age, ageShortLabel, recentWindow, chartWindow, headline, typicalDay,
   } = usePatternsData();
 
   const milestoneIdx = currentMilestoneIndex(age?.decimalMonths ?? null);
@@ -100,31 +72,7 @@ export default function PatternsPage() {
             </div>
           )}
 
-          {recentWindow.length > 0 && (
-            <>
-              <BarChart
-                title="Feeds per day"
-                color="var(--accent)"
-                days={recentWindow}
-                valueOf={d => d.feeds}
-                formatValue={v => (v == null ? '—' : `${Math.round(v)}/day`)}
-              />
-              <BarChart
-                title="Total sleep per day"
-                color="var(--berry-deep)"
-                days={recentWindow}
-                valueOf={d => d.totalSleepMinutes / 60}
-                formatValue={v => (v == null ? '—' : `${formatHoursDecimal(v)}/day`)}
-              />
-              <BarChart
-                title="Diaper changes per day"
-                color="var(--orchid)"
-                days={recentWindow}
-                valueOf={d => d.diapers}
-                formatValue={v => (v == null ? '—' : `${Math.round(v)}/day`)}
-              />
-            </>
-          )}
+          {chartWindow.length > 0 && <SwipeChart days={chartWindow} />}
 
           <NavRow
             href="/patterns/typical-day"

@@ -1250,25 +1250,6 @@ h1 {
 .chart-title {
   margin-bottom: 0;
 }
-.chart-avg {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--ink-muted);
-}
-
-.bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  height: 76px;
-}
-.bar {
-  flex: 1;
-  min-height: 2px;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-}
-
 .chart-footer {
   display: flex;
   justify-content: space-between;
@@ -2521,4 +2502,163 @@ button:focus-visible {
 .tile-grid .tile-icon { width: var(--tile-size); margin-inline: 0; }
 @media (max-height: 740px) {
   .tile-grid { --tile-size: clamp(68px, 10vh, 84px); }
+}
+
+/* ---------- Swipeable Insights chart (lib/SwipeChart.js) ----------
+   Each metric gets its own hue, shaded light-to-deep down the bar. The
+   three hues also differ in lightness so they stay apart for colorblind
+   eyes, and each has a brighter dark-theme twin below. */
+:root {
+  --chart-feeds-top: #f2937c;   --chart-feeds-bottom: #c8513d;   --chart-feeds-soft: #f8d3c9;   --chart-feeds-ink: #a33e2c;   --chart-feeds-glow: rgba(200, 81, 61, 0.35);
+  --chart-sleep-top: #7686d8;   --chart-sleep-bottom: #2d3880;   --chart-sleep-soft: #cdd3f2;   --chart-sleep-ink: #2d3880;   --chart-sleep-glow: rgba(45, 56, 128, 0.32);
+  --chart-diapers-top: #52bba9; --chart-diapers-bottom: #17766c; --chart-diapers-soft: #c4e8e1; --chart-diapers-ink: #156960; --chart-diapers-glow: rgba(23, 118, 108, 0.32);
+  --chart-shadow: 0 1px 2px rgba(42, 34, 48, 0.04), 0 10px 28px rgba(42, 34, 48, 0.07);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --chart-feeds-top: #f7a58f;   --chart-feeds-bottom: #d9654e;   --chart-feeds-soft: #4a2e2a;   --chart-feeds-ink: #ff9c86;   --chart-feeds-glow: rgba(247, 165, 143, 0.3);
+    --chart-sleep-top: #aab5f2;   --chart-sleep-bottom: #5f6fc9;   --chart-sleep-soft: #2e3352;   --chart-sleep-ink: #b3bdf7;   --chart-sleep-glow: rgba(170, 181, 242, 0.3);
+    --chart-diapers-top: #86d9ca; --chart-diapers-bottom: #33a08f; --chart-diapers-soft: #21403b; --chart-diapers-ink: #86d9ca; --chart-diapers-glow: rgba(134, 217, 202, 0.3);
+    --chart-shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --chart-feeds-top: #f7a58f;   --chart-feeds-bottom: #d9654e;   --chart-feeds-soft: #4a2e2a;   --chart-feeds-ink: #ff9c86;   --chart-feeds-glow: rgba(247, 165, 143, 0.3);
+  --chart-sleep-top: #aab5f2;   --chart-sleep-bottom: #5f6fc9;   --chart-sleep-soft: #2e3352;   --chart-sleep-ink: #b3bdf7;   --chart-sleep-glow: rgba(170, 181, 242, 0.3);
+  --chart-diapers-top: #86d9ca; --chart-diapers-bottom: #33a08f; --chart-diapers-soft: #21403b; --chart-diapers-ink: #86d9ca; --chart-diapers-glow: rgba(134, 217, 202, 0.3);
+  --chart-shadow: none;
+}
+
+.swipe-feeds   { --c-top: var(--chart-feeds-top);   --c-bottom: var(--chart-feeds-bottom);   --c-soft: var(--chart-feeds-soft);   --c-ink: var(--chart-feeds-ink);   --c-glow: var(--chart-feeds-glow); }
+.swipe-sleep   { --c-top: var(--chart-sleep-top);   --c-bottom: var(--chart-sleep-bottom);   --c-soft: var(--chart-sleep-soft);   --c-ink: var(--chart-sleep-ink);   --c-glow: var(--chart-sleep-glow); }
+.swipe-diapers { --c-top: var(--chart-diapers-top); --c-bottom: var(--chart-diapers-bottom); --c-soft: var(--chart-diapers-soft); --c-ink: var(--chart-diapers-ink); --c-glow: var(--chart-diapers-glow); }
+
+.swipe-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 7%, var(--card));
+  box-shadow: inset 0 1px 2px rgba(42, 34, 48, 0.06);
+}
+.swipe-tab {
+  flex: 1;
+  min-height: 44px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.swipe-tab.is-on {
+  background: var(--card);
+  color: var(--c-ink);
+  box-shadow: 0 1px 2px rgba(42, 34, 48, 0.08), 0 4px 10px rgba(42, 34, 48, 0.06);
+}
+
+.swipe-card {
+  border-radius: 22px;
+  padding: 18px 18px 16px;
+  box-shadow: var(--chart-shadow);
+}
+.swipe-header {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.swipe-ranges { display: flex; gap: 4px; }
+.swipe-range {
+  min-width: 44px;
+  min-height: 32px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.swipe-range.is-on {
+  background: var(--c-ink);
+  border-color: var(--c-ink);
+  color: var(--card);
+}
+
+.swipe-readout {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  min-height: 40px;
+}
+.swipe-value {
+  font-family: 'Fraunces', 'Georgia', serif;
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--c-ink);
+}
+.swipe-caption { font-size: 14px; color: var(--ink-muted); }
+
+.swipe-track {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 10px 0 6px;
+  scrollbar-width: none;
+}
+.swipe-track::-webkit-scrollbar { display: none; }
+.swipe-inner {
+  position: relative;
+  display: flex;
+  width: max-content;
+  min-width: 100%;
+}
+.swipe-avg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1.5px dashed var(--c-ink);
+  opacity: 0.45;
+  pointer-events: none;
+}
+.swipe-col {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.swipe-plot {
+  height: 150px;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+.swipe-bar {
+  width: 100%;
+  padding: 0;
+  border: none;
+  border-radius: 7px 7px 3px 3px;
+  background: linear-gradient(180deg, var(--c-top) 0%, var(--c-bottom) 100%);
+  cursor: pointer;
+  transition: opacity 0.2s, box-shadow 0.2s, height 0.3s;
+}
+.swipe-bar.is-today {
+  background: repeating-linear-gradient(135deg, var(--c-soft) 0 4px, var(--card) 4px 8px);
+  border: 1.5px dashed var(--c-bottom);
+}
+.swipe-bar.is-on { box-shadow: 0 6px 16px var(--c-glow); }
+.swipe-bar:focus-visible { outline: 2px solid var(--c-ink); outline-offset: 2px; }
+.swipe-tick {
+  height: 14px;
+  font-size: 11px;
+  color: var(--ink-muted);
+  white-space: nowrap;
 }
