@@ -2382,10 +2382,10 @@ button:focus-visible {
 
 /* Small flat icon tiles inside the Today's stats cards. */
 .stat-tile .tile-icon {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   flex: none;
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 /* Flat icon tile in the Next Up card. */
