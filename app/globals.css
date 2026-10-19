@@ -2501,3 +2501,18 @@ button:focus-visible {
   .stats-row { gap: 10px; margin-bottom: 0; }
   .stat-tile { padding: 10px; }
 }
+
+/* Installed (home-screen) app on iPhones with a home indicator: the tab bar
+   runs to the very bottom edge, so the indicator line was drawn over the
+   History / Insights labels. Lift the bar's content ~16px and add the same
+   room to each page's bottom padding so nothing gets covered. */
+@media (display-mode: standalone) {
+  .tab-bar { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+  .wrap { padding-bottom: 124px; }
+}
+@media (display-mode: standalone) and (min-height: 741px) {
+  .wrap:has(.tile-grid) { padding-bottom: 100px; }
+}
+@media (display-mode: standalone) and (max-height: 740px) {
+  .wrap:has(.tile-grid) { padding-bottom: 92px; }
+}
