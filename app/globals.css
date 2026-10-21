@@ -3229,3 +3229,10 @@ button:focus-visible {
 .stat-tile { padding: 10px; }
 .stat-tile-row { grid-template-columns: 24px minmax(0, 1fr); column-gap: 5px; }
 .stat-tile .tile-icon { width: 24px; height: 24px; border-radius: 7px; }
+
+/* Same 24px side margins on every screen, so content lines up with Today
+   when switching tabs. */
+.wrap {
+  padding-left: 24px;
+  padding-right: 24px;
+}
