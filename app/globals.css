@@ -3212,3 +3212,20 @@ button:focus-visible {
 .stat-value { grid-column: 1 / -1; grid-row: 2; font-size: 23px; }
 .stat-sub { margin-top: 2px; }
 .milk-bar { margin-top: 5px; }
+
+/* ---------- Today: even spacing ----------
+   24px side margins instead of 20, and the three button columns spread
+   with space-evenly and no extra column gap, so the space between buttons
+   matches the space out to the margins (about 30px each on an iPhone 14).
+   Stats icon shrinks a touch so "Feedings" still fits at the wider margins. */
+.wrap:has(.tile-grid) {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+.tile-grid {
+  justify-content: space-evenly;
+  column-gap: 0;
+}
+.stat-tile { padding: 10px; }
+.stat-tile-row { grid-template-columns: 24px minmax(0, 1fr); column-gap: 5px; }
+.stat-tile .tile-icon { width: 24px; height: 24px; border-radius: 7px; }
