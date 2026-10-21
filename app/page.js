@@ -20,12 +20,48 @@ import {
   Icon,
   phaseClass,
   TileIcon,
+  TYPE_LABELS,
+  activityDetailSuffix,
+  buildActivityGroups,
+  formatRelative,
 } from '../lib/homeUi';
 import {
   dailyMilkTarget, milkStatus, milkStatusText, usualFeedsPerDay, nextBottle, showEveningNudge,
 } from '../lib/milk';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
+
+// Which flat tile icon a "Latest" row shows for each event type.
+const LATEST_ICON = {
+  feed: 'feed',
+  diaper: 'diaper',
+  medicine: 'medicine',
+  nap_start: 'sleep',
+  nap_end: 'sleep',
+  sleep_start: 'bedtime',
+  sleep_end: 'bedtime',
+};
+
+// Status card shown while she's napping or asleep for the night. The live
+// duration is the headline (ticks with the page's 10s `now`), since "how
+// long has she been down?" is the question at 2am, not the start time.
+// Night sleep gets a deep plum card, naps a light lilac one, so the two
+// states read differently at a glance.
+function AsleepCard({ kind, since, now, timezone }) {
+  const hours = (now.getTime() - new Date(since).getTime()) / 3600000;
+  return (
+    <div className={`nextup asleep-card asleep-${kind}`}>
+      <div className="nextup-row">
+        <TileIcon name={kind === 'nap' ? 'sleep' : 'bedtime'} />
+        <div className="nextup-text">
+          <div className="nextup-eyebrow">{kind === 'nap' ? 'Napping' : 'Sleeping'}</div>
+          <div className="nextup-headline asleep-duration">{formatHours(hours)}</div>
+          <div className="nextup-sub">Since {formatLocalTime(since, timezone)} · alerts paused</div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // Feed/Diaper/Medicine don't change appearance after a tap the way the
 // nap/sleep toggle buttons do (those flip to their "end" state as soon as
@@ -297,36 +333,35 @@ export default function Page() {
   // but was never actually wired to anything — removed as dead code.
   const overdueItems = useMemo(() => overdueSummary(status, now), [status, now]);
 
+  const latest = useMemo(
+    () => (timezone ? buildActivityGroups(events, timezone, now).flatMap(g => g.items).slice(0, 3) : []),
+    [events, timezone, now]
+  );
+
   return (
     <div className="wrap">
-      <div className="header-row">
-        <div>
-          <h1>Today</h1>
-          {/* Purely decorative, matching the reference's heart glyph under
-              "Today" — not a button (no click handler, no hover/press
-              state) since there's no favorites feature behind it. */}
-          <svg className="header-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-            <path d="M12 20.5s-7.5-4.6-10-9.3C.6 8 2 4.5 5.3 3.7c2-.5 4 .3 5.2 2 .3.4.9.4 1.2 0 1.2-1.7 3.2-2.5 5.2-2 3.3.8 4.7 4.3 3.3 7.5-2.5 4.7-10 9.3-10 9.3Z" />
-          </svg>
-        </div>
-        <div className="header-right">
-          {/* Reuses the fuller /upcoming schedule page as this icon's
-              destination, matching the reference's calendar glyph with a
-              real place to go instead of a decorative dead button. Theme
-              toggle and Settings moved off this header entirely — Settings
-              is now its own "Profile" tab, and its own page keeps a theme
-              toggle of its own, so nothing is lost by dropping them from
-              here to match the reference's single-icon header. */}
-          <Link href="/upcoming" className="header-icon-btn" aria-label="Upcoming schedule">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <rect x="4" y="5.5" width="16" height="15" rx="2.5" />
-              <path d="M4 10h16M8 3.5v3M16 3.5v3" />
-            </svg>
-          </Link>
-          <div className="header-datetime" suppressHydrationWarning>
-            {new Intl.DateTimeFormat('en-US', { timeZone: timezone, month: 'long', day: 'numeric', year: 'numeric' }).format(now)}
+      {/* Date sits above the title as a small eyebrow, heart rides inline
+          after "Today", and the calendar button centers against both, so
+          the header reads as one row instead of three loose pieces. */}
+      <div className="header-row today-header">
+        <div className="today-heading">
+          <div className="today-date" suppressHydrationWarning>
+            {new Intl.DateTimeFormat('en-US', { timeZone: timezone, weekday: 'long', month: 'long', day: 'numeric' }).format(now)}
           </div>
+          <h1>
+            Today
+            {/* Decorative only, no favorites feature behind it. */}
+            <svg className="header-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+              <path d="M12 20.5s-7.5-4.6-10-9.3C.6 8 2 4.5 5.3 3.7c2-.5 4 .3 5.2 2 .3.4.9.4 1.2 0 1.2-1.7 3.2-2.5 5.2-2 3.3.8 4.7 4.3 3.3 7.5-2.5 4.7-10 9.3-10 9.3Z" />
+            </svg>
+          </h1>
         </div>
+        <Link href="/upcoming" className="header-icon-btn" aria-label="Upcoming schedule">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="4" y="5.5" width="16" height="15" rx="2.5" />
+            <path d="M4 10h16M8 3.5v3M16 3.5v3" />
+          </svg>
+        </Link>
       </div>
 
       {loading || !status ? (
@@ -383,11 +418,7 @@ export default function Page() {
               1 overdue this card is the only place that story gets told,
               so it stays. */}
           {overdueItems.length <= 1 && (status?.nap?.asleep ? (
-            <div className="nextup nextup-on-track">
-              <div className="nextup-eyebrow">Napping</div>
-              <div className="nextup-headline">Asleep since {formatLocalTime(status.nap.lastEventTime, timezone)}</div>
-              <div className="nextup-sub">Feed and diaper alerts are paused until she wakes up.</div>
-            </div>
+            <AsleepCard kind="nap" since={status.nap.lastEventTime} now={now} timezone={timezone} />
           ) : nextUp ? (
             <div className={`nextup nextup-${nextUpTone} nextup-cat-${nextUpKey}`}>
               <div className="nextup-row">
@@ -408,11 +439,7 @@ export default function Page() {
               )}
             </div>
           ) : status?.sleep?.asleep ? (
-            <div className="nextup nextup-on-track">
-              <div className="nextup-eyebrow">Sleeping</div>
-              <div className="nextup-headline">Asleep since {formatLocalTime(status.sleep.lastEventTime, timezone)}</div>
-              <div className="nextup-sub">Feed and diaper alerts are paused until she wakes up.</div>
-            </div>
+            <AsleepCard kind="sleep" since={status.sleep.lastEventTime} now={now} timezone={timezone} />
           ) : (
             <div className="nextup nextup-on-track">
               <div className="nextup-eyebrow">Getting started</div>
@@ -523,6 +550,37 @@ export default function Page() {
                   </div>
                   <div className="stat-sub">{today.naps} {today.naps === 1 ? 'nap' : 'naps'}</div>
                 </div>
+              </div>
+            </>
+          )}
+
+          {/* Last three logs, so the space under the stats answers "when
+              did we last do X?" without a trip to History. Every row links
+              to History, where entries can be edited. */}
+          {latest.length > 0 && (
+            <>
+              <div className="stats-caption latest-caption">
+                <span>Latest</span>
+                <Link href="/recent" className="latest-see-all">See all</Link>
+              </div>
+              <div className="latest-card">
+                {latest.map(item => {
+                  const ts = item.kind === 'nap' ? item.end : item.event_time;
+                  const label = item.kind === 'nap'
+                    ? `Nap · ${formatHours((new Date(item.end) - new Date(item.start)) / 3600000)}`
+                    : `${TYPE_LABELS[item.type] || item.type}${activityDetailSuffix(item.raw)}`;
+                  const icon = item.kind === 'nap' ? 'sleep' : LATEST_ICON[item.type] || 'journal';
+                  return (
+                    <Link key={item.id} href="/recent" className="latest-row">
+                      <TileIcon name={icon} />
+                      <span className="latest-label">{label}</span>
+                      <span className="latest-when">
+                        <span className="latest-time">{formatLocalTime(ts, timezone)}</span>
+                        <span className="latest-ago">{formatRelative(ts, now)}</span>
+                      </span>
+                    </Link>
+                  );
+                })}
               </div>
             </>
           )}
