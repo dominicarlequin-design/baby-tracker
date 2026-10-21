@@ -3236,3 +3236,32 @@ button:focus-visible {
   padding-left: 24px;
   padding-right: 24px;
 }
+
+/* ---------- Today's stats, toned down ----------
+   One quiet card split into three columns by hairlines, instead of three
+   colored boxes. Numbers drop to 19px in plain ink; category color only
+   survives in the small icons, so the log buttons above stay the focus. */
+.stats-row {
+  gap: 0;
+  padding: 10px 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.stats-row .stat-tile {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 2px 12px;
+}
+.stats-row .stat-tile + .stat-tile {
+  border-left: 1px solid var(--border);
+}
+.stats-row .stat-value {
+  font-size: 19px;
+  color: var(--ink);
+}
+.stats-row .stat-label { color: var(--ink-muted); font-weight: 600; }
+.stats-row .stat-tile .tile-icon { box-shadow: none; }
+.stats-row .stat-tile-btn:active { transform: none; opacity: 0.7; }
+.stats-row .milk-bar { height: 4px; }
