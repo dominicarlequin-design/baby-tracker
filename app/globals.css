@@ -3264,3 +3264,66 @@ button:focus-visible {
 .stats-row .stat-label { color: var(--ink-muted); font-weight: 600; }
 .stats-row .stat-tile .tile-icon { box-shadow: none; }
 .stats-row .stat-tile-btn:active { transform: none; opacity: 0.7; }
+
+/* ---------- Sky backdrop (lib/SkyBackdrop.js) ----------
+   Two soft glows near the top, tinted by time of day, behind everything on
+   Today. Stars fade in only while she's napping or asleep. */
+.sky {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  --sky: var(--sky-light);
+  background:
+    radial-gradient(90% 42% at 92% 10%, var(--sky) 0%, transparent 70%),
+    radial-gradient(75% 34% at 0% 52%, color-mix(in srgb, var(--sky) 75%, transparent) 0%, transparent 70%),
+    radial-gradient(80% 26% at 60% 100%, color-mix(in srgb, var(--sky) 55%, transparent) 0%, transparent 70%);
+  transition: background 1s ease;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sky { --sky: var(--sky-dark); }
+}
+:root[data-theme="dark"] .sky { --sky: var(--sky-dark); }
+
+.sky-stars {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(100%, 480px);
+  height: 640px;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.sky-stars.is-on { opacity: 1; }
+.sky-star {
+  position: absolute;
+  border-radius: 50%;
+  background: #a67fca;
+  box-shadow: 0 0 6px 1px rgba(166, 127, 202, 0.55);
+  animation: sky-twinkle 4.2s ease-in-out infinite;
+}
+.sky-sparkle {
+  width: 10px;
+  height: 10px;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  fill: #e8b955;
+  filter: drop-shadow(0 0 3px rgba(232, 185, 85, 0.6));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sky-star:not(.sky-sparkle) { background: #fff; box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.6); }
+}
+:root[data-theme="dark"] .sky-star:not(.sky-sparkle) { background: #fff; box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.6); }
+@keyframes sky-twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sky-star { animation: none; opacity: 0.7; }
+  .sky, .sky-stars { transition: none; }
+}
+/* body paints its own background above negative-z layers, so let the html
+   background show through on screens that have the sky. */
+body:has(.sky) { background: transparent; }

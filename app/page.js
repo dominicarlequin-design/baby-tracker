@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import { TabBar } from '../lib/TabBar';
+import { SkyBackdrop } from '../lib/SkyBackdrop';
 import { computeStatus, lastEventOf, localDateStr } from '../lib/logic';
 import { dailySummaries } from '../lib/summaries';
 import {
@@ -320,6 +321,7 @@ export default function Page() {
 
   return (
     <div className="wrap">
+      <SkyBackdrop now={now} timezone={timezone} asleep={Boolean(status?.sleep?.asleep || status?.nap?.asleep)} />
       {/* Date sits above the title as a small eyebrow, heart rides inline
           after "Today", and the calendar button centers against both, so
           the header reads as one row instead of three loose pieces. */}
