@@ -3049,7 +3049,7 @@ button:focus-visible {
 /* Tile icon depth: soft contact shadow on the art, matching the recipe icons. */
 .tile-icon > svg:first-child { filter: drop-shadow(0 2px 1.5px rgba(90, 58, 85, 0.22)); }
 
-/* ---------- Today polish pass (header, asleep card, stats, Latest) ---------- */
+/* ---------- Today polish pass (header, asleep card, stats) ---------- */
 
 /* Header: date eyebrow above "Today", heart inline, calendar button
    centered against both lines. */
@@ -3145,77 +3145,6 @@ button:focus-visible {
   white-space: nowrap;
 }
 .stat-tile-btn { text-align: left; }
-
-/* Latest: last three logs under the stats. */
-.latest-caption {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-top: 18px;
-}
-.latest-see-all {
-  position: relative;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--accent-text);
-  text-decoration: none;
-}
-.latest-see-all::after {
-  content: '';
-  position: absolute;
-  inset: -14px -10px;
-}
-.latest-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 4px 14px;
-}
-.latest-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
-  color: var(--ink);
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
-}
-.latest-row:last-child { border-bottom: none; }
-.latest-row:active { opacity: 0.7; }
-.latest-row .tile-icon {
-  width: 38px;
-  height: 38px;
-  flex: none;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px -4px rgba(90, 58, 85, 0.35), inset 0 1.5px 0 rgba(255, 255, 255, 0.7);
-}
-.latest-label {
-  flex: 1;
-  min-width: 0;
-  font-size: 15px;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.latest-when {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  flex: none;
-}
-.latest-time {
-  font-size: 14px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-.latest-ago {
-  font-size: 12px;
-  color: var(--ink-muted);
-}
 
 /* ---------- Today fits above the fold ----------
    On a phone, Today has to show the status card, all six buttons and the

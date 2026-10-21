@@ -20,27 +20,12 @@ import {
   Icon,
   phaseClass,
   TileIcon,
-  TYPE_LABELS,
-  activityDetailSuffix,
-  buildActivityGroups,
-  formatRelative,
 } from '../lib/homeUi';
 import {
   dailyMilkTarget, milkStatus, milkStatusText, usualFeedsPerDay, nextBottle, showEveningNudge,
 } from '../lib/milk';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
-
-// Which flat tile icon a "Latest" row shows for each event type.
-const LATEST_ICON = {
-  feed: 'feed',
-  diaper: 'diaper',
-  medicine: 'medicine',
-  nap_start: 'sleep',
-  nap_end: 'sleep',
-  sleep_start: 'bedtime',
-  sleep_end: 'bedtime',
-};
 
 // Status card shown while she's napping or asleep for the night. The live
 // duration is the headline (ticks with the page's 10s `now`), since "how
@@ -333,11 +318,6 @@ export default function Page() {
   // but was never actually wired to anything — removed as dead code.
   const overdueItems = useMemo(() => overdueSummary(status, now), [status, now]);
 
-  const latest = useMemo(
-    () => (timezone ? buildActivityGroups(events, timezone, now).flatMap(g => g.items).slice(0, 3) : []),
-    [events, timezone, now]
-  );
-
   return (
     <div className="wrap">
       {/* Date sits above the title as a small eyebrow, heart rides inline
@@ -560,37 +540,6 @@ export default function Page() {
                   </div>
                   <div className="stat-sub">{today.naps} {today.naps === 1 ? 'nap' : 'naps'}</div>
                 </div>
-              </div>
-            </>
-          )}
-
-          {/* Last three logs, so the space under the stats answers "when
-              did we last do X?" without a trip to History. Every row links
-              to History, where entries can be edited. */}
-          {latest.length > 0 && (
-            <>
-              <div className="stats-caption latest-caption">
-                <span>Latest</span>
-                <Link href="/recent" className="latest-see-all">See all</Link>
-              </div>
-              <div className="latest-card">
-                {latest.map(item => {
-                  const ts = item.kind === 'nap' ? item.end : item.event_time;
-                  const label = item.kind === 'nap'
-                    ? `Nap · ${formatHours((new Date(item.end) - new Date(item.start)) / 3600000)}`
-                    : `${TYPE_LABELS[item.type] || item.type}${activityDetailSuffix(item.raw)}`;
-                  const icon = item.kind === 'nap' ? 'sleep' : LATEST_ICON[item.type] || 'journal';
-                  return (
-                    <Link key={item.id} href="/recent" className="latest-row">
-                      <TileIcon name={icon} />
-                      <span className="latest-label">{label}</span>
-                      <span className="latest-when">
-                        <span className="latest-time">{formatLocalTime(ts, timezone)}</span>
-                        <span className="latest-ago">{formatRelative(ts, now)}</span>
-                      </span>
-                    </Link>
-                  );
-                })}
               </div>
             </>
           )}
