@@ -3264,4 +3264,3 @@ button:focus-visible {
 .stats-row .stat-label { color: var(--ink-muted); font-weight: 600; }
 .stats-row .stat-tile .tile-icon { box-shadow: none; }
 .stats-row .stat-tile-btn:active { transform: none; opacity: 0.7; }
-.stats-row .milk-bar { height: 4px; }

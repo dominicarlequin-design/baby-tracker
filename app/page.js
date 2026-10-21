@@ -504,9 +504,6 @@ export default function Page() {
                       </div>
                     </div>
                     <div className="stat-sub">{milk.oz} / {milk.target} oz</div>
-                    <div className={`milk-bar milk-${milk.status}`} aria-hidden="true">
-                      <div className="milk-bar-fill" style={{ width: `${milk.pct}%` }} />
-                    </div>
                   </button>
                 ) : (
                   <div className="stat-tile stat-tile-feed">
