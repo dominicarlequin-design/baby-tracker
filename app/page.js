@@ -420,7 +420,17 @@ export default function Page() {
           {overdueItems.length <= 1 && (status?.nap?.asleep ? (
             <AsleepCard kind="nap" since={status.nap.lastEventTime} now={now} timezone={timezone} />
           ) : nextUp ? (
-            <div className={`nextup nextup-${nextUpTone} nextup-cat-${nextUpKey}`}>
+            // Tappable: the sub-line is capped at two lines to keep Today
+            // above the fold, so the full text (plus the usual "how this
+            // is estimated" note) opens in the explain popup.
+            <div
+              className={`nextup nextup-${nextUpTone} nextup-cat-${nextUpKey} nextup-tappable`}
+              role="button"
+              tabIndex={0}
+              aria-label={`${nextUp.eyebrow}: ${nextUp.headline}. Show details.`}
+              onClick={() => setExplainKey(nextUpKey)}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExplainKey(nextUpKey); } }}
+            >
               <div className="nextup-row">
                 {NEXTUP_ICON[nextUpKey] ? <TileIcon name={NEXTUP_ICON[nextUpKey]} /> : <Icon name={nextUpKey} />}
                 <div className="nextup-text">
@@ -775,6 +785,7 @@ export default function Page() {
         <div className="modal-overlay" onClick={() => setExplainKey(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="modal-title">How this is estimated</div>
+            {explainKey === nextUpKey && nextUp?.sub && <div className="explain-lead">{nextUp.sub}</div>}
             <div className="explain-body">{explainStatus(explainKey, status[explainKey], config, timezone)}</div>
             <button className="modal-btn-confirm form-save" onClick={() => setExplainKey(null)}>Got it</button>
           </div>
