@@ -3645,7 +3645,6 @@ body:has(.sky) { background: transparent; }
 }
 .journal-card-stats { font-size: 12.5px; color: var(--ink-muted); }
 .journal-empty { padding: 20px 16px; font-size: 14px; color: var(--ink-muted); text-align: center; }
-.journal-sheet { max-height: 88vh; overflow-y: auto; }
 .journal-sheet .form-textarea { min-height: 150px; }
 
 /* ---------- Journal photos + prompts ----------
@@ -3714,3 +3713,44 @@ body:has(.sky) { background: transparent; }
   cursor: pointer;
 }
 .journal-card { overflow: hidden; }
+
+/* ---------- Journal editor sheet: scrolling ----------
+   Three parts: a fixed header (grabber, title, close), a body that is the
+   only thing that scrolls, and a fixed footer holding Save / Delete. The
+   body can't drag the page behind it (overscroll-behavior), and the sheet
+   is sized to the visible screen (the overlay is resized above the
+   keyboard in app/journal/page.js), so Save never scrolls out of reach. */
+.journal-overlay { height: 100%; height: 100dvh; }
+.modal.journal-sheet {
+  display: flex;
+  flex-direction: column;
+  max-height: 92%;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 28px 28px 0 0;
+}
+.journal-sheet-head { flex: none; padding: 10px 20px 4px; }
+.journal-sheet-head .milk-sheet-grabber { margin: 0 auto 10px; }
+.journal-sheet-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 20px 16px;
+}
+.journal-sheet-body > .form-input,
+.journal-sheet-body > .mood-grid,
+.journal-sheet-body > .journal-photo-add,
+.journal-sheet-body > .journal-photo-edit { margin-bottom: 18px; }
+.journal-sheet-body > .form-textarea:placeholder-shown { margin-bottom: 4px; }
+.journal-sheet-body > .form-input:last-child { margin-bottom: 0; }
+.journal-sheet-foot {
+  flex: none;
+  padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  background: var(--card);
+}
+.journal-sheet-foot .form-save { margin-top: 0; }
+.journal-sheet-foot .modal-btn-delete { margin-top: 4px; }
+.journal-sheet-foot .form-message { margin: 0 0 8px; }

@@ -157,6 +157,46 @@ export default function JournalPage() {
   const [toastShow, setToastShow] = useState(false);
   const toastTimeoutRef = useRef(null);
   const fromTodayRef = useRef(false);
+  const overlayRef = useRef(null);
+
+  // While the editor is open: freeze the page behind it (so a scroll inside
+  // the sheet never drags the feed along), and size the overlay to the part
+  // of the screen the keyboard isn't covering, so Save stays in view while
+  // typing. Both are undone when the sheet closes.
+  const editorOpen = Boolean(editor);
+  useEffect(() => {
+    if (!editorOpen) return undefined;
+    const scrollY = window.scrollY;
+    const body = document.body.style;
+    const saved = { position: body.position, top: body.top, width: body.width, overflow: body.overflow };
+    Object.assign(body, { position: 'fixed', top: `-${scrollY}px`, width: '100%', overflow: 'hidden' });
+
+    const vv = window.visualViewport;
+    const fit = () => {
+      const el = overlayRef.current;
+      if (!el || !vv) return;
+      el.style.top = `${vv.offsetTop}px`;
+      el.style.height = `${vv.height}px`;
+      el.style.bottom = 'auto';
+    };
+    fit();
+    vv?.addEventListener('resize', fit);
+    vv?.addEventListener('scroll', fit);
+    return () => {
+      vv?.removeEventListener('resize', fit);
+      vv?.removeEventListener('scroll', fit);
+      Object.assign(body, saved);
+      window.scrollTo(0, scrollY);
+    };
+  }, [editorOpen]);
+
+  // When a field gets focus (and the keyboard slides up), bring it into the
+  // visible part of the sheet once the resize has settled.
+  const keepFocusedFieldVisible = useCallback((event) => {
+    const field = event.target;
+    if (!field.matches?.('input, textarea')) return;
+    setTimeout(() => field.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 320);
+  }, []);
 
   const showToast = useCallback((text) => {
     clearTimeout(toastTimeoutRef.current);
@@ -480,105 +520,112 @@ export default function JournalPage() {
       </div>
 
       {editor && (
-        <div className="modal-overlay" onClick={closeEditor}>
-          <div className="modal milk-sheet journal-sheet" role="dialog" aria-label={editor.entry ? 'Edit entry' : 'New entry'} onClick={e => e.stopPropagation()}>
-            <div className="milk-sheet-grabber" aria-hidden="true" />
-            <div className="milk-sheet-head">
-              <h2 className="milk-sheet-title">{editor.entry ? 'Edit entry' : 'New entry'}</h2>
-              <button type="button" className="milk-sheet-close" aria-label="Close" onClick={closeEditor}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-              </button>
-            </div>
-
-            <label className="form-label" htmlFor="journal-title">Title (optional)</label>
-            <input
-              id="journal-title"
-              className="form-input"
-              type="text"
-              placeholder="e.g. First time rolling over"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              style={{ marginBottom: '14px' }}
-            />
-
-            <label className="form-label" htmlFor="journal-note">Note</label>
-            <textarea
-              id="journal-note"
-              className="form-input form-textarea"
-              placeholder={prompt}
-              value={note}
-              onChange={e => setNote(e.target.value)}
-              style={{ marginBottom: note ? '14px' : '6px' }}
-            />
-            {!note && (
-              <button type="button" className="journal-prompt-shuffle" onClick={() => setPrompt(p => randomPrompt(p))}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4" /></svg>
-                Another prompt
-              </button>
-            )}
-
-            <div className="form-label">Photo (optional)</div>
-            {(() => {
-              const current = photoPreview || (!removePhoto && editor.entry?.photo_path ? photoUrls[editor.entry.photo_path] : null);
-              return current ? (
-                <div className="journal-photo-edit">
-                  <img src={current} alt="" />
-                  <div className="journal-photo-actions">
-                    <label className="journal-photo-btn">
-                      Replace
-                      <input type="file" accept="image/*" onChange={pickPhoto} hidden />
-                    </label>
-                    <button type="button" className="journal-photo-btn" onClick={clearPhoto}>Remove</button>
-                  </div>
-                </div>
-              ) : (
-                <label className={`journal-photo-add${photoBusy ? ' is-busy' : ''}`}>
-                  {photoBusy ? <span className="btn-spinner" /> : (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="3" /><circle cx="12" cy="13" r="3.5" /><path d="M9 6l1.5-2h3L15 6" /></svg>
-                  )}
-                  {photoBusy ? 'Preparing photo…' : 'Add a photo'}
-                  <input type="file" accept="image/*" onChange={pickPhoto} hidden disabled={photoBusy} />
-                </label>
-              );
-            })()}
-
-            <div className="form-label">Mood (optional)</div>
-            <div className="mood-grid" style={{ marginBottom: '14px' }}>
-              {MOODS.map(m => (
-                <button
-                  key={m.key}
-                  type="button"
-                  className={`picker-btn ${mood === m.key ? 'selected' : ''}`}
-                  onClick={() => setMood(mood === m.key ? '' : m.key)}
-                >
-                  {m.label}
+        <div className="modal-overlay journal-overlay" ref={overlayRef} onClick={closeEditor}>
+          <div className="modal journal-sheet" role="dialog" aria-label={editor.entry ? 'Edit entry' : 'New entry'} onClick={e => e.stopPropagation()}>
+            {/* Header and footer stay put; only the fields in between scroll. */}
+            <div className="journal-sheet-head">
+              <div className="milk-sheet-grabber" aria-hidden="true" />
+              <div className="milk-sheet-head">
+                <h2 className="milk-sheet-title">{editor.entry ? 'Edit entry' : 'New entry'}</h2>
+                <button type="button" className="milk-sheet-close" aria-label="Close" onClick={closeEditor}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
                 </button>
-              ))}
+              </div>
             </div>
 
-            <label className="form-label" htmlFor="journal-time">When</label>
-            <input
-              id="journal-time"
-              className="form-input"
-              type="datetime-local"
-              value={entryValue}
-              onChange={e => setEntryValue(e.target.value)}
-            />
+            <div className="journal-sheet-body" onFocus={keepFocusedFieldVisible}>
 
-            <button
-              className={`modal-btn-confirm form-save ${saving ? 'is-loading' : ''}`}
-              onClick={handleSave}
-              disabled={saving || deleting || photoBusy}
-            >
-              {saving && <span className="btn-spinner" />}
-              {saving ? 'Saving…' : editor.entry ? 'Save changes' : 'Save entry'}
-            </button>
-            {editor.entry && (
-              <button className="modal-btn-delete" onClick={handleDelete} disabled={saving || deleting}>
-                {deleting ? 'Deleting…' : confirmDelete ? 'Tap again to delete' : 'Delete entry'}
+              <label className="form-label" htmlFor="journal-title">Title (optional)</label>
+              <input
+                id="journal-title"
+                className="form-input"
+                type="text"
+                placeholder="e.g. First time rolling over"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+              />
+
+              <label className="form-label" htmlFor="journal-note">Note</label>
+              <textarea
+                id="journal-note"
+                className="form-input form-textarea"
+                placeholder={prompt}
+                value={note}
+                onChange={e => setNote(e.target.value)}
+              />
+              {!note && (
+                <button type="button" className="journal-prompt-shuffle" onClick={() => setPrompt(p => randomPrompt(p))}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4" /></svg>
+                  Another prompt
+                </button>
+              )}
+
+              <div className="form-label">Photo (optional)</div>
+              {(() => {
+                const current = photoPreview || (!removePhoto && editor.entry?.photo_path ? photoUrls[editor.entry.photo_path] : null);
+                return current ? (
+                  <div className="journal-photo-edit">
+                    <img src={current} alt="" />
+                    <div className="journal-photo-actions">
+                      <label className="journal-photo-btn">
+                        Replace
+                        <input type="file" accept="image/*" onChange={pickPhoto} hidden />
+                      </label>
+                      <button type="button" className="journal-photo-btn" onClick={clearPhoto}>Remove</button>
+                    </div>
+                  </div>
+                ) : (
+                  <label className={`journal-photo-add${photoBusy ? ' is-busy' : ''}`}>
+                    {photoBusy ? <span className="btn-spinner" /> : (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="3" /><circle cx="12" cy="13" r="3.5" /><path d="M9 6l1.5-2h3L15 6" /></svg>
+                    )}
+                    {photoBusy ? 'Preparing photo…' : 'Add a photo'}
+                    <input type="file" accept="image/*" onChange={pickPhoto} hidden disabled={photoBusy} />
+                  </label>
+                );
+              })()}
+
+              <div className="form-label">Mood (optional)</div>
+              <div className="mood-grid">
+                {MOODS.map(m => (
+                  <button
+                    key={m.key}
+                    type="button"
+                    className={`picker-btn ${mood === m.key ? 'selected' : ''}`}
+                    onClick={() => setMood(mood === m.key ? '' : m.key)}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+
+              <label className="form-label" htmlFor="journal-time">When</label>
+              <input
+                id="journal-time"
+                className="form-input"
+                type="datetime-local"
+                value={entryValue}
+                onChange={e => setEntryValue(e.target.value)}
+              />
+
+            </div>
+
+            <div className="journal-sheet-foot">
+              {message && <div className="form-message error">{message}</div>}
+              <button
+                className={`modal-btn-confirm form-save ${saving ? 'is-loading' : ''}`}
+                onClick={handleSave}
+                disabled={saving || deleting || photoBusy}
+              >
+                {saving && <span className="btn-spinner" />}
+                {saving ? 'Saving…' : editor.entry ? 'Save changes' : 'Save entry'}
               </button>
-            )}
-            {message && <div className="form-message error">{message}</div>}
+              {editor.entry && (
+                <button className="modal-btn-delete" onClick={handleDelete} disabled={saving || deleting}>
+                  {deleting ? 'Deleting…' : confirmDelete ? 'Tap again to delete' : 'Delete entry'}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
