@@ -3464,3 +3464,20 @@ body:has(.sky) { background: transparent; }
     mask-image: linear-gradient(transparent 0, transparent 116px, #000 170px, #000 55%, transparent 92%);
   }
 }
+
+/* ---------- History categories (app/recent/page.js) ----------
+   Same pill tabs as Insights, five across. In a category view each day
+   label carries that day's total on the right ("3 feeds · 15 oz"). */
+.history-tabs .swipe-tab { font-size: 14px; padding: 0 2px; min-width: 0; }
+.activity-day-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.activity-day-summary {
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
