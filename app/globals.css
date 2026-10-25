@@ -3405,7 +3405,7 @@ body:has(.sky) { background: transparent; }
 .tile-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   justify-content: stretch;
-  column-gap: 28px;
+  column-gap: 40px; /* wider gaps = slightly smaller buttons (about 77pt on an iPhone 14) with the outer edges still flush */
 }
 .tile-grid .tile-icon { width: 100%; border-radius: 26px; }
 @media (max-height: 740px) {
