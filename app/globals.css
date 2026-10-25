@@ -3757,14 +3757,13 @@ body:has(.sky) { background: transparent; }
 
 /* ---------- Today: action buttons placed in the lower part ----------
    Information up top (date, Next up / Napping card), the six log buttons
-   lower down where a thumb reaches them more easily, but not pinned to
-   the tab bar. Today's page is a full-height column; the leftover space is
+   centered in the open space between that card and the tab bar. Today's page is a full-height column; the leftover space is
    split between a spacer above the buttons and one below them, in the
    ratio set by --gap-above / --gap-below. On short phones there is no
    leftover space and the layout is the same as before. Bottom padding
    clears the tab bar plus the home-indicator area. */
 .wrap:has(.tile-grid) {
-  --gap-above: 2;
+  --gap-above: 1; /* equal gaps: buttons centered in the open space */
   --gap-below: 1;
   display: flex;
   flex-direction: column;
