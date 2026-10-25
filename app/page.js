@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import { TabBar } from '../lib/TabBar';
-import { SkyBackdrop } from '../lib/SkyBackdrop';
+import { SkyBackdrop, SkyGlyph } from '../lib/SkyBackdrop';
 import { computeStatus, lastEventOf, localDateStr } from '../lib/logic';
 import { dailySummaries } from '../lib/summaries';
 import {
@@ -300,6 +300,14 @@ export default function Page() {
   }, [todayExtra]);
 
   const timezone = config?.timezone || 'America/New_York';
+
+  // "2h 27m ago" under Fed and Diaper, straight from the last logged event
+  // (status.*.hoursSince is paused while she's asleep, so it can't be used).
+  const agoText = (type) => {
+    const last = lastEventOf(events, type);
+    if (!last) return 'none yet';
+    return `${formatHours((now.getTime() - new Date(last.event_time).getTime()) / 3600000)} ago`;
+  };
   const nextUpKey = status ? pickNextUp(status, now) : null;
   const nextUp = nextUpKey ? nextUpContent(nextUpKey, status, config, timezone) : null;
   const nextUpTone = nextUpKey ? status[nextUpKey].state : null;
@@ -330,6 +338,7 @@ export default function Page() {
         <div className="today-heading">
           <div className="today-date" suppressHydrationWarning>
             {new Intl.DateTimeFormat('en-US', { timeZone: timezone, weekday: 'long', month: 'long', day: 'numeric' }).format(now)}
+            <SkyGlyph now={now} timezone={timezone} />
           </div>
           <h1>
             Today
@@ -445,10 +454,12 @@ export default function Page() {
             <button className={`tile-btn ${phaseClass(phase.feed)}`} onClick={() => setFeedPickerOpen(true)}>
               <TileIcon name="feed" phase={phase.feed} />
               <span className="tile-label">Fed</span>
+              <span className="tile-sub">{agoText('feed')}</span>
             </button>
             <button className={`tile-btn ${phaseClass(phase.diaper)}`} onClick={() => setDiaperPickerOpen(true)}>
               <TileIcon name="diaper" phase={phase.diaper} />
               <span className="tile-label">Diaper</span>
+              <span className="tile-sub">{agoText('diaper')}</span>
             </button>
             {status.nap.asleep ? (
               <button className={`tile-btn ${phaseClass(phase.nap)}`} onClick={() => logEvent('nap_end', 'Nap ended', {}, 'nap')}>

@@ -3294,7 +3294,7 @@ button:focus-visible {
 }
 
 /* Header strip, same width as .wrap, anchored to its right edge so the
-   moon always sits just left of the calendar button. */
+   constellation always sits just left of the calendar button. */
 .sky-head {
   position: absolute;
   top: 0;
@@ -3303,16 +3303,10 @@ button:focus-visible {
   height: 120px;
   transform: translateX(-50%);
 }
-.sky-cel {
-  position: absolute;
-  top: 20px;
-  right: 84px;
-  opacity: 0.6;
-}
 .sky-constellation {
   position: absolute;
   top: 0;
-  right: 132px;
+  right: 80px;
   opacity: 0;
   transition: opacity 2.4s ease;
 }
@@ -3396,3 +3390,32 @@ body:has(.sky) { background: transparent; }
 }
 .stats-pill-chevron { flex: none; width: 18px; height: 18px; color: var(--ink-muted); }
 .stats-sheet .stats-row { margin: 4px 0 6px; }
+
+/* ---------- Today layout polish ----------
+   1. Tile grid shares its outer edges with the cards above and below: the
+      left edge of Fed lines up with the left edge of Next up, and Journal
+      with its right edge. Tiles grow to fill the row on taller phones;
+      short phones keep their smaller fixed size, still flush to the edges.
+   2. Sun/moon sits inline after the date (see SkyGlyph), in the date's
+      muted color, so it reads as part of the label rather than a button.
+   3. Inactive tab labels are plain muted gray, so the active tab's color is
+      the one thing that stands out. */
+.tile-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-content: stretch;
+  column-gap: 28px;
+}
+.tile-grid .tile-icon { width: 100%; border-radius: 26px; }
+@media (max-height: 740px) {
+  .tile-grid {
+    grid-template-columns: repeat(3, var(--tile-size));
+    justify-content: space-between;
+    column-gap: 0;
+  }
+  .tile-grid .tile-icon { width: var(--tile-size); border-radius: 22px; }
+}
+
+.today-date { display: flex; align-items: center; gap: 6px; }
+.sky-glyph { flex: none; width: 15px; height: 15px; }
+
+.tab-item:not(.tab-active) { color: var(--ink-muted); }
