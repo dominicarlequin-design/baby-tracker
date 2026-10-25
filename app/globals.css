@@ -3350,3 +3350,49 @@ button:focus-visible {
 /* body paints its own background above negative-z layers, so let the html
    background show through on screens that have the sky. */
 body:has(.sky) { background: transparent; }
+
+/* ---------- Today's stats button (app/page.js) ----------
+   One slim full-width button under the log tiles with a one-line summary.
+   Tapping opens the full stats (Feedings / Diapers / Sleep) in a popup,
+   which reuses the Daily Milk sheet's look. */
+.stats-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.stats-pill:active { transform: scale(0.98); opacity: 0.8; }
+.stats-pill-icon {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lilac-deep);
+  background: color-mix(in srgb, var(--lilac-deep) 16%, var(--card));
+}
+.stats-pill-icon svg { width: 18px; height: 18px; }
+.stats-pill-label { flex: none; font-weight: 700; font-size: 15px; }
+.stats-pill-summary {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stats-pill-chevron { flex: none; width: 18px; height: 18px; color: var(--ink-muted); }
+.stats-sheet .stats-row { margin: 4px 0 6px; }

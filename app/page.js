@@ -92,6 +92,7 @@ export default function Page() {
   const [overdueOpen, setOverdueOpen] = useState(true);
   const [pendingDuplicate, setPendingDuplicate] = useState(null);
   const [milkSheetOpen, setMilkSheetOpen] = useState(false);
+  const [statsSheetOpen, setStatsSheetOpen] = useState(false);
   const [nudgeDismissedDay, setNudgeDismissedDay] = useState(null);
   const toastTimeoutRef = useRef(null);
 
@@ -488,59 +489,21 @@ export default function Page() {
           </div>
 
           {today && (
-            <>
-              <div className="stats-caption">Today's stats</div>
-              <div className="stats-row">
-                {milk ? (
-                  <button
-                    type="button"
-                    className="stat-tile stat-tile-feed stat-tile-btn"
-                    onClick={() => setMilkSheetOpen(true)}
-                    aria-label={`${today.feeds} feedings, ${milk.oz} of ${milk.target} ounces, ${milk.statusText}. Open Daily Milk.`}
-                  >
-                    <div className="stat-tile-row">
-                      <TileIcon name="feed" />
-                      <div className="stat-tile-text">
-                        <div className="stat-value">{today.feeds}</div>
-                        <div className="stat-label">Feedings</div>
-                      </div>
-                    </div>
-                    <div className="stat-sub">{milk.oz} / {milk.target} oz</div>
-                  </button>
-                ) : (
-                  <div className="stat-tile stat-tile-feed">
-                    <div className="stat-tile-row">
-                      <TileIcon name="feed" />
-                      <div className="stat-tile-text">
-                        <div className="stat-value">{today.feeds}</div>
-                        <div className="stat-label">Feedings</div>
-                      </div>
-                    </div>
-                    {todayExtra && <div className="stat-sub">Total: {todayExtra.ounces} oz</div>}
-                  </div>
-                )}
-                <div className="stat-tile stat-tile-diaper">
-                  <div className="stat-tile-row">
-                    <TileIcon name="diaper" />
-                    <div className="stat-tile-text">
-                      <div className="stat-value">{today.diapers}</div>
-                      <div className="stat-label">Diapers</div>
-                    </div>
-                  </div>
-                  {todayExtra && <div className="stat-sub">{todayExtra.wet} Wet &middot; {todayExtra.dirty} Dirty</div>}
-                </div>
-                <div className="stat-tile stat-tile-nap">
-                  <div className="stat-tile-row">
-                    <TileIcon name="sleep" />
-                    <div className="stat-tile-text">
-                      <div className="stat-value">{formatHours(today.napMinutes / 60) || '0m'}</div>
-                      <div className="stat-label">Sleep</div>
-                    </div>
-                  </div>
-                  <div className="stat-sub">{today.naps} {today.naps === 1 ? 'nap' : 'naps'}</div>
-                </div>
-              </div>
-            </>
+            <button
+              type="button"
+              className="stats-pill"
+              onClick={() => setStatsSheetOpen(true)}
+              aria-label={`Today's stats: ${today.feeds} feedings, ${today.diapers} diapers, ${formatHours(today.napMinutes / 60) || '0m'} sleep. Open details.`}
+            >
+              <span className="stats-pill-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 19V11M12 19V5M19 19v-6" /></svg>
+              </span>
+              <span className="stats-pill-label">Today</span>
+              <span className="stats-pill-summary">
+                {today.feeds} {today.feeds === 1 ? 'feed' : 'feeds'} · {today.diapers} {today.diapers === 1 ? 'diaper' : 'diapers'} · {formatHours(today.napMinutes / 60) || '0m'}
+              </span>
+              <svg className="stats-pill-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+            </button>
           )}
         </>
       )}
@@ -633,6 +596,70 @@ export default function Page() {
             >
               Skip — just log the time
             </button>
+          </div>
+        </div>
+      )}
+
+      {statsSheetOpen && today && (
+        <div className="modal-overlay" onClick={() => setStatsSheetOpen(false)}>
+          <div className="modal milk-sheet stats-sheet" role="dialog" aria-label="Today's stats" onClick={e => e.stopPropagation()}>
+            <div className="milk-sheet-grabber" aria-hidden="true" />
+            <div className="milk-sheet-head">
+              <h2 className="milk-sheet-title">Today's stats</h2>
+              <button type="button" className="milk-sheet-close" aria-label="Close" onClick={() => setStatsSheetOpen(false)}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+              </button>
+            </div>
+            <div className="stats-row">
+              {milk ? (
+                <button
+                  type="button"
+                  className="stat-tile stat-tile-feed stat-tile-btn"
+                  onClick={() => { setStatsSheetOpen(false); setMilkSheetOpen(true); }}
+                  aria-label={`${today.feeds} feedings, ${milk.oz} of ${milk.target} ounces, ${milk.statusText}. Open Daily Milk.`}
+                >
+                  <div className="stat-tile-row">
+                    <TileIcon name="feed" />
+                    <div className="stat-tile-text">
+                      <div className="stat-value">{today.feeds}</div>
+                      <div className="stat-label">Feedings</div>
+                    </div>
+                  </div>
+                  <div className="stat-sub">{milk.oz} / {milk.target} oz</div>
+                </button>
+              ) : (
+                <div className="stat-tile stat-tile-feed">
+                  <div className="stat-tile-row">
+                    <TileIcon name="feed" />
+                    <div className="stat-tile-text">
+                      <div className="stat-value">{today.feeds}</div>
+                      <div className="stat-label">Feedings</div>
+                    </div>
+                  </div>
+                  {todayExtra && <div className="stat-sub">Total: {todayExtra.ounces} oz</div>}
+                </div>
+              )}
+              <div className="stat-tile stat-tile-diaper">
+                <div className="stat-tile-row">
+                  <TileIcon name="diaper" />
+                  <div className="stat-tile-text">
+                    <div className="stat-value">{today.diapers}</div>
+                    <div className="stat-label">Diapers</div>
+                  </div>
+                </div>
+                {todayExtra && <div className="stat-sub">{todayExtra.wet} Wet &middot; {todayExtra.dirty} Dirty</div>}
+              </div>
+              <div className="stat-tile stat-tile-nap">
+                <div className="stat-tile-row">
+                  <TileIcon name="sleep" />
+                  <div className="stat-tile-text">
+                    <div className="stat-value">{formatHours(today.napMinutes / 60) || '0m'}</div>
+                    <div className="stat-label">Sleep</div>
+                  </div>
+                </div>
+                <div className="stat-sub">{today.naps} {today.naps === 1 ? 'nap' : 'naps'}</div>
+              </div>
+            </div>
           </div>
         </div>
       )}
