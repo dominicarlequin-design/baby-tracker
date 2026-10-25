@@ -3394,20 +3394,20 @@ body:has(.sky) { background: transparent; }
 .stats-sheet .stats-row { margin: 4px 0 6px; }
 
 /* ---------- Today layout polish ----------
-   1. Tile grid shares its outer edges with the cards above and below: the
-      left edge of Fed lines up with the left edge of Next up, and Journal
-      with its right edge. Tiles grow to fill the row on taller phones;
-      short phones keep their smaller fixed size, still flush to the edges.
+   1. Tile grid: fixed-size buttons with a 28px gap, centered within the
+      page margins. Short phones keep their smaller fixed size, spread to
+      the edges.
    2. Sun/moon sits inline after the date (see SkyGlyph), in the date's
       muted color, so it reads as part of the label rather than a button.
    3. Inactive tab labels are plain muted gray, so the active tab's color is
       the one thing that stands out. */
 .tile-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  justify-content: stretch;
-  column-gap: 40px; /* wider gaps = slightly smaller buttons (about 77pt on an iPhone 14) with the outer edges still flush */
+  --tile-size: 76px; /* slightly smaller than full width (was about 85pt), still a big tap target */
+  grid-template-columns: repeat(3, var(--tile-size));
+  justify-content: center;
+  column-gap: 28px; /* same gap as before; the row is centered within the margins */
 }
-.tile-grid .tile-icon { width: 100%; border-radius: 26px; }
+.tile-grid .tile-icon { width: var(--tile-size); border-radius: 24px; }
 @media (max-height: 740px) {
   .tile-grid {
     grid-template-columns: repeat(3, var(--tile-size));
