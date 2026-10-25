@@ -3755,15 +3755,17 @@ body:has(.sky) { background: transparent; }
 .journal-sheet-foot .modal-btn-delete { margin-top: 4px; }
 .journal-sheet-foot .form-message { margin: 0 0 8px; }
 
-/* ---------- Today: action buttons anchored to the bottom ----------
+/* ---------- Today: action buttons placed in the lower part ----------
    Information up top (date, Next up / Napping card), the six log buttons
-   down by the tab bar where a thumb reaches them one-handed. Today's page
-   becomes a full-height column and the button grid takes the leftover
-   space above itself (margin-top: auto), so the gap sits between the card
-   and the buttons. On short phones there is no leftover space and the
-   layout is the same as before. Bottom padding clears the tab bar plus
-   the home-indicator area. */
+   lower down where a thumb reaches them more easily, but not pinned to
+   the tab bar. Today's page is a full-height column; the leftover space is
+   split between a spacer above the buttons and one below them, in the
+   ratio set by --gap-above / --gap-below. On short phones there is no
+   leftover space and the layout is the same as before. Bottom padding
+   clears the tab bar plus the home-indicator area. */
 .wrap:has(.tile-grid) {
+  --gap-above: 2;
+  --gap-below: 1;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -3771,4 +3773,6 @@ body:has(.sky) { background: transparent; }
   padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
 }
 .wrap:has(.tile-grid) > * { flex-shrink: 0; }
-.wrap:has(.tile-grid) > .tile-grid { margin-top: auto; margin-bottom: 0; padding-top: 24px; }
+.today-spacer { flex: var(--gap-above) 1 0px; min-height: 0; }
+.wrap:has(.tile-grid)::after { content: ''; flex: var(--gap-below) 1 0px; }
+.wrap:has(.tile-grid) > .tile-grid { margin-bottom: 0; }

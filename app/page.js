@@ -457,6 +457,9 @@ export default function Page() {
             </div>
           ))}
 
+          {/* Flexible gap above the buttons; see "Today: action buttons" in globals.css. */}
+          <div className="today-spacer" aria-hidden="true" />
+
           <div className="tile-grid">
             <button className={`tile-btn ${phaseClass(phase.feed)}`} onClick={() => setFeedPickerOpen(true)}>
               <TileIcon name="feed" phase={phase.feed} />
