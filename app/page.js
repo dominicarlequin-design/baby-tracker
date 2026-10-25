@@ -341,11 +341,18 @@ export default function Page() {
             <SkyGlyph now={now} timezone={timezone} />
           </div>
           <h1>
-            Today
-            {/* Decorative only, no favorites feature behind it. */}
-            <svg className="header-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-              <path d="M12 20.5s-7.5-4.6-10-9.3C.6 8 2 4.5 5.3 3.7c2-.5 4 .3 5.2 2 .3.4.9.4 1.2 0 1.2-1.7 3.2-2.5 5.2-2 3.3.8 4.7 4.3 3.3 7.5-2.5 4.7-10 9.3-10 9.3Z" />
-            </svg>
+            {/* The title doubles as the way into today's stats. The chevron is
+                the visible cue that it opens something. */}
+            <button
+              type="button"
+              className="today-title-btn"
+              onClick={() => setStatsSheetOpen(true)}
+              aria-label="Today. Open today's stats."
+              disabled={!today}
+            >
+              Today
+              <svg className="today-title-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+            </button>
           </h1>
         </div>
         <Link href="/upcoming" className="header-icon-btn" aria-label="Upcoming schedule">
@@ -499,22 +506,6 @@ export default function Page() {
             </Link>
           </div>
 
-          {today && (
-            <button
-              type="button"
-              className="stats-pill"
-              onClick={() => setStatsSheetOpen(true)}
-              aria-label={`Today's stats: ${today.feeds} feedings, ${today.diapers} diapers, ${formatHours(today.napMinutes / 60) || '0m'} sleep. Open details.`}
-            >
-              <span className="stats-pill-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 19V11M12 19V5M19 19v-6" /></svg>
-              </span>
-              <span className="stats-pill-summary">
-                {today.feeds} {today.feeds === 1 ? 'feed' : 'feeds'} · {today.diapers} {today.diapers === 1 ? 'diaper' : 'diapers'} · {formatHours(today.napMinutes / 60) || '0m'}
-              </span>
-              <svg className="stats-pill-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
-            </button>
-          )}
         </>
       )}
 

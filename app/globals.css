@@ -3421,3 +3421,28 @@ body:has(.sky) { background: transparent; }
 .sky-glyph { flex: none; width: 15px; height: 15px; }
 
 .tab-item:not(.tab-active) { color: var(--ink-muted); }
+
+/* ---------- "Today" title opens stats ----------
+   The page title is a button with a small chevron (the cue that it opens
+   something, like iOS title menus). Looks like the plain heading otherwise. */
+.today-title-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.12s ease;
+}
+.today-title-btn:active { opacity: 0.6; }
+.today-title-chevron {
+  width: 20px;
+  height: 20px;
+  margin-top: 4px;
+  color: var(--accent-text);
+  opacity: 0.75;
+}
