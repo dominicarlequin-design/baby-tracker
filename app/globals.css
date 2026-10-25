@@ -3446,3 +3446,21 @@ body:has(.sky) { background: transparent; }
   color: var(--accent-text);
   opacity: 0.75;
 }
+
+/* ---------- Room at the top ----------
+   Taller phones: every screen starts 32px below the status bar (Today was
+   12px, the other tabs 16px), so the date and title get breathing room
+   instead of hugging the top. The header line art (constellation) and the
+   doodles' header gap move down by the same 20px so they stay lined up
+   with the header. Short phones keep their compact top. */
+@media (min-height: 741px) {
+  .wrap,
+  .wrap:has(.tile-grid) {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 32px);
+  }
+  .sky-head { top: calc(env(safe-area-inset-top, 0px) + 20px); }
+  .sky-doodles {
+    -webkit-mask-image: linear-gradient(transparent 0, transparent 116px, #000 170px, #000 55%, transparent 92%);
+    mask-image: linear-gradient(transparent 0, transparent 116px, #000 170px, #000 55%, transparent 92%);
+  }
+}
