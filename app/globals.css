@@ -3541,3 +3541,109 @@ body:has(.sky) { background: transparent; }
   letter-spacing: 0;
   white-space: nowrap;
 }
+
+/* ---------- Journal feed (app/journal/page.js) ----------
+   Every past entry, newest first, grouped by month. Each card shows the
+   title, date, mood, her age that day, a 3-line preview of the note, and
+   that day's feeds / diapers / naps. Tapping a card opens the editor sheet. */
+.journal-new-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 0;
+}
+.journal-new-btn svg { width: 18px; height: 18px; }
+.journal-digest-link {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 12px 2px 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-text);
+  text-decoration: none;
+}
+.journal-digest-sub { flex: 1; font-weight: 500; color: var(--ink-muted); font-size: 13px; }
+.journal-digest-link svg { width: 16px; height: 16px; align-self: center; color: var(--ink-muted); }
+.journal-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; }
+.journal-filter {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--ink-muted);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.journal-filter.is-on {
+  background: color-mix(in srgb, var(--accent) 12%, var(--card));
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  color: var(--accent-text);
+}
+.journal-month { margin-top: 18px; }
+.journal-month-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  margin: 0 2px 8px;
+}
+.journal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.journal-card:active { transform: scale(0.99); opacity: 0.85; }
+.journal-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.journal-card-title {
+  font-weight: 700;
+  font-size: 16px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.journal-card-date { flex: none; font-size: 12.5px; color: var(--ink-muted); }
+.journal-card-meta { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-muted); }
+.journal-mood {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+  color: var(--lilac-deep);
+  background: color-mix(in srgb, var(--lilac-deep) 13%, var(--card));
+}
+.journal-mood-milestone { color: var(--due-soon); background: color-mix(in srgb, var(--butter-yellow) 28%, var(--card)); }
+.journal-mood-happy { color: var(--berry-deep); background: color-mix(in srgb, var(--blush-rose) 16%, var(--card)); }
+.journal-mood-fussy, .journal-mood-sick { color: var(--overdue); background: color-mix(in srgb, var(--overdue) 10%, var(--card)); }
+.journal-card-note {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink);
+  white-space: pre-wrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.journal-card-stats { font-size: 12.5px; color: var(--ink-muted); }
+.journal-empty { padding: 20px 16px; font-size: 14px; color: var(--ink-muted); text-align: center; }
+.journal-sheet { max-height: 88vh; overflow-y: auto; }
+.journal-sheet .form-textarea { min-height: 150px; }

@@ -499,7 +499,7 @@ export default function Page() {
               <span className="tile-label">Medicine</span>
               <span className="tile-sub">{medicineNext ? `next ${formatLocalTime(medicineNext.toISOString(), timezone)}` : 'no schedule'}</span>
             </button>
-            <Link href="/journal" className="tile-btn">
+            <Link href="/journal?new=1" className="tile-btn">
               <TileIcon name="journal" />
               <span className="tile-label">Journal</span>
               <span className="tile-sub">write a note</span>
