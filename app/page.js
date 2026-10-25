@@ -509,7 +509,6 @@ export default function Page() {
               <span className="stats-pill-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 19V11M12 19V5M19 19v-6" /></svg>
               </span>
-              <span className="stats-pill-label">Stats</span>
               <span className="stats-pill-summary">
                 {today.feeds} {today.feeds === 1 ? 'feed' : 'feeds'} · {today.diapers} {today.diapers === 1 ? 'diaper' : 'diapers'} · {formatHours(today.napMinutes / 60) || '0m'}
               </span>
