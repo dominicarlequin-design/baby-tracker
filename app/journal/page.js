@@ -21,6 +21,56 @@ const MOODS = [
 const MOOD_LABELS = Object.fromEntries(MOODS.map(m => [m.key, m.label]));
 
 const ENTRY_LIMIT = 500;
+const PHOTO_BUCKET = 'journal-photos'; // private; shown through signed URLs
+const PHOTO_MAX_SIDE = 1600;          // resized before upload to keep files small
+
+// Shown as the note's placeholder when it's empty, with a shuffle button.
+const PROMPTS = [
+  'What made her laugh today?',
+  'What new thing did she try?',
+  'What did she stare at the longest?',
+  'What sound is she making lately?',
+  'What calmed her down today?',
+  'Who did she meet or see today?',
+  'What do you want to remember about today?',
+  'What was the sweetest moment?',
+  'What was hard today, and what helped?',
+  'How does she react to music right now?',
+  'What is she reaching for these days?',
+  'What did she do that surprised you?',
+  'What is her favorite spot in the house?',
+  'What did bath time look like today?',
+  'What faces is she making?',
+  'What would you tell her about this week?',
+];
+const randomPrompt = (avoid) => {
+  const options = PROMPTS.filter(p => p !== avoid);
+  return options[Math.floor(Math.random() * options.length)];
+};
+
+// Shrinks a picked photo to at most PHOTO_MAX_SIDE on its long edge and
+// re-encodes it as JPEG, so a 4 MB iPhone photo uploads as a few hundred KB.
+async function resizePhoto(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("Couldn't read that photo"));
+      el.src = url;
+    });
+    const scale = Math.min(1, PHOTO_MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(img.naturalWidth * scale);
+    canvas.height = Math.round(img.naturalHeight * scale);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    return await new Promise((resolve, reject) =>
+      canvas.toBlob(b => (b ? resolve(b) : reject(new Error("Couldn't process that photo"))), 'image/jpeg', 0.82)
+    );
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
 const PAGE_SIZE = 1000; // Supabase returns at most 1000 rows per request
 
 // Same fetch-with-a-timeout shape as before: a hung request (not just a
@@ -97,6 +147,12 @@ export default function JournalPage() {
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [message, setMessage] = useState(null);
+  const [prompt, setPrompt] = useState(PROMPTS[0]);
+  const [photoUrls, setPhotoUrls] = useState({});   // photo_path -> signed URL
+  const [photoBlob, setPhotoBlob] = useState(null); // newly picked, not yet uploaded
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const [removePhoto, setRemovePhoto] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
   const [toast, setToast] = useState(null);
   const [toastShow, setToastShow] = useState(false);
   const toastTimeoutRef = useRef(null);
@@ -142,6 +198,19 @@ export default function JournalPage() {
     setDayStats(stats);
   }, []);
 
+  // Private bucket, so each photo gets a signed URL good for a few hours.
+  const loadPhotoUrls = useCallback(async (list) => {
+    const paths = list.map(e => e.photo_path).filter(Boolean);
+    if (!paths.length) return;
+    const { data, error } = await supabase.storage.from(PHOTO_BUCKET).createSignedUrls(paths, 60 * 60 * 6);
+    if (error) { console.error(error); return; }
+    setPhotoUrls(prev => {
+      const next = { ...prev };
+      for (const item of data || []) if (item.signedUrl) next[item.path] = item.signedUrl;
+      return next;
+    });
+  }, []);
+
   const loadAll = useCallback(async () => {
     let tz = 'America/New_York';
     try {
@@ -157,6 +226,7 @@ export default function JournalPage() {
       setLoadError(false);
       setLoading(false);
       loadDayStats(entriesRes.data || [], tz);
+      loadPhotoUrls(entriesRes.data || []);
     } catch (err) {
       console.error(err);
       setTimezone(tz);
@@ -164,7 +234,7 @@ export default function JournalPage() {
       setLoading(false);
     }
     return tz;
-  }, [loadDayStats]);
+  }, [loadDayStats, loadPhotoUrls]);
 
   const openEditor = useCallback((entry, tz) => {
     setEditor({ entry });
@@ -174,6 +244,35 @@ export default function JournalPage() {
     setEntryValue(isoToLocalDatetimeInputValue(entry ? entry.entry_time : new Date().toISOString(), tz));
     setConfirmDelete(false);
     setMessage(null);
+    setPhotoBlob(null);
+    setPhotoPreview(prev => { if (prev) URL.revokeObjectURL(prev); return null; });
+    setRemovePhoto(false);
+    setPrompt(randomPrompt());
+  }, []);
+
+  const pickPhoto = useCallback(async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = ''; // so picking the same photo again still fires
+    if (!file) return;
+    setPhotoBusy(true);
+    setMessage(null);
+    try {
+      const blob = await resizePhoto(file);
+      setPhotoBlob(blob);
+      setPhotoPreview(prev => { if (prev) URL.revokeObjectURL(prev); return URL.createObjectURL(blob); });
+      setRemovePhoto(false);
+    } catch (err) {
+      console.error(err);
+      setMessage(err.message || "Couldn't use that photo.");
+    } finally {
+      setPhotoBusy(false);
+    }
+  }, []);
+
+  const clearPhoto = useCallback(() => {
+    setPhotoBlob(null);
+    setPhotoPreview(prev => { if (prev) URL.revokeObjectURL(prev); return null; });
+    setRemovePhoto(true);
   }, []);
 
   useEffect(() => {
@@ -214,10 +313,27 @@ export default function JournalPage() {
         entry_time: localDateTimeToUtc(datePart, timePart, timezone).toISOString(),
       };
       const editing = editor?.entry;
+      const oldPath = editing?.photo_path || null;
+      let newPath = oldPath;
+      if (photoBlob) {
+        newPath = `${crypto.randomUUID()}.jpg`;
+        const { error: upErr } = await supabase.storage.from(PHOTO_BUCKET)
+          .upload(newPath, photoBlob, { contentType: 'image/jpeg', cacheControl: '31536000' });
+        if (upErr) throw upErr;
+      } else if (removePhoto) {
+        newPath = null;
+      }
+      row.photo_path = newPath;
       const { data, error } = editing
         ? await supabase.from('baby_journal').update(row).eq('id', editing.id).select().single()
         : await supabase.from('baby_journal').insert(row).select().single();
-      if (error) throw error;
+      if (error) {
+        if (photoBlob) supabase.storage.from(PHOTO_BUCKET).remove([newPath]);
+        throw error;
+      }
+      // The entry now points at the new photo (or none), so the old file can go.
+      if (oldPath && oldPath !== newPath) supabase.storage.from(PHOTO_BUCKET).remove([oldPath]);
+      if (newPath && photoPreview) setPhotoUrls(prev => ({ ...prev, [newPath]: photoPreview }));
       if (fromTodayRef.current && !editing) {
         router.push('/');
         return;
@@ -226,6 +342,12 @@ export default function JournalPage() {
         .sort((a, b) => new Date(b.entry_time) - new Date(a.entry_time));
       setEntries(next);
       loadDayStats(next, timezone);
+      if (newPath && newPath !== oldPath) {
+        // Keep the local preview showing until a signed URL replaces it.
+        setPhotoPreview(null);
+        setPhotoBlob(null);
+        loadPhotoUrls([data]);
+      }
       closeEditor();
       showToast(editing ? 'Entry updated' : 'Entry saved');
     } catch (err) {
@@ -234,7 +356,7 @@ export default function JournalPage() {
     } finally {
       setSaving(false);
     }
-  }, [note, title, mood, entryValue, timezone, editor, entries, router, loadDayStats, closeEditor, showToast]);
+  }, [note, title, mood, entryValue, timezone, editor, entries, router, loadDayStats, loadPhotoUrls, closeEditor, showToast, photoBlob, photoPreview, removePhoto]);
 
   const handleDelete = useCallback(async () => {
     const entry = editor?.entry;
@@ -245,6 +367,7 @@ export default function JournalPage() {
     try {
       const { error } = await supabase.from('baby_journal').delete().eq('id', entry.id);
       if (error) throw error;
+      if (entry.photo_path) supabase.storage.from(PHOTO_BUCKET).remove([entry.photo_path]);
       setEntries(prev => prev.filter(e => e.id !== entry.id));
       closeEditor();
       showToast('Entry deleted');
@@ -326,6 +449,9 @@ export default function JournalPage() {
               const s = dayStats[day];
               return (
                 <button key={entry.id} type="button" className="journal-card" onClick={() => openEditor(entry, timezone)}>
+                  {entry.photo_path && photoUrls[entry.photo_path] && (
+                    <img className="journal-card-photo" src={photoUrls[entry.photo_path]} alt="" loading="lazy" />
+                  )}
                   <span className="journal-card-head">
                     <span className="journal-card-title">{entry.title || 'Journal entry'}</span>
                     <span className="journal-card-date">{shortDate(day)} · {formatLocalTime(entry.entry_time, timezone)}</span>
@@ -379,11 +505,42 @@ export default function JournalPage() {
             <textarea
               id="journal-note"
               className="form-input form-textarea"
-              placeholder="What happened?"
+              placeholder={prompt}
               value={note}
               onChange={e => setNote(e.target.value)}
-              style={{ marginBottom: '14px' }}
+              style={{ marginBottom: note ? '14px' : '6px' }}
             />
+            {!note && (
+              <button type="button" className="journal-prompt-shuffle" onClick={() => setPrompt(p => randomPrompt(p))}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.5-4.5L4 8M4 4v4h4M4 13a8 8 0 0 0 14.5 4.5L20 16M20 20v-4h-4" /></svg>
+                Another prompt
+              </button>
+            )}
+
+            <div className="form-label">Photo (optional)</div>
+            {(() => {
+              const current = photoPreview || (!removePhoto && editor.entry?.photo_path ? photoUrls[editor.entry.photo_path] : null);
+              return current ? (
+                <div className="journal-photo-edit">
+                  <img src={current} alt="" />
+                  <div className="journal-photo-actions">
+                    <label className="journal-photo-btn">
+                      Replace
+                      <input type="file" accept="image/*" onChange={pickPhoto} hidden />
+                    </label>
+                    <button type="button" className="journal-photo-btn" onClick={clearPhoto}>Remove</button>
+                  </div>
+                </div>
+              ) : (
+                <label className={`journal-photo-add${photoBusy ? ' is-busy' : ''}`}>
+                  {photoBusy ? <span className="btn-spinner" /> : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="3" /><circle cx="12" cy="13" r="3.5" /><path d="M9 6l1.5-2h3L15 6" /></svg>
+                  )}
+                  {photoBusy ? 'Preparing photo…' : 'Add a photo'}
+                  <input type="file" accept="image/*" onChange={pickPhoto} hidden disabled={photoBusy} />
+                </label>
+              );
+            })()}
 
             <div className="form-label">Mood (optional)</div>
             <div className="mood-grid" style={{ marginBottom: '14px' }}>
@@ -411,7 +568,7 @@ export default function JournalPage() {
             <button
               className={`modal-btn-confirm form-save ${saving ? 'is-loading' : ''}`}
               onClick={handleSave}
-              disabled={saving || deleting}
+              disabled={saving || deleting || photoBusy}
             >
               {saving && <span className="btn-spinner" />}
               {saving ? 'Saving…' : editor.entry ? 'Save changes' : 'Save entry'}
