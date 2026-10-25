@@ -3214,13 +3214,13 @@ button:focus-visible {
 .milk-bar { margin-top: 5px; }
 
 /* ---------- Today: even spacing ----------
-   32px side margins (was 24), and the three button columns spread
+   40px side margins (was 24), and the three button columns spread
    with space-evenly and no extra column gap, so the space between buttons
    matches the space out to the margins (about 30px each on an iPhone 14).
    Stats icon shrinks a touch so "Feedings" still fits at the wider margins. */
 .wrap:has(.tile-grid) {
-  padding-left: 32px;
-  padding-right: 32px;
+  padding-left: 40px;
+  padding-right: 40px;
 }
 .tile-grid {
   justify-content: space-evenly;
@@ -3230,12 +3230,12 @@ button:focus-visible {
 .stat-tile-row { grid-template-columns: 24px minmax(0, 1fr); column-gap: 5px; }
 .stat-tile .tile-icon { width: 24px; height: 24px; border-radius: 7px; }
 
-/* Same 32px side margins on every screen, so content lines up with Today
-   when switching tabs. (24px felt too close to the edge once the tiles
-   filled the full width.) */
+/* Same 40px side margins on every screen, so content lines up with Today
+   when switching tabs. (24px, then 32px, still felt too close to the edge
+   once the tiles filled the full width.) */
 .wrap {
-  padding-left: 32px;
-  padding-right: 32px;
+  padding-left: 40px;
+  padding-right: 40px;
 }
 
 /* ---------- Today's stats, toned down ----------
