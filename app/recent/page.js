@@ -13,6 +13,7 @@ import {
   activityDetailSuffix,
   activityDotClass,
   TYPE_LABELS,
+  TileIcon,
 } from '../../lib/homeUi';
 
 const EVENT_TYPES = ['feed', 'diaper', 'nap_start', 'nap_end', 'medicine', 'sleep_start', 'sleep_end'];
@@ -24,16 +25,17 @@ const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 const HISTORY_DAYS = 30;
 const RECENT_ACTIVITY_LIMIT = 60;
 
-// Category chips at the top. "All" is the original timeline; the others
-// filter to one kind and add a per-day total beside each day label.
-const FILTERS = [
-  { key: 'all', label: 'All' },
-  { key: 'feed', label: 'Feeds' },
-  { key: 'diaper', label: 'Diapers' },
-  { key: 'sleep', label: 'Sleep' },
-  { key: 'medicine', label: 'Meds' },
+// History opens as a short stack of category buttons. Tapping one drops
+// down that category's history underneath it (one open at a time).
+const CATEGORIES = [
+  { key: 'feed', label: 'Feeds', icon: 'feed', none: 'No feeds yet today' },
+  { key: 'diaper', label: 'Diapers', icon: 'diaper', none: 'No diapers yet today' },
+  { key: 'sleep', label: 'Sleep', icon: 'sleep', none: 'No naps yet today' },
+  { key: 'medicine', label: 'Medicine', icon: 'medicine', none: 'No medicine yet today' },
+  { key: 'all', label: 'All activity', icon: null, none: 'Nothing logged yet today' },
 ];
 const EMPTY_TEXT = {
+  all: 'Nothing logged in the last 30 days.',
   feed: 'No feeds in the last 30 days.',
   diaper: 'No diapers in the last 30 days.',
   sleep: 'No naps or night sleep in the last 30 days.',
@@ -86,7 +88,7 @@ export default function RecentPage() {
   const [editDiaperDetail, setEditDiaperDetail] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
   const [deletingEdit, setDeletingEdit] = useState(false);
-  const [filter, setFilter] = useState('all');
+  const [openKey, setOpenKey] = useState(null);
   const toastTimeoutRef = useRef(null);
 
   const fetchAll = useCallback(async () => {
@@ -123,25 +125,55 @@ export default function RecentPage() {
   }, []);
 
   const timezone = config?.timezone || 'America/New_York';
-  // "All" keeps the original cap of recent events. A single category looks
-  // back over the whole 30-day window (capped at the same number of rows),
-  // so e.g. Meds isn't limited to whatever happened in the last day or two.
-  const activityGroups = useMemo(() => {
-    if (filter === 'all') return buildActivityGroups(events.slice(0, RECENT_ACTIVITY_LIMIT), timezone, now);
-    let left = RECENT_ACTIVITY_LIMIT;
-    const groups = [];
-    // Sleep pairs nap start/end from sleep entries only, so a diaper or feed
-    // logged mid-nap doesn't split one nap into two separate rows.
-    const source = filter === 'sleep' ? events.filter(e => SLEEP_TYPES.includes(e.type)) : events;
-    for (const g of buildActivityGroups(source, timezone, now)) {
-      if (left <= 0) break;
-      const items = g.items.filter(i => categoryOf(i) === filter).slice(0, left);
-      if (!items.length) continue;
-      left -= items.length;
-      groups.push({ ...g, items, summary: daySummary(filter, items) });
+  // Day-grouped history for each category. "All" keeps the original cap of
+  // recent events; a single category looks back over the whole 30-day
+  // window (capped at the same number of rows).
+  const groupsByCategory = useMemo(() => {
+    const out = { all: buildActivityGroups(events.slice(0, RECENT_ACTIVITY_LIMIT), timezone, now) };
+    for (const { key } of CATEGORIES) {
+      if (key === 'all') continue;
+      let left = RECENT_ACTIVITY_LIMIT;
+      const groups = [];
+      // Sleep pairs nap start/end from sleep entries only, so a diaper or
+      // feed logged mid-nap doesn't split one nap into two separate rows.
+      const source = key === 'sleep' ? events.filter(e => SLEEP_TYPES.includes(e.type)) : events;
+      for (const g of buildActivityGroups(source, timezone, now)) {
+        if (left <= 0) break;
+        const items = g.items.filter(i => categoryOf(i) === key).slice(0, left);
+        if (!items.length) continue;
+        left -= items.length;
+        groups.push({ ...g, items, summary: daySummary(key, items) });
+      }
+      out[key] = groups;
     }
-    return groups;
-  }, [events, timezone, now, filter]);
+    return out;
+  }, [events, timezone, now]);
+
+  // Today's line under each category button, kept short enough to fit on
+  // one line ("4 today · 3 wet · 2 dirty").
+  const todayLine = (cat) => {
+    const groups = groupsByCategory[cat.key] || [];
+    const today = groups[0]?.label === 'Today' ? groups[0] : null;
+    if (!today) return cat.none;
+    const items = today.items;
+    if (cat.key === 'feed') {
+      const oz = items.reduce((sum, i) => sum + (i.raw.feed_ounces || 0), 0);
+      return `${items.length} today` + (oz ? ` · ${oz} oz` : '');
+    }
+    if (cat.key === 'diaper') {
+      const wet = items.filter(i => i.raw.diaper_detail === 'pee' || i.raw.diaper_detail === 'both').length;
+      const dirty = items.filter(i => i.raw.diaper_detail === 'poop' || i.raw.diaper_detail === 'both').length;
+      return `${items.length} today · ${wet} wet · ${dirty} dirty`;
+    }
+    if (cat.key === 'sleep') {
+      const naps = items.filter(i => i.kind === 'nap');
+      if (!naps.length) return cat.none;
+      const hours = naps.reduce((sum, i) => sum + (new Date(i.end) - new Date(i.start)) / 3600000, 0);
+      return `${plural(naps.length, 'nap', 'naps')} today · ${formatHours(hours)}`;
+    }
+    if (cat.key === 'medicine') return `${plural(items.length, 'dose', 'doses')} today`;
+    return `${plural(items.length, 'entry', 'entries')} today`;
+  };
 
   const openEdit = useCallback((event) => {
     if (typeof event.id !== 'number') return; // not yet reconciled with the server
@@ -217,64 +249,79 @@ export default function RecentPage() {
         </div>
       </div>
 
-      <div className="swipe-tabs history-tabs" role="group" aria-label="Show">
-        {FILTERS.map(f => (
-          <button
-            key={f.key}
-            type="button"
-            className={`swipe-tab${f.key === filter ? ' is-on' : ''}`}
-            aria-pressed={f.key === filter}
-            onClick={() => setFilter(f.key)}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
-
       {loading ? (
         <div className="card"><div className="info-item">Loading{'…'}</div></div>
       ) : (
-        <div className="card">
-          <div className="history">
-            {activityGroups.length === 0 ? (
-              <div className="info-item">{filter === 'all' ? 'Nothing logged yet.' : EMPTY_TEXT[filter]}</div>
-            ) : (
-              activityGroups.map(group => (
-                <div key={group.dayStr} className="activity-group">
-                  <div className="activity-day-label">
-                    <span>{group.label}</span>
-                    {group.summary && <span className="activity-day-summary">{group.summary}</span>}
+        <div className="history-cats">
+          {CATEGORIES.map(cat => {
+            const open = openKey === cat.key;
+            const groups = groupsByCategory[cat.key] || [];
+            return (
+              <div key={cat.key} className={`history-cat${open ? ' is-open' : ''}`}>
+                <button
+                  type="button"
+                  className="history-cat-head"
+                  aria-expanded={open}
+                  onClick={() => setOpenKey(open ? null : cat.key)}
+                >
+                  {cat.icon ? (
+                    <TileIcon name={cat.icon} />
+                  ) : (
+                    <span className="tile-icon history-cat-all-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M8 7h11M8 12h11M8 17h11M4.5 7h.01M4.5 12h.01M4.5 17h.01" /></svg>
+                    </span>
+                  )}
+                  <span className="history-cat-text">
+                    <span className="history-cat-label">{cat.label}</span>
+                    <span className="history-cat-sub">{todayLine(cat)}</span>
+                  </span>
+                  <svg className="history-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+                </button>
+                {open && (
+                  <div className="history history-cat-body">
+                    {groups.length === 0 ? (
+                      <div className="info-item">{EMPTY_TEXT[cat.key]}</div>
+                    ) : (
+                      groups.map(group => (
+                        <div key={group.dayStr} className="activity-group">
+                          <div className="activity-day-label">
+                            <span>{group.label}</span>
+                            {group.summary && <span className="activity-day-summary">{group.summary}</span>}
+                          </div>
+                          {group.items.map(item => (
+                            <button key={item.id} className="activity-item" onClick={() => openEdit(item.raw)}>
+                              {item.kind === 'nap' ? (
+                                <>
+                                  <span className="activity-type">
+                                    <span className={`activity-dot ${activityDotClass(item)}`} aria-hidden="true" />
+                                    Nap · {formatHours((new Date(item.end) - new Date(item.start)) / (1000 * 60 * 60))}
+                                  </span>
+                                  <span className="activity-time">
+                                    {formatLocalTime(item.start, timezone)} – {formatLocalTime(item.end, timezone)}
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="activity-type">
+                                    <span className={`activity-dot ${activityDotClass(item)}`} aria-hidden="true" />
+                                    {TYPE_LABELS[item.type] || item.type}{activityDetailSuffix(item.raw)}
+                                  </span>
+                                  <span className="activity-time">
+                                    {formatLocalTime(item.event_time, timezone)}
+                                    {group.label === 'Today' ? ` · ${formatRelative(item.event_time, now)}` : ''}
+                                  </span>
+                                </>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      ))
+                    )}
                   </div>
-                  {group.items.map(item => (
-                    <button key={item.id} className="activity-item" onClick={() => openEdit(item.raw)}>
-                      {item.kind === 'nap' ? (
-                        <>
-                          <span className="activity-type">
-                            <span className={`activity-dot ${activityDotClass(item)}`} aria-hidden="true" />
-                            Nap · {formatHours((new Date(item.end) - new Date(item.start)) / (1000 * 60 * 60))}
-                          </span>
-                          <span className="activity-time">
-                            {formatLocalTime(item.start, timezone)} – {formatLocalTime(item.end, timezone)}
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="activity-type">
-                            <span className={`activity-dot ${activityDotClass(item)}`} aria-hidden="true" />
-                            {TYPE_LABELS[item.type] || item.type}{activityDetailSuffix(item.raw)}
-                          </span>
-                          <span className="activity-time">
-                            {formatLocalTime(item.event_time, timezone)}
-                            {group.label === 'Today' ? ` · ${formatRelative(item.event_time, now)}` : ''}
-                          </span>
-                        </>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              ))
-            )}
-          </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
