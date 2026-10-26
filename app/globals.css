@@ -3825,8 +3825,8 @@ body:has(.sky) { background: transparent; }
   border-radius: 14px;
 }
 .tab-active .tab-icon-wrap {
-  background: color-mix(in srgb, #f6b3c6 var(--chip-mix, 32%), var(--card));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #f6b3c6 45%, transparent);
+  background: color-mix(in srgb, var(--glow-tint, #f6b3c6) var(--chip-mix, 32%), var(--card));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--glow-tint, #f6b3c6) 45%, transparent);
 }
 .tab-icon { width: 28px; height: 28px; opacity: 0.92; }
 .tab-active .tab-icon { opacity: 1; transform: none; }
@@ -4487,8 +4487,8 @@ body:has(.sky) { background: transparent; }
   border-radius: 14px;
   opacity: 0;
   pointer-events: none;
-  background: color-mix(in srgb, #f6b3c6 var(--chip-mix, 32%), var(--card));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #f6b3c6 45%, transparent);
+  background: color-mix(in srgb, var(--glow-tint, #f6b3c6) var(--chip-mix, 32%), var(--card));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--glow-tint, #f6b3c6) 45%, transparent);
   transition: transform 0.38s cubic-bezier(0.3, 1.25, 0.5, 1), opacity 0.2s ease;
 }
 .tab-bar.has-glow .tab-active .tab-icon-wrap { background: transparent; box-shadow: none; }
@@ -4719,3 +4719,184 @@ body:has(.sky) { background: transparent; }
 :root[data-theme="dark"] .tab-fab { box-shadow: 0 0 0 5px var(--bar-bg), 0 -6px 14px -8px rgba(0, 0, 0, 0.5); }
 .tab-fab:active { transform: translateY(2px) scale(0.94); }
 
+
+
+/* =====================================================================
+   Skins (lib/skin.js; picked in Profile → App look)
+   Blossom is the original look (no attribute). Each other skin swaps the
+   accent, borders, input fill, tab bar tint, highlight tint and doodle
+   line color, plus a matching dark-mode night sky. Status colors (due
+   soon, overdue) and the category colors (feed yellow, diaper pink...)
+   stay the same in every skin so they always mean the same thing.
+   ===================================================================== */
+
+/* Tab bar tint and the dark night sky read from variables, so skins can
+   change them (defaults = Blossom). */
+.tab-bar { --bar-bg: color-mix(in srgb, var(--bar-tint, #fff3e4) 55%, var(--card)); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .tab-bar { --bar-bg: var(--bar-dark, rgba(42, 31, 85, 0.78)); }
+  :root:not([data-theme="light"]) { background: var(--night-bottom, #130c2b); }
+  :root:not([data-theme="light"]) body::before {
+    background:
+      radial-gradient(120% 55% at 85% -8%, var(--night-haze-1, rgba(176, 132, 255, 0.38)), transparent 60%),
+      radial-gradient(90% 45% at -10% 35%, var(--night-haze-2, rgba(236, 128, 190, 0.12)), transparent 60%),
+      radial-gradient(100% 40% at 50% 110%, var(--night-haze-3, rgba(110, 120, 230, 0.12)), transparent 60%),
+      linear-gradient(180deg, var(--night-top, #271b52) 0%, var(--night-mid, #1c1340) 45%, var(--night-bottom, #130c2b) 100%);
+  }
+}
+:root[data-theme="dark"] .tab-bar { --bar-bg: var(--bar-dark, rgba(42, 31, 85, 0.78)); }
+:root[data-theme="dark"] { background: var(--night-bottom, #130c2b); }
+:root[data-theme="dark"] body::before {
+  background:
+    radial-gradient(120% 55% at 85% -8%, var(--night-haze-1, rgba(176, 132, 255, 0.38)), transparent 60%),
+    radial-gradient(90% 45% at -10% 35%, var(--night-haze-2, rgba(236, 128, 190, 0.12)), transparent 60%),
+    radial-gradient(100% 40% at 50% 110%, var(--night-haze-3, rgba(110, 120, 230, 0.12)), transparent 60%),
+    linear-gradient(180deg, var(--night-top, #271b52) 0%, var(--night-mid, #1c1340) 45%, var(--night-bottom, #130c2b) 100%);
+}
+
+/* Moonlight */
+:root[data-skin="moonlight"] {
+  --accent: #4f5fc4;
+  --accent-text: #4f5fc4;
+  --border: #e3e6f6;
+  --soft-beige-tint: #f6f7fe;
+  --bar-tint: #e9edff;
+  --glow-tint: #c3cbf6;
+}
+:root[data-skin="moonlight"] .sky { --sky-line: #6f7fc0; }
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="moonlight"]:not([data-theme="light"]) {
+    --bg: #142049;
+    --card: #1d2b5c;
+    --border: #2c3a6e;
+    --soft-beige-tint: #1a2652;
+    --ink-muted: #aab3d6;
+    --accent-text: #a9b8ff;
+    --glass: rgba(32, 48, 102, 0.6);
+    --glass-edge: rgba(170, 190, 255, 0.18);
+    --bar-dark: rgba(29, 43, 92, 0.8);
+    --night-top: #22356f;
+    --night-mid: #142049;
+    --night-bottom: #0b1433;
+    --night-haze-1: rgba(140, 160, 255, 0.32);
+    --night-haze-2: rgba(250, 220, 150, 0.08);
+    --night-haze-3: rgba(120, 140, 230, 0.12);
+  }
+  :root[data-skin="moonlight"]:not([data-theme="light"]) .sky { --sky-line: #dfe6ff; }
+}
+:root[data-skin="moonlight"][data-theme="dark"] {
+  --bg: #142049;
+  --card: #1d2b5c;
+  --border: #2c3a6e;
+  --soft-beige-tint: #1a2652;
+  --ink-muted: #aab3d6;
+  --accent-text: #a9b8ff;
+  --glass: rgba(32, 48, 102, 0.6);
+  --glass-edge: rgba(170, 190, 255, 0.18);
+  --bar-dark: rgba(29, 43, 92, 0.8);
+  --night-top: #22356f;
+  --night-mid: #142049;
+  --night-bottom: #0b1433;
+  --night-haze-1: rgba(140, 160, 255, 0.32);
+  --night-haze-2: rgba(250, 220, 150, 0.08);
+  --night-haze-3: rgba(120, 140, 230, 0.12);
+}
+:root[data-skin="moonlight"][data-theme="dark"] .sky { --sky-line: #dfe6ff; }
+
+/* Sage */
+:root[data-skin="sage"] {
+  --accent: #2f7d5b;
+  --accent-text: #2f7d5b;
+  --border: #dcebe2;
+  --soft-beige-tint: #f5faf7;
+  --bar-tint: #e8f4ec;
+  --glow-tint: #b8dec8;
+}
+:root[data-skin="sage"] .sky { --sky-line: #6f9f88; }
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="sage"]:not([data-theme="light"]) {
+    --bg: #12251d;
+    --card: #1b3329;
+    --border: #2a4639;
+    --soft-beige-tint: #183026;
+    --ink-muted: #a9c4b6;
+    --accent-text: #8fdcb5;
+    --glass: rgba(30, 60, 46, 0.6);
+    --glass-edge: rgba(170, 230, 200, 0.16);
+    --bar-dark: rgba(27, 51, 41, 0.82);
+    --night-top: #1d3a2d;
+    --night-mid: #12251d;
+    --night-bottom: #0a1712;
+    --night-haze-1: rgba(120, 220, 170, 0.22);
+    --night-haze-2: rgba(230, 240, 180, 0.07);
+    --night-haze-3: rgba(90, 170, 200, 0.1);
+  }
+  :root[data-skin="sage"]:not([data-theme="light"]) .sky { --sky-line: #e0f2e8; }
+}
+:root[data-skin="sage"][data-theme="dark"] {
+  --bg: #12251d;
+  --card: #1b3329;
+  --border: #2a4639;
+  --soft-beige-tint: #183026;
+  --ink-muted: #a9c4b6;
+  --accent-text: #8fdcb5;
+  --glass: rgba(30, 60, 46, 0.6);
+  --glass-edge: rgba(170, 230, 200, 0.16);
+  --bar-dark: rgba(27, 51, 41, 0.82);
+  --night-top: #1d3a2d;
+  --night-mid: #12251d;
+  --night-bottom: #0a1712;
+  --night-haze-1: rgba(120, 220, 170, 0.22);
+  --night-haze-2: rgba(230, 240, 180, 0.07);
+  --night-haze-3: rgba(90, 170, 200, 0.1);
+}
+:root[data-skin="sage"][data-theme="dark"] .sky { --sky-line: #e0f2e8; }
+
+/* Sunset */
+:root[data-skin="sunset"] {
+  --accent: #c94a22;
+  --accent-text: #c94a22;
+  --border: #f5e2da;
+  --soft-beige-tint: #fff8f4;
+  --bar-tint: #ffeee3;
+  --glow-tint: #f8c4ae;
+}
+:root[data-skin="sunset"] .sky { --sky-line: #c08a7e; }
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="sunset"]:not([data-theme="light"]) {
+    --bg: #2a1520;
+    --card: #3a1f2c;
+    --border: #4f2c3c;
+    --soft-beige-tint: #331a26;
+    --ink-muted: #d0b0b6;
+    --accent-text: #ffab8f;
+    --glass: rgba(66, 34, 48, 0.6);
+    --glass-edge: rgba(255, 190, 170, 0.18);
+    --bar-dark: rgba(58, 31, 44, 0.82);
+    --night-top: #3d1d2c;
+    --night-mid: #2a1520;
+    --night-bottom: #1a0c14;
+    --night-haze-1: rgba(255, 140, 110, 0.28);
+    --night-haze-2: rgba(255, 200, 120, 0.1);
+    --night-haze-3: rgba(200, 110, 170, 0.12);
+  }
+  :root[data-skin="sunset"]:not([data-theme="light"]) .sky { --sky-line: #ffe6dc; }
+}
+:root[data-skin="sunset"][data-theme="dark"] {
+  --bg: #2a1520;
+  --card: #3a1f2c;
+  --border: #4f2c3c;
+  --soft-beige-tint: #331a26;
+  --ink-muted: #d0b0b6;
+  --accent-text: #ffab8f;
+  --glass: rgba(66, 34, 48, 0.6);
+  --glass-edge: rgba(255, 190, 170, 0.18);
+  --bar-dark: rgba(58, 31, 44, 0.82);
+  --night-top: #3d1d2c;
+  --night-mid: #2a1520;
+  --night-bottom: #1a0c14;
+  --night-haze-1: rgba(255, 140, 110, 0.28);
+  --night-haze-2: rgba(255, 200, 120, 0.1);
+  --night-haze-3: rgba(200, 110, 170, 0.12);
+}
+:root[data-skin="sunset"][data-theme="dark"] .sky { --sky-line: #ffe6dc; }
