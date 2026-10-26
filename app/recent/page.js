@@ -6,7 +6,9 @@ import { ThemeToggle } from '../../lib/theme';
 import { TabBar } from '../../lib/TabBar';
 import { EVENTS_CHANGED } from '../../lib/QuickLogSheet';
 import { parentName } from '../../lib/logText';
-import { isoToLocalDatetimeInputValue, localDateTimeToUtc } from '../../lib/logic';
+import { isoToLocalDatetimeInputValue, localDateTimeToUtc, localDateStr } from '../../lib/logic';
+import { dailySummaries } from '../../lib/summaries';
+import { dailyMilkTarget } from '../../lib/milk';
 import {
   formatLocalTime,
   formatRelative,
@@ -192,6 +194,28 @@ export default function RecentPage() {
     return `${plural(items.length, 'entry', 'entries')} today`;
   };
 
+  // Today's stats (moved here from the sheet behind Today's title): feeds
+  // with ounces against the daily milk goal, diapers wet/dirty, sleep.
+  const todayStats = useMemo(() => {
+    if (!config) return null;
+    const summary = dailySummaries(events, config, 1)[0];
+    if (!summary) return null;
+    const todayKey = localDateStr(now, timezone);
+    let ounces = 0;
+    let wet = 0;
+    let dirty = 0;
+    for (const e of events) {
+      if (localDateStr(new Date(e.event_time), timezone) !== todayKey) continue;
+      if (e.type === 'feed' && typeof e.feed_ounces === 'number') ounces += e.feed_ounces;
+      else if (e.type === 'diaper') {
+        if (e.diaper_detail === 'pee' || e.diaper_detail === 'both') wet++;
+        if (e.diaper_detail === 'poop' || e.diaper_detail === 'both') dirty++;
+      }
+    }
+    const goal = dailyMilkTarget(config.weight_lbs);
+    return { ...summary, ounces, wet, dirty, target: goal?.target ?? null };
+  }, [events, config, now, timezone]);
+
   const openEdit = useCallback((event) => {
     if (typeof event.id !== 'number') return; // not yet reconciled with the server
     setEditingEvent(event);
@@ -277,6 +301,46 @@ export default function RecentPage() {
       {loading ? (
         <div className="card"><div className="info-item">Loading{'…'}</div></div>
       ) : (
+        <>
+        {todayStats && (
+          <section className="history-stats" aria-label="Today's stats">
+            <h2 className="history-stats-title">Today&apos;s stats</h2>
+            <div className="stats-row">
+              <div className="stat-tile stat-tile-feed">
+                <div className="stat-tile-row">
+                  <TileIcon name="feed" />
+                  <div className="stat-tile-text">
+                    <div className="stat-value">{todayStats.feeds}</div>
+                    <div className="stat-label">Feeds</div>
+                  </div>
+                </div>
+                <div className="stat-sub">
+                  {todayStats.target ? `${todayStats.ounces} / ${todayStats.target} oz` : `Total: ${todayStats.ounces} oz`}
+                </div>
+              </div>
+              <div className="stat-tile stat-tile-diaper">
+                <div className="stat-tile-row">
+                  <TileIcon name="diaper" />
+                  <div className="stat-tile-text">
+                    <div className="stat-value">{todayStats.diapers}</div>
+                    <div className="stat-label">Diapers</div>
+                  </div>
+                </div>
+                <div className="stat-sub">{todayStats.wet} Wet &middot; {todayStats.dirty} Dirty</div>
+              </div>
+              <div className="stat-tile stat-tile-nap">
+                <div className="stat-tile-row">
+                  <TileIcon name="sleep" />
+                  <div className="stat-tile-text">
+                    <div className="stat-value">{formatHours(todayStats.napMinutes / 60) || '0m'}</div>
+                    <div className="stat-label">Sleep</div>
+                  </div>
+                </div>
+                <div className="stat-sub">{plural(todayStats.naps, 'nap', 'naps')}</div>
+              </div>
+            </div>
+          </section>
+        )}
         <div className="history-cats">
           {CATEGORIES.map(cat => {
             const open = openKey === cat.key;
@@ -349,6 +413,7 @@ export default function RecentPage() {
             );
           })}
         </div>
+        </>
       )}
 
       <div className={`toast ${toastShow ? 'show' : ''}`}>

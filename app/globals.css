@@ -4192,3 +4192,21 @@ body:has(.sky) { background: transparent; }
   box-shadow: 0 14px 34px -12px rgba(0, 0, 0, 0.7);
 }
 :root[data-theme="dark"] .partner-avatar { background: #5a3a7e; color: #ffc4dc; }
+
+/* ---------- History: today's stats ----------
+   The three stat tiles (feeds, diapers, sleep) at the top of History,
+   above the category buttons. */
+.history-stats { margin: 4px 0 18px; }
+.history-stats-title {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.history-stats .stats-row { margin-bottom: 0; }
+/* Smaller icons so "Feeds" / "Diapers" fit beside them at 40px margins. */
+.history-stats .stat-tile-row { column-gap: 5px; }
+.history-stats .stat-tile .tile-icon { width: 18px; height: 18px; border-radius: 6px; }
+.history-stats .stat-label { font-size: 12px; text-overflow: clip; }
