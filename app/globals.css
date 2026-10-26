@@ -4900,3 +4900,8 @@ body:has(.sky) { background: transparent; }
   :root[data-skin="olive"]:not([data-theme="light"]) .tab-icon-line { color: #e6eaf1; }
 }
 :root[data-skin="olive"][data-theme="dark"] .tab-icon-line { color: #e6eaf1; }
+
+/* Olive & Blue: Next up progress bar in Dom's Clementine (#d78d65), for
+   every category and for "due soon". Overdue keeps its red so a real
+   warning still stands out. */
+:root[data-skin="olive"] .nextup:not(.nextup-overdue) { --nextup-progress-color: #d78d65; }
