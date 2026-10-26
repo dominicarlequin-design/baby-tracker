@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { ThemeToggle } from '../../lib/theme';
 import { TabBar } from '../../lib/TabBar';
 import { EVENTS_CHANGED } from '../../lib/QuickLogSheet';
+import { parentName } from '../../lib/logText';
 import { isoToLocalDatetimeInputValue, localDateTimeToUtc } from '../../lib/logic';
 import {
   formatLocalTime,
@@ -333,6 +334,7 @@ export default function RecentPage() {
                                   <span className="activity-time">
                                     {formatLocalTime(item.event_time, timezone)}
                                     {group.label === 'Today' ? ` · ${formatRelative(item.event_time, now)}` : ''}
+                                    {parentName(item.raw?.logged_by) ? ` · ${parentName(item.raw.logged_by)}` : ''}
                                   </span>
                                 </>
                               )}

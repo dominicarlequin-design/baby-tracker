@@ -4107,3 +4107,88 @@ body:has(.sky) { background: transparent; }
 }
 :root[data-theme="dark"] .tab-fab { box-shadow: 0 0 0 6px var(--card), 0 10px 22px -6px rgba(255, 120, 190, 0.35); }
 :root[data-theme="dark"] .sky { --sky-line: #c8b8f5; --sky-doodle-opacity: 0.13; }
+
+/* ---------- Partner banner (lib/LogSync.js) ----------
+   Slides down from the top when the other parent logs something:
+   "Ysa logged a feed · 4 oz". The twin version (both of you logged the
+   same thing at once) adds a "Remove mine" button. */
+.partner-banner {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  left: 50%;
+  width: min(calc(100vw - 32px), 420px);
+  transform: translate(-50%, -140%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px 10px 10px;
+  border-radius: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 14px 34px -14px rgba(60, 40, 70, 0.45);
+  color: var(--ink);
+  z-index: 60;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.1), opacity 0.2s ease;
+}
+.partner-banner.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+.partner-avatar {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #f9d3e1;
+  color: #a2385f;
+  font-weight: 800;
+  font-size: 15px;
+}
+.partner-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.partner-title { font-size: 14.5px; font-weight: 700; line-height: 1.25; }
+.partner-detail { font-size: 13px; color: var(--ink-muted); line-height: 1.3; }
+.partner-action {
+  flex: none;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: var(--btn-ink);
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.partner-close {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.partner-close svg { width: 16px; height: 16px; }
+@media (prefers-reduced-motion: reduce) { .partner-banner { transition: opacity 0.2s ease; } }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .partner-banner {
+    background: rgba(54, 38, 98, 0.86);
+    border-color: var(--glass-edge);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+    box-shadow: 0 14px 34px -12px rgba(0, 0, 0, 0.7);
+  }
+  :root:not([data-theme="light"]) .partner-avatar { background: #5a3a7e; color: #ffc4dc; }
+}
+:root[data-theme="dark"] .partner-banner {
+  background: rgba(54, 38, 98, 0.86);
+  border-color: var(--glass-edge);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  box-shadow: 0 14px 34px -12px rgba(0, 0, 0, 0.7);
+}
+:root[data-theme="dark"] .partner-avatar { background: #5a3a7e; color: #ffc4dc; }

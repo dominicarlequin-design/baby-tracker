@@ -26,6 +26,9 @@ import {
 import {
   dailyMilkTarget, milkStatus, milkStatusText, usualFeedsPerDay, nextBottle, showEveningNudge,
 } from '../lib/milk';
+import { EVENTS_CHANGED } from '../lib/QuickLogSheet';
+import { useLogSync } from '../lib/LogSync';
+import { describeLog, findDoubleLog, whoLogged } from '../lib/logText';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -50,13 +53,11 @@ function AsleepCard({ kind, since, now, timezone }) {
   );
 }
 
-// Feed/Diaper/Medicine don't change appearance after a tap the way the
-// nap/sleep toggle buttons do (those flip to their "end" state as soon as
-// the optimistic insert lands, so a fast second tap hits a different
-// button). A real double-tap or two caregivers logging the same moment
-// within this window gets a confirm step instead of silently creating a
-// second row that skews the rolling averages.
-const DUPLICATE_GUARD_SECONDS = 60;
+// Double-log check: if the same thing was already logged a few minutes ago
+// (by you or by the other parent, whose logs arrive live via
+// lib/LogSync.js), ask before saving a second row that would skew the
+// rolling averages. Windows per type live in lib/logText.js
+// (DOUBLE_LOG_MINUTES: feed 15, diaper 10, medicine 30, nap/sleep 10).
 
 // Remembers (per device) which local day the evening milk banner was
 // dismissed on, so the X hides it for the rest of that day only.
@@ -66,7 +67,7 @@ function formatSecondsAgo(seconds) {
   const s = Math.max(0, Math.round(seconds));
   if (s < 60) return `${s} second${s === 1 ? '' : 's'} ago`;
   const m = Math.round(s / 60);
-  return `${m} minute${m === 1 ? '' : 's'} ago`;
+  return `${m} min ago`;
 }
 
 // Bounds how much history is fetched/rescanned on every load and 60s tick.
@@ -97,6 +98,7 @@ export default function Page() {
   const [lastJournalAt, setLastJournalAt] = useState(null);
   const [nudgeDismissedDay, setNudgeDismissedDay] = useState(null);
   const toastTimeoutRef = useRef(null);
+  const { email: myEmail } = useLogSync();
 
   // Per-button loading/success/error state, keyed by category ('feed',
   // 'diaper', 'nap', 'sleep', 'medicine') rather than by event id — the
@@ -134,6 +136,21 @@ export default function Page() {
 
   useEffect(() => {
     fetchAll();
+  }, [fetchAll]);
+
+  // Refresh when the other parent logs, edits or deletes something (live,
+  // via lib/LogSync.js), when this app comes back to the foreground, or
+  // after a custom log. This phone's own inserts are already on screen.
+  useEffect(() => {
+    let t = null;
+    const onChange = (e) => {
+      const d = e.detail || {};
+      if (d.mine && d.eventType === 'INSERT') return;
+      clearTimeout(t);
+      t = setTimeout(fetchAll, 150);
+    };
+    window.addEventListener(EVENTS_CHANGED, onChange);
+    return () => { clearTimeout(t); window.removeEventListener(EVENTS_CHANGED, onChange); };
   }, [fetchAll]);
 
   // When the last journal entry was written, for the Journal button's subtitle.
@@ -223,21 +240,24 @@ export default function Page() {
     });
   }, [showToast, setButtonPhase]);
 
-  // Gate in front of logEvent for the buttons that don't change appearance
-  // after a tap (Feed, Diaper, Medicine) — if the same type was logged in
-  // the last DUPLICATE_GUARD_SECONDS, ask before creating a second row
-  // instead of silently doing it.
+  // Gate in front of logEvent for every button: if the same thing was
+  // logged inside its double-log window, ask first (naming who logged it)
+  // instead of silently saving a second row.
   const attemptLog = useCallback((type, label, extra = {}, phaseKey = null) => {
-    const last = lastEventOf(events, type);
-    if (last) {
-      const secondsAgo = (Date.now() - new Date(last.event_time).getTime()) / 1000;
-      if (secondsAgo >= 0 && secondsAgo < DUPLICATE_GUARD_SECONDS) {
-        setPendingDuplicate({ type, label, extra, phaseKey, secondsAgo });
-        return;
-      }
+    const match = findDoubleLog(events, { type, ...extra }, Date.now());
+    if (match) {
+      const { action, detail } = describeLog(match);
+      setPendingDuplicate({
+        type, label, extra, phaseKey,
+        who: whoLogged(match.logged_by, myEmail),
+        action,
+        detail,
+        secondsAgo: (Date.now() - new Date(match.event_time).getTime()) / 1000,
+      });
+      return;
     }
     logEvent(type, label, extra, phaseKey);
-  }, [events, logEvent]);
+  }, [events, logEvent, myEmail]);
 
   const status = useMemo(() => {
     if (!config) return null;
@@ -354,7 +374,9 @@ export default function Page() {
   const agoText = (type) => {
     const last = lastEventOf(events, type);
     if (!last) return 'none yet';
-    return `${formatHours((now.getTime() - new Date(last.event_time).getTime()) / 3600000)} ago`;
+    const hours = (now.getTime() - new Date(last.event_time).getTime()) / 3600000;
+    if (hours < 1 / 60) return 'just now';
+    return `${formatHours(hours)} ago`;
   };
   const nextUpKey = status ? pickNextUp(status, now) : null;
   const nextUp = nextUpKey ? nextUpContent(nextUpKey, status, config, timezone) : null;
@@ -520,26 +542,26 @@ export default function Page() {
               <span className="tile-sub">{agoText('diaper')}</span>
             </button>
             {status.nap.asleep ? (
-              <button className={`tile-btn tile-running tile-running-nap ${phaseClass(phase.nap)}`} onClick={() => logEvent('nap_end', 'Nap ended', {}, 'nap')}>
+              <button className={`tile-btn tile-running tile-running-nap ${phaseClass(phase.nap)}`} onClick={() => attemptLog('nap_end', 'Nap ended', {}, 'nap')}>
                 <TileIcon name="sleep" phase={phase.nap} />
                 <span className="tile-label">End nap</span>
                 <span className="tile-sub">asleep {formatHours((now.getTime() - new Date(status.nap.lastEventTime).getTime()) / (1000 * 60 * 60))}</span>
               </button>
             ) : (
-              <button className={`tile-btn ${phaseClass(phase.nap)}`} onClick={() => logEvent('nap_start', 'Nap started', {}, 'nap')}>
+              <button className={`tile-btn ${phaseClass(phase.nap)}`} onClick={() => attemptLog('nap_start', 'Nap started', {}, 'nap')}>
                 <TileIcon name="sleep" phase={phase.nap} dot={dotFor(status.nap)} />
                 <span className="tile-label">Start nap{dotText(dotFor(status.nap))}</span>
                 <span className="tile-sub">{status.nap.hoursSince != null ? `awake ${formatHours(status.nap.hoursSince)}` : status.sleep.asleep ? 'after she wakes' : 'no naps yet'}</span>
               </button>
             )}
             {status.sleep.asleep ? (
-              <button className={`tile-btn tile-running tile-running-sleep ${phaseClass(phase.sleep)}`} onClick={() => logEvent('sleep_end', 'Wake up', {}, 'sleep')}>
+              <button className={`tile-btn tile-running tile-running-sleep ${phaseClass(phase.sleep)}`} onClick={() => attemptLog('sleep_end', 'Wake up', {}, 'sleep')}>
                 <TileIcon name="bedtime" phase={phase.sleep} />
                 <span className="tile-label">Wake Up</span>
                 <span className="tile-sub">asleep {formatHours((now.getTime() - new Date(status.sleep.lastEventTime).getTime()) / (1000 * 60 * 60))}</span>
               </button>
             ) : (
-              <button className={`tile-btn ${phaseClass(phase.sleep)}`} onClick={() => logEvent('sleep_start', 'Bedtime', {}, 'sleep')}>
+              <button className={`tile-btn ${phaseClass(phase.sleep)}`} onClick={() => attemptLog('sleep_start', 'Bedtime', {}, 'sleep')}>
                 <TileIcon name="bedtime" phase={phase.sleep} dot={dotFor(status.sleep)} />
                 <span className="tile-label">Bedtime{dotText(dotFor(status.sleep))}</span>
                 <span className="tile-sub">{bedtimeSub()}</span>
@@ -788,12 +810,13 @@ export default function Page() {
       {pendingDuplicate && (
         <div className="modal-overlay" onClick={() => setPendingDuplicate(null)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-title">Log {pendingDuplicate.label} again?</div>
+            <div className="modal-title">Already logged?</div>
             <div className="explain-body">
-              {pendingDuplicate.label} was already logged {formatSecondsAgo(pendingDuplicate.secondsAgo)}.
+              {pendingDuplicate.who} {pendingDuplicate.action} {formatSecondsAgo(pendingDuplicate.secondsAgo)}
+              {pendingDuplicate.detail ? ` (${pendingDuplicate.detail})` : ''}. Log it again?
             </div>
             <div className="modal-actions">
-              <button className="modal-btn-cancel" onClick={() => setPendingDuplicate(null)}>Cancel</button>
+              <button className="modal-btn-cancel" onClick={() => setPendingDuplicate(null)}>Don&apos;t log</button>
               <button
                 className="modal-btn-confirm"
                 onClick={() => {

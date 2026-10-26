@@ -2,6 +2,7 @@ import './globals.css';
 import { THEME_INIT_SCRIPT } from '../lib/theme';
 import { ClickSoundListener } from '../lib/ClickSoundListener';
 import { QuickLogProvider } from '../lib/QuickLogSheet';
+import { LogSyncProvider } from '../lib/LogSync';
 
 // Warm serif for page headings ("Today", etc.) only — everything else
 // stays on the system sans stack. Loaded as a plain stylesheet link
@@ -70,7 +71,11 @@ export default function RootLayout({ children }) {
         {/* Wraps every route (not just Today) so the "+" tab's quick-log
             popup can open — and log an event — from History, Insights, or
             Profile just as well as from Today. See lib/QuickLogSheet.js. */}
-        <QuickLogProvider>{children}</QuickLogProvider>
+        {/* LogSyncProvider keeps both parents' phones in step (live updates,
+            "Ysa logged a feed" banner). See lib/LogSync.js. */}
+        <LogSyncProvider>
+          <QuickLogProvider>{children}</QuickLogProvider>
+        </LogSyncProvider>
       </body>
     </html>
   );
