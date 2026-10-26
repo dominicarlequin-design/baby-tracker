@@ -3907,3 +3907,68 @@ body:has(.sky) { background: transparent; }
   .tile-btn .tile-overlay,
   .tile-btn.is-success .tile-icon { animation: none; }
 }
+
+/* ---------- Button smarts: status dots, running state, tap animations ---------- */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Status dot on a button's corner: amber when due soon, red when overdue.
+   Hidden while the button shows its own saving / saved badge. */
+.tile-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2.5px var(--card), 0 2px 5px rgba(90, 58, 85, 0.3);
+}
+.tile-dot-due-soon { background: #f2a93b; }
+.tile-dot-overdue { background: var(--overdue); }
+
+/* Running: while she's napping or asleep, the End nap / Wake Up button
+   gets a soft ring that slowly breathes, and its live timer is tinted. */
+.tile-running .tile-icon::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: calc(var(--running-radius, 24px) + 5px);
+  border: 2.5px solid var(--running-color);
+  opacity: 0.55;
+  animation: running-breathe 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+.tile-running-nap { --running-color: #5cc2ad; }
+.tile-running-sleep { --running-color: #9b86d8; }
+.tile-running .tile-sub { color: color-mix(in srgb, var(--running-color) 75%, var(--ink)); font-weight: 600; }
+@keyframes running-breathe {
+  0%, 100% { opacity: 0.25; transform: scale(0.97); }
+  50% { opacity: 0.75; transform: scale(1.02); }
+}
+
+/* Tap animations: each illustration does its own tiny move on tap. */
+.tile-icon.tap > svg:first-child { transform-origin: 50% 85%; }
+.tile-icon.tap[data-art="feed"] > svg:first-child { animation: art-tip 0.45s ease-out; }
+.tile-icon.tap[data-art="diaper"] > svg:first-child { animation: art-wiggle 0.45s ease-out; }
+.tile-icon.tap[data-art="sleep"] > svg:first-child { animation: art-float 0.5s ease-out; }
+.tile-icon.tap[data-art="bedtime"] > svg:first-child { animation: art-rock 0.55s ease-out; }
+.tile-icon.tap[data-art="medicine"] > svg:first-child { animation: art-jiggle 0.4s ease-out; }
+.tile-icon.tap[data-art="journal"] > svg:first-child { animation: art-flip 0.45s ease-out; }
+@keyframes art-tip { 0%, 100% { transform: rotate(0); } 40% { transform: rotate(-14deg); } 75% { transform: rotate(4deg); } }
+@keyframes art-wiggle { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-7deg); } 50% { transform: rotate(6deg); } 75% { transform: rotate(-3deg); } }
+@keyframes art-float { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(-7px); } }
+@keyframes art-rock { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(10deg); } 65% { transform: rotate(-6deg); } }
+@keyframes art-jiggle { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-3px) rotate(-3deg); } 60% { transform: translateX(3px) rotate(3deg); } }
+@keyframes art-flip { 0%, 100% { transform: scale(1) rotate(0); } 45% { transform: scale(1.06) rotate(-6deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tile-icon.tap > svg:first-child { animation: none !important; }
+  .tile-running .tile-icon::before { animation: none; opacity: 0.5; transform: none; }
+}

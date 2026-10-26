@@ -12,6 +12,7 @@ import {
   formatHours,
   formatDurationWords,
   formatTimeOfDay,
+  formatRelative,
   nextMedicineSlot,
   pickNextUp,
   nextUpContent,
@@ -93,6 +94,7 @@ export default function Page() {
   const [pendingDuplicate, setPendingDuplicate] = useState(null);
   const [milkSheetOpen, setMilkSheetOpen] = useState(false);
   const [statsSheetOpen, setStatsSheetOpen] = useState(false);
+  const [lastJournalAt, setLastJournalAt] = useState(null);
   const [nudgeDismissedDay, setNudgeDismissedDay] = useState(null);
   const toastTimeoutRef = useRef(null);
 
@@ -133,6 +135,15 @@ export default function Page() {
   useEffect(() => {
     fetchAll();
   }, [fetchAll]);
+
+  // When the last journal entry was written, for the Journal button's subtitle.
+  useEffect(() => {
+    supabase.from('baby_journal').select('entry_time').order('entry_time', { ascending: false }).limit(1)
+      .then(({ data, error }) => {
+        if (error) { console.error(error); return; }
+        setLastJournalAt(data?.[0]?.entry_time || null);
+      });
+  }, []);
 
   // keep the header clock and every "time since" display fresh without
   // needing a full refetch. 10s (not 60s) so the header clock never sits
@@ -301,6 +312,43 @@ export default function Page() {
 
   const timezone = config?.timezone || 'America/New_York';
 
+  // Status dot for a button: amber when due soon, red when overdue.
+  const dotFor = (st) => (st?.state === 'overdue' || st?.overdue ? 'overdue' : st?.state === 'due-soon' ? 'due-soon' : null);
+  const dotText = (dot) => (dot ? <span className="visually-hidden">, {dot === 'overdue' ? 'overdue' : 'due soon'}</span> : null);
+
+  // Medicine subtitle: just given beats the schedule; otherwise the next
+  // scheduled dose, otherwise when it was last given.
+  const medicineSub = () => {
+    const last = lastEventOf(events, 'medicine');
+    const sinceMin = last ? (now.getTime() - new Date(last.event_time).getTime()) / 60000 : null;
+    if (last && sinceMin < 60) return `given ${formatRelative(last.event_time, now)}`;
+    if (medicineNext) return `next ${formatLocalTime(medicineNext.toISOString(), timezone)}`;
+    if (last) return `given ${formatRelative(last.event_time, now)}`;
+    return 'no schedule';
+  };
+
+  // Bedtime subtitle: counts down in the last 3 hours, says when it's past.
+  const bedtimeSub = () => {
+    const usual = formatTimeOfDay(config.target_bedtime_local ?? '19:15');
+    const s = status.sleep;
+    if (s.state === 'due-soon' || s.state === 'overdue') return `past ${usual}`;
+    if (s.dueAt) {
+      const hoursLeft = (new Date(s.dueAt).getTime() - now.getTime()) / 3600000;
+      if (hoursLeft > 0 && hoursLeft <= 3) return `in ${formatHours(hoursLeft)}`;
+    }
+    return `usual ${usual}`;
+  };
+
+  // Restarts the tapped button's illustration animation (see "tap
+  // animations" in globals.css); a class swap so it replays on every tap.
+  const playTapAnimation = (e) => {
+    const art = e.target.closest('.tile-btn')?.querySelector('.tile-icon');
+    if (!art) return;
+    art.classList.remove('tap');
+    void art.offsetWidth;
+    art.classList.add('tap');
+  };
+
   // "2h 27m ago" under Fed and Diaper, straight from the last logged event
   // (status.*.hoursSince is paused while she's asleep, so it can't be used).
   const agoText = (type) => {
@@ -460,52 +508,52 @@ export default function Page() {
           {/* Flexible gap above the buttons; see "Today: action buttons" in globals.css. */}
           <div className="today-spacer" aria-hidden="true" />
 
-          <div className="tile-grid">
+          <div className="tile-grid" onPointerDown={playTapAnimation}>
             <button className={`tile-btn ${phaseClass(phase.feed)}`} onClick={() => setFeedPickerOpen(true)}>
-              <TileIcon name="feed" phase={phase.feed} />
-              <span className="tile-label">Fed</span>
+              <TileIcon name="feed" phase={phase.feed} dot={dotFor(status.feed)} />
+              <span className="tile-label">Fed{dotText(dotFor(status.feed))}</span>
               <span className="tile-sub">{agoText('feed')}</span>
             </button>
             <button className={`tile-btn ${phaseClass(phase.diaper)}`} onClick={() => setDiaperPickerOpen(true)}>
-              <TileIcon name="diaper" phase={phase.diaper} />
-              <span className="tile-label">Diaper</span>
+              <TileIcon name="diaper" phase={phase.diaper} dot={dotFor(status.diaper)} />
+              <span className="tile-label">Diaper{dotText(dotFor(status.diaper))}</span>
               <span className="tile-sub">{agoText('diaper')}</span>
             </button>
             {status.nap.asleep ? (
-              <button className={`tile-btn ${phaseClass(phase.nap)}`} onClick={() => logEvent('nap_end', 'Nap ended', {}, 'nap')}>
+              <button className={`tile-btn tile-running tile-running-nap ${phaseClass(phase.nap)}`} onClick={() => logEvent('nap_end', 'Nap ended', {}, 'nap')}>
                 <TileIcon name="sleep" phase={phase.nap} />
                 <span className="tile-label">End nap</span>
                 <span className="tile-sub">asleep {formatHours((now.getTime() - new Date(status.nap.lastEventTime).getTime()) / (1000 * 60 * 60))}</span>
               </button>
             ) : (
               <button className={`tile-btn ${phaseClass(phase.nap)}`} onClick={() => logEvent('nap_start', 'Nap started', {}, 'nap')}>
-                <TileIcon name="sleep" phase={phase.nap} />
-                <span className="tile-label">Start nap</span>
+                <TileIcon name="sleep" phase={phase.nap} dot={dotFor(status.nap)} />
+                <span className="tile-label">Start nap{dotText(dotFor(status.nap))}</span>
                 <span className="tile-sub">{status.nap.hoursSince != null ? `awake ${formatHours(status.nap.hoursSince)}` : status.sleep.asleep ? 'after she wakes' : 'no naps yet'}</span>
               </button>
             )}
             {status.sleep.asleep ? (
-              <button className={`tile-btn ${phaseClass(phase.sleep)}`} onClick={() => logEvent('sleep_end', 'Wake up', {}, 'sleep')}>
+              <button className={`tile-btn tile-running tile-running-sleep ${phaseClass(phase.sleep)}`} onClick={() => logEvent('sleep_end', 'Wake up', {}, 'sleep')}>
                 <TileIcon name="bedtime" phase={phase.sleep} />
                 <span className="tile-label">Wake Up</span>
                 <span className="tile-sub">asleep {formatHours((now.getTime() - new Date(status.sleep.lastEventTime).getTime()) / (1000 * 60 * 60))}</span>
               </button>
             ) : (
               <button className={`tile-btn ${phaseClass(phase.sleep)}`} onClick={() => logEvent('sleep_start', 'Bedtime', {}, 'sleep')}>
-                <TileIcon name="bedtime" phase={phase.sleep} />
-                <span className="tile-label">Bedtime</span>
-                <span className="tile-sub">usual {formatTimeOfDay(config.target_bedtime_local ?? '19:15')}</span>
+                <TileIcon name="bedtime" phase={phase.sleep} dot={dotFor(status.sleep)} />
+                <span className="tile-label">Bedtime{dotText(dotFor(status.sleep))}</span>
+                <span className="tile-sub">{bedtimeSub()}</span>
               </button>
             )}
             <button className={`tile-btn ${phaseClass(phase.medicine)}`} onClick={() => attemptLog('medicine', 'Medicine', {}, 'medicine')}>
-              <TileIcon name="medicine" phase={phase.medicine} />
-              <span className="tile-label">Medicine</span>
-              <span className="tile-sub">{medicineNext ? `next ${formatLocalTime(medicineNext.toISOString(), timezone)}` : 'no schedule'}</span>
+              <TileIcon name="medicine" phase={phase.medicine} dot={dotFor(status.medicine)} />
+              <span className="tile-label">Medicine{dotText(dotFor(status.medicine))}</span>
+              <span className="tile-sub">{medicineSub()}</span>
             </button>
             <Link href="/journal?new=1" className="tile-btn">
               <TileIcon name="journal" />
               <span className="tile-label">Journal</span>
-              <span className="tile-sub">write a note</span>
+              <span className="tile-sub">{lastJournalAt ? `last entry ${formatRelative(lastJournalAt, now)}` : 'write a note'}</span>
             </Link>
           </div>
 
