@@ -93,8 +93,6 @@ export default function Page() {
   const [explainKey, setExplainKey] = useState(null);
   const [overdueOpen, setOverdueOpen] = useState(true);
   const [pendingDuplicate, setPendingDuplicate] = useState(null);
-  const [milkSheetOpen, setMilkSheetOpen] = useState(false);
-  const [statsSheetOpen, setStatsSheetOpen] = useState(false);
   const [lastJournalAt, setLastJournalAt] = useState(null);
   const [nudgeDismissedDay, setNudgeDismissedDay] = useState(null);
   const toastTimeoutRef = useRef(null);
@@ -410,20 +408,7 @@ export default function Page() {
             {new Intl.DateTimeFormat('en-US', { timeZone: timezone, weekday: 'long', month: 'long', day: 'numeric' }).format(now)}
             <SkyGlyph now={now} timezone={timezone} />
           </div>
-          <h1>
-            {/* The title doubles as the way into today's stats. The chevron is
-                the visible cue that it opens something. */}
-            <button
-              type="button"
-              className="today-title-btn"
-              onClick={() => setStatsSheetOpen(true)}
-              aria-label="Today. Open today's stats."
-              disabled={!today}
-            >
-              Today
-              <svg className="today-title-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
-            </button>
-          </h1>
+          <h1>Today</h1>
         </div>
         <Link href="/upcoming" className="header-icon-btn" aria-label="Upcoming schedule">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -670,139 +655,6 @@ export default function Page() {
             >
               Skip — just log the time
             </button>
-          </div>
-        </div>
-      )}
-
-      {statsSheetOpen && today && (
-        <div className="modal-overlay" onClick={() => setStatsSheetOpen(false)}>
-          <div className="modal milk-sheet stats-sheet" role="dialog" aria-label="Today's stats" onClick={e => e.stopPropagation()}>
-            <div className="milk-sheet-grabber" aria-hidden="true" />
-            <div className="milk-sheet-head">
-              <h2 className="milk-sheet-title">Today's stats</h2>
-              <button type="button" className="milk-sheet-close" aria-label="Close" onClick={() => setStatsSheetOpen(false)}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-              </button>
-            </div>
-            <div className="stats-row">
-              {milk ? (
-                <button
-                  type="button"
-                  className="stat-tile stat-tile-feed stat-tile-btn"
-                  onClick={() => { setStatsSheetOpen(false); setMilkSheetOpen(true); }}
-                  aria-label={`${today.feeds} feedings, ${milk.oz} of ${milk.target} ounces, ${milk.statusText}. Open Daily Milk.`}
-                >
-                  <div className="stat-tile-row">
-                    <TileIcon name="feed" />
-                    <div className="stat-tile-text">
-                      <div className="stat-value">{today.feeds}</div>
-                      <div className="stat-label">Feedings</div>
-                    </div>
-                  </div>
-                  <div className="stat-sub">{milk.oz} / {milk.target} oz</div>
-                </button>
-              ) : (
-                <div className="stat-tile stat-tile-feed">
-                  <div className="stat-tile-row">
-                    <TileIcon name="feed" />
-                    <div className="stat-tile-text">
-                      <div className="stat-value">{today.feeds}</div>
-                      <div className="stat-label">Feedings</div>
-                    </div>
-                  </div>
-                  {todayExtra && <div className="stat-sub">Total: {todayExtra.ounces} oz</div>}
-                </div>
-              )}
-              <div className="stat-tile stat-tile-diaper">
-                <div className="stat-tile-row">
-                  <TileIcon name="diaper" />
-                  <div className="stat-tile-text">
-                    <div className="stat-value">{today.diapers}</div>
-                    <div className="stat-label">Diapers</div>
-                  </div>
-                </div>
-                {todayExtra && <div className="stat-sub">{todayExtra.wet} Wet &middot; {todayExtra.dirty} Dirty</div>}
-              </div>
-              <div className="stat-tile stat-tile-nap">
-                <div className="stat-tile-row">
-                  <TileIcon name="sleep" />
-                  <div className="stat-tile-text">
-                    <div className="stat-value">{formatHours(today.napMinutes / 60) || '0m'}</div>
-                    <div className="stat-label">Sleep</div>
-                  </div>
-                </div>
-                <div className="stat-sub">{today.naps} {today.naps === 1 ? 'nap' : 'naps'}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {milkSheetOpen && milk && (
-        <div className="modal-overlay" onClick={() => setMilkSheetOpen(false)}>
-          <div className="modal milk-sheet" role="dialog" aria-label="Daily Milk" onClick={e => e.stopPropagation()}>
-            <div className="milk-sheet-grabber" aria-hidden="true" />
-            <div className="milk-sheet-head">
-              <h2 className="milk-sheet-title">Daily Milk</h2>
-              <button type="button" className="milk-sheet-close" aria-label="Close" onClick={() => setMilkSheetOpen(false)}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-              </button>
-            </div>
-
-            <div className="milk-progress-card">
-              <div className="milk-progress-top">
-                <span className="milk-progress-head">{milk.oz} oz of {milk.target} oz today</span>
-                <span className="milk-progress-left">
-                  {milk.oz > milk.target ? `${Math.round((milk.oz - milk.target) * 10) / 10} oz over` : `${Math.round(milk.next.left * 10) / 10} oz to go`}
-                </span>
-              </div>
-              <div
-                className={`milk-bar milk-bar-lg milk-${milk.status}`}
-                role="progressbar"
-                aria-label="Milk today"
-                aria-valuemin={0}
-                aria-valuemax={milk.target}
-                aria-valuenow={milk.oz}
-              >
-                <div className="milk-bar-fill" style={{ width: `${milk.pct}%` }} />
-              </div>
-              <div className="milk-progress-note">
-                Target: {config.weight_lbs} lbs × 2.5 oz{milk.capped ? ', capped at 32 oz' : ''}
-              </div>
-            </div>
-
-            <div className="stats-caption">Today's bottles</div>
-            {todayExtra.bottles.length ? (
-              <ul className="milk-bottles">
-                {todayExtra.bottles.map(b => (
-                  <li key={b.id} className="milk-bottle">
-                    <TileIcon name="feed" />
-                    <span className="milk-bottle-time">{formatLocalTime(b.time, timezone)}</span>
-                    <span className="milk-bottle-oz">{b.ounces} oz</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="milk-bottles milk-bottles-empty">No bottles with ounces logged yet today.</div>
-            )}
-
-            <div className="milk-next">
-              {milk.next.left > 0 ? (
-                <>
-                  <div className="milk-next-head">Next bottle: about {milk.next.ounces} oz</div>
-                  <div className="milk-next-sub">
-                    {Math.round(milk.next.left * 10) / 10} oz left over her usual {milk.next.feedsLeft} more {milk.next.feedsLeft === 1 ? 'feed' : 'feeds'}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="milk-next-head">Target reached for today</div>
-                  <div className="milk-next-sub">Keep following her hunger cues.</div>
-                </>
-              )}
-            </div>
-
-            <p className="milk-caption">A guide, not a rule. Hunger cues come first.</p>
           </div>
         </div>
       )}

@@ -9,6 +9,7 @@ import { parentName } from '../../lib/logText';
 import { isoToLocalDatetimeInputValue, localDateTimeToUtc, localDateStr } from '../../lib/logic';
 import { dailySummaries } from '../../lib/summaries';
 import { dailyMilkTarget } from '../../lib/milk';
+import { DailyMilkSheet, useDailyMilk } from '../../lib/DailyMilkSheet';
 import {
   formatLocalTime,
   formatRelative,
@@ -98,6 +99,7 @@ export default function RecentPage() {
   const [savingEdit, setSavingEdit] = useState(false);
   const [deletingEdit, setDeletingEdit] = useState(false);
   const [openKey, setOpenKey] = useState(null);
+  const [milkOpen, setMilkOpen] = useState(false);
   const toastTimeoutRef = useRef(null);
 
   const fetchAll = useCallback(async () => {
@@ -216,6 +218,8 @@ export default function RecentPage() {
     return { ...summary, ounces, wet, dirty, target: goal?.target ?? null };
   }, [events, config, now, timezone]);
 
+  const milk = useDailyMilk(events, config, now);
+
   const openEdit = useCallback((event) => {
     if (typeof event.id !== 'number') return; // not yet reconciled with the server
     setEditingEvent(event);
@@ -306,7 +310,13 @@ export default function RecentPage() {
           <section className="history-stats" aria-label="Today's stats">
             <h2 className="history-stats-title">Today&apos;s stats</h2>
             <div className="stats-row">
-              <div className="stat-tile stat-tile-feed">
+              {milk ? (
+                <button
+                  type="button"
+                  className="stat-tile stat-tile-feed stat-tile-btn"
+                  onClick={() => setMilkOpen(true)}
+                  aria-label={`${todayStats.feeds} feeds, ${milk.oz} of ${milk.target} ounces, ${milk.statusText}. Open Daily Milk.`}
+                >
                 <div className="stat-tile-row">
                   <TileIcon name="feed" />
                   <div className="stat-tile-text">
@@ -317,7 +327,21 @@ export default function RecentPage() {
                 <div className="stat-sub">
                   {todayStats.target ? `${todayStats.ounces} / ${todayStats.target} oz` : `Total: ${todayStats.ounces} oz`}
                 </div>
-              </div>
+                </button>
+              ) : (
+                <div className="stat-tile stat-tile-feed">
+                <div className="stat-tile-row">
+                  <TileIcon name="feed" />
+                  <div className="stat-tile-text">
+                    <div className="stat-value">{todayStats.feeds}</div>
+                    <div className="stat-label">Feeds</div>
+                  </div>
+                </div>
+                <div className="stat-sub">
+                  {todayStats.target ? `${todayStats.ounces} / ${todayStats.target} oz` : `Total: ${todayStats.ounces} oz`}
+                </div>
+                </div>
+              )}
               <div className="stat-tile stat-tile-diaper">
                 <div className="stat-tile-row">
                   <TileIcon name="diaper" />
@@ -415,6 +439,8 @@ export default function RecentPage() {
         </div>
         </>
       )}
+
+      {milkOpen && <DailyMilkSheet milk={milk} onClose={() => setMilkOpen(false)} />}
 
       <div className={`toast ${toastShow ? 'show' : ''}`}>
         <span>{toast?.message}</span>
