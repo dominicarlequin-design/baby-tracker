@@ -4754,149 +4754,100 @@ body:has(.sky) { background: transparent; }
     linear-gradient(180deg, var(--night-top, #271b52) 0%, var(--night-mid, #1c1340) 45%, var(--night-bottom, #130c2b) 100%);
 }
 
-/* Moonlight */
-:root[data-skin="moonlight"] {
-  --accent: #4f5fc4;
-  --accent-text: #4f5fc4;
-  --border: #e3e6f6;
-  --soft-beige-tint: #f6f7fe;
-  --bar-tint: #e9edff;
-  --glow-tint: #c3cbf6;
-}
-:root[data-skin="moonlight"] .sky { --sky-line: #6f7fc0; }
-@media (prefers-color-scheme: dark) {
-  :root[data-skin="moonlight"]:not([data-theme="light"]) {
-    --bg: #142049;
-    --card: #1d2b5c;
-    --border: #2c3a6e;
-    --soft-beige-tint: #1a2652;
-    --ink-muted: #aab3d6;
-    --accent-text: #a9b8ff;
-    --glass: rgba(32, 48, 102, 0.6);
-    --glass-edge: rgba(170, 190, 255, 0.18);
-    --bar-dark: rgba(29, 43, 92, 0.8);
-    --night-top: #22356f;
-    --night-mid: #142049;
-    --night-bottom: #0b1433;
-    --night-haze-1: rgba(140, 160, 255, 0.32);
-    --night-haze-2: rgba(250, 220, 150, 0.08);
-    --night-haze-3: rgba(120, 140, 230, 0.12);
-  }
-  :root[data-skin="moonlight"]:not([data-theme="light"]) .sky { --sky-line: #dfe6ff; }
-}
-:root[data-skin="moonlight"][data-theme="dark"] {
-  --bg: #142049;
-  --card: #1d2b5c;
-  --border: #2c3a6e;
-  --soft-beige-tint: #1a2652;
-  --ink-muted: #aab3d6;
-  --accent-text: #a9b8ff;
-  --glass: rgba(32, 48, 102, 0.6);
-  --glass-edge: rgba(170, 190, 255, 0.18);
-  --bar-dark: rgba(29, 43, 92, 0.8);
-  --night-top: #22356f;
-  --night-mid: #142049;
-  --night-bottom: #0b1433;
-  --night-haze-1: rgba(140, 160, 255, 0.32);
-  --night-haze-2: rgba(250, 220, 150, 0.08);
-  --night-haze-3: rgba(120, 140, 230, 0.12);
-}
-:root[data-skin="moonlight"][data-theme="dark"] .sky { --sky-line: #dfe6ff; }
 
-/* Sage */
-:root[data-skin="sage"] {
-  --accent: #2f7d5b;
-  --accent-text: #2f7d5b;
-  --border: #dcebe2;
-  --soft-beige-tint: #f5faf7;
-  --bar-tint: #e8f4ec;
-  --glow-tint: #b8dec8;
+/* Olive & Blue, from Dom's palette: Olive Branch #b4bda2 and French Blue
+   #7c8ba8. French Blue (deepened to #56688d so text and buttons stay
+   readable on white) is the main color; Olive Branch tints the tab bar,
+   highlights and doodles. Dark mode is a slate-blue night with an olive
+   glow. */
+:root[data-skin="olive"] {
+  --accent: #56688d;
+  --accent-text: #56688d;
+  --border: #e3e7dc;
+  --soft-beige-tint: #f6f7f2;
+  --bar-tint: #edf0e5;
+  --glow-tint: #cfd6bf;
 }
-:root[data-skin="sage"] .sky { --sky-line: #6f9f88; }
+:root[data-skin="olive"] .sky { --sky-line: #8f9a78; }
 @media (prefers-color-scheme: dark) {
-  :root[data-skin="sage"]:not([data-theme="light"]) {
-    --bg: #12251d;
-    --card: #1b3329;
-    --border: #2a4639;
-    --soft-beige-tint: #183026;
-    --ink-muted: #a9c4b6;
-    --accent-text: #8fdcb5;
-    --glass: rgba(30, 60, 46, 0.6);
-    --glass-edge: rgba(170, 230, 200, 0.16);
-    --bar-dark: rgba(27, 51, 41, 0.82);
-    --night-top: #1d3a2d;
-    --night-mid: #12251d;
-    --night-bottom: #0a1712;
-    --night-haze-1: rgba(120, 220, 170, 0.22);
-    --night-haze-2: rgba(230, 240, 180, 0.07);
-    --night-haze-3: rgba(90, 170, 200, 0.1);
+  :root[data-skin="olive"]:not([data-theme="light"]) {
+    --bg: #1b2230;
+    --card: #252e40;
+    --border: #343f55;
+    --soft-beige-tint: #212a3a;
+    --ink-muted: #aeb6c4;
+    --accent-text: #a9b8d6;
+    --glass: rgba(44, 54, 76, 0.6);
+    --glass-edge: rgba(190, 205, 170, 0.16);
+    --bar-dark: rgba(37, 46, 64, 0.82);
+    --night-top: #273247;
+    --night-mid: #1b2230;
+    --night-bottom: #121722;
+    --night-haze-1: rgba(124, 139, 168, 0.34);
+    --night-haze-2: rgba(180, 189, 162, 0.12);
+    --night-haze-3: rgba(124, 139, 168, 0.12);
   }
-  :root[data-skin="sage"]:not([data-theme="light"]) .sky { --sky-line: #e0f2e8; }
+  :root[data-skin="olive"]:not([data-theme="light"]) .sky { --sky-line: #dfe6d4; }
 }
-:root[data-skin="sage"][data-theme="dark"] {
-  --bg: #12251d;
-  --card: #1b3329;
-  --border: #2a4639;
-  --soft-beige-tint: #183026;
-  --ink-muted: #a9c4b6;
-  --accent-text: #8fdcb5;
-  --glass: rgba(30, 60, 46, 0.6);
-  --glass-edge: rgba(170, 230, 200, 0.16);
-  --bar-dark: rgba(27, 51, 41, 0.82);
-  --night-top: #1d3a2d;
-  --night-mid: #12251d;
-  --night-bottom: #0a1712;
-  --night-haze-1: rgba(120, 220, 170, 0.22);
-  --night-haze-2: rgba(230, 240, 180, 0.07);
-  --night-haze-3: rgba(90, 170, 200, 0.1);
+:root[data-skin="olive"][data-theme="dark"] {
+  --bg: #1b2230;
+  --card: #252e40;
+  --border: #343f55;
+  --soft-beige-tint: #212a3a;
+  --ink-muted: #aeb6c4;
+  --accent-text: #a9b8d6;
+  --glass: rgba(44, 54, 76, 0.6);
+  --glass-edge: rgba(190, 205, 170, 0.16);
+  --bar-dark: rgba(37, 46, 64, 0.82);
+  --night-top: #273247;
+  --night-mid: #1b2230;
+  --night-bottom: #121722;
+  --night-haze-1: rgba(124, 139, 168, 0.34);
+  --night-haze-2: rgba(180, 189, 162, 0.12);
+  --night-haze-3: rgba(124, 139, 168, 0.12);
 }
-:root[data-skin="sage"][data-theme="dark"] .sky { --sky-line: #e0f2e8; }
+:root[data-skin="olive"][data-theme="dark"] .sky { --sky-line: #dfe6d4; }
 
-/* Sunset */
-:root[data-skin="sunset"] {
-  --accent: #c94a22;
-  --accent-text: #c94a22;
-  --border: #f5e2da;
-  --soft-beige-tint: #fff8f4;
-  --bar-tint: #ffeee3;
-  --glow-tint: #f8c4ae;
+/* App look picker (Profile). */
+.skin-grid { display: grid; gap: 10px; margin-top: 2px; }
+.skin-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px 10px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.12s ease;
 }
-:root[data-skin="sunset"] .sky { --sky-line: #c08a7e; }
+.skin-option:active { transform: scale(0.98); }
+.skin-option.is-on {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+.skin-swatch {
+  flex: none;
+  display: flex;
+  width: 54px;
+  height: 40px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+.skin-swatch span { flex: 1; }
+.skin-text { flex: 1; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.skin-name { font-size: 15px; font-weight: 700; }
+.skin-note { font-size: 12.5px; color: var(--ink-muted); }
+.skin-check { flex: none; width: 20px; height: 20px; color: var(--accent-text); }
 @media (prefers-color-scheme: dark) {
-  :root[data-skin="sunset"]:not([data-theme="light"]) {
-    --bg: #2a1520;
-    --card: #3a1f2c;
-    --border: #4f2c3c;
-    --soft-beige-tint: #331a26;
-    --ink-muted: #d0b0b6;
-    --accent-text: #ffab8f;
-    --glass: rgba(66, 34, 48, 0.6);
-    --glass-edge: rgba(255, 190, 170, 0.18);
-    --bar-dark: rgba(58, 31, 44, 0.82);
-    --night-top: #3d1d2c;
-    --night-mid: #2a1520;
-    --night-bottom: #1a0c14;
-    --night-haze-1: rgba(255, 140, 110, 0.28);
-    --night-haze-2: rgba(255, 200, 120, 0.1);
-    --night-haze-3: rgba(200, 110, 170, 0.12);
-  }
-  :root[data-skin="sunset"]:not([data-theme="light"]) .sky { --sky-line: #ffe6dc; }
+  :root:not([data-theme="light"]) .skin-option { background: var(--glass); border-color: var(--glass-edge); }
+  :root:not([data-theme="light"]) .skin-option.is-on { border-color: var(--accent-text); }
 }
-:root[data-skin="sunset"][data-theme="dark"] {
-  --bg: #2a1520;
-  --card: #3a1f2c;
-  --border: #4f2c3c;
-  --soft-beige-tint: #331a26;
-  --ink-muted: #d0b0b6;
-  --accent-text: #ffab8f;
-  --glass: rgba(66, 34, 48, 0.6);
-  --glass-edge: rgba(255, 190, 170, 0.18);
-  --bar-dark: rgba(58, 31, 44, 0.82);
-  --night-top: #3d1d2c;
-  --night-mid: #2a1520;
-  --night-bottom: #1a0c14;
-  --night-haze-1: rgba(255, 140, 110, 0.28);
-  --night-haze-2: rgba(255, 200, 120, 0.1);
-  --night-haze-3: rgba(200, 110, 170, 0.12);
-}
-:root[data-skin="sunset"][data-theme="dark"] .sky { --sky-line: #ffe6dc; }
+:root[data-theme="dark"] .skin-option { background: var(--glass); border-color: var(--glass-edge); }
+:root[data-theme="dark"] .skin-option.is-on { border-color: var(--accent-text); }

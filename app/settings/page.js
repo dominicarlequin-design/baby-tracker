@@ -14,6 +14,7 @@ import { dailyMilkTarget } from '../../lib/milk';
 import { BABY_NAME, ageLine, formatHours } from '../../lib/homeUi';
 import { useLogSync } from '../../lib/LogSync';
 import { PARENT_NAMES, parentName } from '../../lib/logText';
+import { SKINS, getSkin, applySkin, getMode, applyMode } from '../../lib/skin';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -114,6 +115,8 @@ export default function SettingsPage() {
   const [pushJustSucceeded, setPushJustSucceeded] = useState(false);
   const [pushFailed, setPushFailed] = useState(false);
   const [soundJustToggled, setSoundJustToggled] = useState(false);
+  const [skin, setSkin] = useState('blossom');
+  const [mode, setMode] = useState('auto');
 
   // Starts at the same defaults getSoundSettings() falls back to on the
   // server (no localStorage there), then syncs to whatever's actually
@@ -136,6 +139,7 @@ export default function SettingsPage() {
 
   useEffect(() => { getPushStatus().then(setPushStatus); }, []);
   useEffect(() => { setSoundSettingsState(getSoundSettings()); }, []);
+  useEffect(() => { setSkin(getSkin()); setMode(getMode()); }, []);
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 60 * 1000);
     return () => clearInterval(t);
@@ -449,6 +453,50 @@ export default function SettingsPage() {
               />
             )}
             {errors.medicine && <div className="form-message error">{errors.medicine}</div>}
+          </div>
+
+          {/* App look: skin and light/dark, saved on this phone only. */}
+          <div className="card">
+            <div className="section-title">App look</div>
+            <div className="skin-grid" role="radiogroup" aria-label="Skin">
+              {SKINS.map(k => (
+                <button
+                  key={k.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={skin === k.id}
+                  className={`skin-option${skin === k.id ? ' is-on' : ''}`}
+                  onClick={() => { applySkin(k.id); setSkin(k.id); }}
+                >
+                  <span className="skin-swatch" aria-hidden="true">
+                    {k.swatch.map(c => <span key={c} style={{ background: c }} />)}
+                  </span>
+                  <span className="skin-text">
+                    <span className="skin-name">{k.name}</span>
+                    <span className="skin-note">{k.note}</span>
+                  </span>
+                  {skin === k.id && (
+                    <svg className="skin-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+                  )}
+                </button>
+              ))}
+            </div>
+            <div className="form-label profile-sub">Light or dark</div>
+            <div className="choice-row" role="radiogroup" aria-label="Light or dark">
+              {[['auto', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="radio"
+                  aria-checked={mode === id}
+                  className={`choice${mode === id ? ' is-on' : ''}`}
+                  onClick={() => { applyMode(id); setMode(id); }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <div className="form-hint">Just for this phone. Feed, diaper and sleep colors stay the same in every skin.</div>
           </div>
 
           {/* Sounds: saved on this phone only. */}
