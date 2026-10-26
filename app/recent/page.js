@@ -10,13 +10,13 @@ import {
   formatRelative,
   formatHours,
   buildActivityGroups,
-  activityDetailSuffix,
+  activityTitle,
   activityDotClass,
   TYPE_LABELS,
   TileIcon,
 } from '../../lib/homeUi';
 
-const EVENT_TYPES = ['feed', 'diaper', 'nap_start', 'nap_end', 'medicine', 'sleep_start', 'sleep_end'];
+const EVENT_TYPES = ['feed', 'diaper', 'nap_start', 'nap_end', 'medicine', 'sleep_start', 'sleep_end', 'custom'];
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 // Same fetch window as the Log screen; the activity list itself only shows
@@ -32,6 +32,7 @@ const CATEGORIES = [
   { key: 'diaper', label: 'Diapers', icon: 'diaper', none: 'No diapers yet today' },
   { key: 'sleep', label: 'Sleep', icon: 'sleep', none: 'No naps yet today' },
   { key: 'medicine', label: 'Medicine', icon: 'medicine', none: 'No medicine yet today' },
+  { key: 'custom', label: 'Custom', icon: 'custom', none: 'Nothing custom yet today' },
   { key: 'all', label: 'All activity', icon: null, none: 'Nothing logged yet today' },
 ];
 const EMPTY_TEXT = {
@@ -40,6 +41,7 @@ const EMPTY_TEXT = {
   diaper: 'No diapers in the last 30 days.',
   sleep: 'No naps or night sleep in the last 30 days.',
   medicine: 'No medicine in the last 30 days.',
+  custom: 'Nothing custom logged in the last 30 days.',
 };
 
 function categoryOf(item) {
@@ -47,6 +49,7 @@ function categoryOf(item) {
   if (item.type === 'feed') return 'feed';
   if (item.type === 'diaper') return 'diaper';
   if (item.type === 'medicine') return 'medicine';
+  if (item.type === 'custom') return 'custom';
   return 'sleep'; // nap_start / nap_end / sleep_start / sleep_end
 }
 
@@ -71,6 +74,7 @@ function daySummary(filter, items) {
     return naps.length ? `${plural(naps.length, 'nap', 'naps')} · ${formatHours(hours)}` : '';
   }
   if (filter === 'medicine') return plural(items.length, 'dose', 'doses');
+  if (filter === 'custom') return plural(items.length, 'entry', 'entries');
   return '';
 }
 
@@ -86,6 +90,7 @@ export default function RecentPage() {
   const [editType, setEditType] = useState('');
   const [editFeedOunces, setEditFeedOunces] = useState('');
   const [editDiaperDetail, setEditDiaperDetail] = useState('');
+  const [editCustomLabel, setEditCustomLabel] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
   const [deletingEdit, setDeletingEdit] = useState(false);
   const [openKey, setOpenKey] = useState(null);
@@ -172,6 +177,10 @@ export default function RecentPage() {
       return `${plural(naps.length, 'nap', 'naps')} today · ${formatHours(hours)}`;
     }
     if (cat.key === 'medicine') return `${plural(items.length, 'dose', 'doses')} today`;
+    if (cat.key === 'custom') {
+      const labels = [...new Set(items.map(i => i.raw.custom_label).filter(Boolean))];
+      return `${items.length} today · ${labels.join(', ')}`;
+    }
     return `${plural(items.length, 'entry', 'entries')} today`;
   };
 
@@ -182,6 +191,7 @@ export default function RecentPage() {
     setEditValue(isoToLocalDatetimeInputValue(event.event_time, config?.timezone || 'America/New_York'));
     setEditFeedOunces(event.feed_ounces != null ? String(event.feed_ounces) : '');
     setEditDiaperDetail(event.diaper_detail || '');
+    setEditCustomLabel(event.custom_label || '');
   }, [config]);
 
   const cancelEdit = useCallback(() => {
@@ -190,10 +200,16 @@ export default function RecentPage() {
     setEditType('');
     setEditFeedOunces('');
     setEditDiaperDetail('');
+    setEditCustomLabel('');
   }, []);
 
   const confirmEdit = useCallback(async () => {
     if (!editingEvent || !editValue) return;
+    const customLabel = editCustomLabel.trim().replace(/\s+/g, ' ');
+    if (editType === 'custom' && !customLabel) {
+      showToast('Give the custom entry a label');
+      return;
+    }
     const [datePart, timePart] = editValue.split('T');
     const iso = localDateTimeToUtc(datePart, timePart, config?.timezone || 'America/New_York').toISOString();
     setSavingEdit(true);
@@ -207,6 +223,7 @@ export default function RecentPage() {
           type: editType,
           feed_ounces: editType === 'feed' && editFeedOunces ? Number(editFeedOunces) : null,
           diaper_detail: editType === 'diaper' && editDiaperDetail ? editDiaperDetail : null,
+          custom_label: editType === 'custom' ? customLabel.slice(0, 60) : null,
         })
         .eq('id', editingEvent.id)
         .select()
@@ -221,7 +238,7 @@ export default function RecentPage() {
     } finally {
       setSavingEdit(false);
     }
-  }, [editingEvent, editValue, editType, editFeedOunces, editDiaperDetail, config, cancelEdit, showToast]);
+  }, [editingEvent, editValue, editType, editFeedOunces, editDiaperDetail, editCustomLabel, config, cancelEdit, showToast]);
 
   const deleteEdit = useCallback(async () => {
     if (!editingEvent) return;
@@ -304,7 +321,7 @@ export default function RecentPage() {
                                 <>
                                   <span className="activity-type">
                                     <span className={`activity-dot ${activityDotClass(item)}`} aria-hidden="true" />
-                                    {TYPE_LABELS[item.type] || item.type}{activityDetailSuffix(item.raw)}
+                                    {activityTitle(item.raw)}
                                   </span>
                                   <span className="activity-time">
                                     {formatLocalTime(item.event_time, timezone)}
@@ -345,6 +362,16 @@ export default function RecentPage() {
                   <option key={oz} value={oz}>{oz} oz</option>
                 ))}
               </select>
+            )}
+            {editType === 'custom' && (
+              <input
+                className="form-input modal-select"
+                type="text"
+                maxLength={60}
+                placeholder="What was it? e.g. Vitamin D"
+                value={editCustomLabel}
+                onChange={e => setEditCustomLabel(e.target.value)}
+              />
             )}
             {editType === 'diaper' && (
               <select className="modal-select" value={editDiaperDetail} onChange={e => setEditDiaperDetail(e.target.value)}>

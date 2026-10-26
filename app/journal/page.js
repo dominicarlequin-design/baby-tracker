@@ -8,6 +8,7 @@ import { ThemeToggle } from '../../lib/theme';
 import { TabBar } from '../../lib/TabBar';
 import { isoToLocalDatetimeInputValue, localDateStr, localDateTimeToUtc } from '../../lib/logic';
 import { formatLocalTime } from '../../lib/homeUi';
+import { useSheetViewport, keepFocusedFieldVisible } from '../../lib/useSheetViewport';
 
 // Text-only, same as the diaper-detail picker's Pee/Poop/Both — no emoji,
 // matching the rest of this app's icon set (sticker glyphs, never emoji).
@@ -159,44 +160,8 @@ export default function JournalPage() {
   const fromTodayRef = useRef(false);
   const overlayRef = useRef(null);
 
-  // While the editor is open: freeze the page behind it (so a scroll inside
-  // the sheet never drags the feed along), and size the overlay to the part
-  // of the screen the keyboard isn't covering, so Save stays in view while
-  // typing. Both are undone when the sheet closes.
-  const editorOpen = Boolean(editor);
-  useEffect(() => {
-    if (!editorOpen) return undefined;
-    const scrollY = window.scrollY;
-    const body = document.body.style;
-    const saved = { position: body.position, top: body.top, width: body.width, overflow: body.overflow };
-    Object.assign(body, { position: 'fixed', top: `-${scrollY}px`, width: '100%', overflow: 'hidden' });
-
-    const vv = window.visualViewport;
-    const fit = () => {
-      const el = overlayRef.current;
-      if (!el || !vv) return;
-      el.style.top = `${vv.offsetTop}px`;
-      el.style.height = `${vv.height}px`;
-      el.style.bottom = 'auto';
-    };
-    fit();
-    vv?.addEventListener('resize', fit);
-    vv?.addEventListener('scroll', fit);
-    return () => {
-      vv?.removeEventListener('resize', fit);
-      vv?.removeEventListener('scroll', fit);
-      Object.assign(body, saved);
-      window.scrollTo(0, scrollY);
-    };
-  }, [editorOpen]);
-
-  // When a field gets focus (and the keyboard slides up), bring it into the
-  // visible part of the sheet once the resize has settled.
-  const keepFocusedFieldVisible = useCallback((event) => {
-    const field = event.target;
-    if (!field.matches?.('input, textarea')) return;
-    setTimeout(() => field.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 320);
-  }, []);
+  // Freeze the page and keep the sheet above the keyboard while open.
+  useSheetViewport(Boolean(editor), overlayRef);
 
   const showToast = useCallback((text) => {
     clearTimeout(toastTimeoutRef.current);

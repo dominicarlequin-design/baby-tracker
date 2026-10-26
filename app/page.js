@@ -5,13 +5,15 @@ import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import { TabBar } from '../lib/TabBar';
 import { SkyBackdrop, SkyGlyph } from '../lib/SkyBackdrop';
-import { computeStatus, lastEventOf, localDateStr } from '../lib/logic';
+import { computeStatus, isoToLocalDatetimeInputValue, lastEventOf, localDateStr, localDateTimeToUtc } from '../lib/logic';
+import { useSheetViewport, keepFocusedFieldVisible } from '../lib/useSheetViewport';
 import { dailySummaries } from '../lib/summaries';
 import {
   formatLocalTime,
   formatHours,
   formatDurationWords,
   formatTimeOfDay,
+  formatRelative,
   nextMedicineSlot,
   pickNextUp,
   nextUpContent,
@@ -93,6 +95,15 @@ export default function Page() {
   const [pendingDuplicate, setPendingDuplicate] = useState(null);
   const [milkSheetOpen, setMilkSheetOpen] = useState(false);
   const [statsSheetOpen, setStatsSheetOpen] = useState(false);
+  // Custom log sheet: log anything with a label of your own.
+  const [customOpen, setCustomOpen] = useState(false);
+  const [customLabel, setCustomLabel] = useState('');
+  const [customNote, setCustomNote] = useState('');
+  const [customTime, setCustomTime] = useState('');
+  const [customTimeEdited, setCustomTimeEdited] = useState(false);
+  const [customError, setCustomError] = useState(null);
+  const customOverlayRef = useRef(null);
+  useSheetViewport(customOpen, customOverlayRef);
   const [nudgeDismissedDay, setNudgeDismissedDay] = useState(null);
   const toastTimeoutRef = useRef(null);
 
@@ -300,6 +311,48 @@ export default function Page() {
   }, [todayExtra]);
 
   const timezone = config?.timezone || 'America/New_York';
+
+  // Labels used with Custom before, most-used first (ties: most recent),
+  // offered as one-tap chips in the Custom sheet.
+  const customLabels = useMemo(() => {
+    const byKey = new Map();
+    for (const e of events) {
+      if (e.type !== 'custom' || !e.custom_label) continue;
+      const key = e.custom_label.trim().toLowerCase();
+      const hit = byKey.get(key);
+      if (hit) hit.count += 1;
+      else byKey.set(key, { label: e.custom_label.trim(), count: 1, last: e.event_time });
+    }
+    return [...byKey.values()]
+      .sort((a, b) => b.count - a.count || new Date(b.last) - new Date(a.last))
+      .slice(0, 8)
+      .map(x => x.label);
+  }, [events]);
+  const lastCustom = useMemo(() => lastEventOf(events, 'custom'), [events]);
+
+  const openCustom = () => {
+    setCustomLabel('');
+    setCustomNote('');
+    setCustomTime(isoToLocalDatetimeInputValue(new Date().toISOString(), timezone));
+    setCustomTimeEdited(false);
+    setCustomError(null);
+    setCustomOpen(true);
+  };
+
+  const submitCustom = () => {
+    const label = customLabel.trim().replace(/\s+/g, ' ');
+    if (!label) { setCustomError('Type what you\'re logging first.'); return; }
+    if (label.length > 60) { setCustomError('Keep the label under 60 characters.'); return; }
+    // Untouched time means "now" at the moment of logging, not when the
+    // sheet was opened.
+    let eventTime = new Date().toISOString();
+    if (customTimeEdited && customTime) {
+      const [d, t] = customTime.split('T');
+      eventTime = localDateTimeToUtc(d, t, timezone).toISOString();
+    }
+    setCustomOpen(false);
+    logEvent('custom', label, { custom_label: label, note: customNote.trim() || null, event_time: eventTime }, 'custom');
+  };
 
   // "2h 27m ago" under Fed and Diaper, straight from the last logged event
   // (status.*.hoursSince is paused while she's asleep, so it can't be used).
@@ -509,6 +562,18 @@ export default function Page() {
             </Link>
           </div>
 
+          {/* 7th button: log anything with your own label. */}
+          <button type="button" className={`custom-btn ${phaseClass(phase.custom)}`} onClick={openCustom}>
+            <TileIcon name="custom" phase={phase.custom} />
+            <span className="custom-btn-text">
+              <span className="custom-btn-label">Custom</span>
+              <span className="custom-btn-sub">
+                {lastCustom ? `last: ${lastCustom.custom_label} · ${formatRelative(lastCustom.event_time, now)}` : 'log anything'}
+              </span>
+            </span>
+            <svg className="custom-btn-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+          </button>
+
         </>
       )}
 
@@ -663,6 +728,77 @@ export default function Page() {
                 </div>
                 <div className="stat-sub">{today.naps} {today.naps === 1 ? 'nap' : 'naps'}</div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {customOpen && (
+        <div className="modal-overlay journal-overlay" ref={customOverlayRef} onClick={() => setCustomOpen(false)}>
+          <div className="modal journal-sheet" role="dialog" aria-label="Custom log" onClick={e => e.stopPropagation()}>
+            <div className="journal-sheet-head">
+              <div className="milk-sheet-grabber" aria-hidden="true" />
+              <div className="milk-sheet-head">
+                <h2 className="milk-sheet-title">Custom log</h2>
+                <button type="button" className="milk-sheet-close" aria-label="Close" onClick={() => setCustomOpen(false)}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                </button>
+              </div>
+            </div>
+
+            <div className="journal-sheet-body" onFocus={keepFocusedFieldVisible}>
+              <label className="form-label" htmlFor="custom-label">What are you logging?</label>
+              <input
+                id="custom-label"
+                className="form-input"
+                type="text"
+                maxLength={60}
+                autoCapitalize="sentences"
+                placeholder="e.g. Vitamin D, Tummy time, Bath"
+                value={customLabel}
+                onChange={e => { setCustomLabel(e.target.value); setCustomError(null); }}
+                onKeyDown={e => { if (e.key === 'Enter') submitCustom(); }}
+              />
+              {customLabels.length > 0 && (
+                <div className="custom-chips" role="group" aria-label="Recent custom labels">
+                  {customLabels.map(l => (
+                    <button
+                      key={l}
+                      type="button"
+                      className={`journal-filter${customLabel.trim().toLowerCase() === l.toLowerCase() ? ' is-on' : ''}`}
+                      onClick={() => { setCustomLabel(l); setCustomError(null); }}
+                    >
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <label className="form-label" htmlFor="custom-note">Note (optional)</label>
+              <input
+                id="custom-note"
+                className="form-input"
+                type="text"
+                placeholder="Any detail worth remembering"
+                value={customNote}
+                onChange={e => setCustomNote(e.target.value)}
+              />
+
+              <label className="form-label" htmlFor="custom-time">When</label>
+              <input
+                id="custom-time"
+                className="form-input"
+                type="datetime-local"
+                value={customTime}
+                onChange={e => { setCustomTime(e.target.value); setCustomTimeEdited(true); }}
+              />
+            </div>
+
+            <div className="journal-sheet-foot">
+              {customError && <div className="form-message error">{customError}</div>}
+              <button type="button" className="modal-btn-confirm form-save" onClick={submitCustom}>
+                {customLabel.trim() ? `Log "${customLabel.trim().replace(/\s+/g, ' ')}"` : 'Log it'}
+              </button>
             </div>
           </div>
         </div>
