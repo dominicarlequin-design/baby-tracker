@@ -32,6 +32,9 @@ import { describeLog, findDoubleLog, whoLogged } from '../lib/logText';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
+// Her name, shown as the title of this screen.
+const BABY_NAME = 'Cassia';
+
 // Status card shown while she's napping or asleep for the night. The live
 // duration is the headline (ticks with the page's 10s `now`), since "how
 // long has she been down?" is the question at 2am, not the start time.
@@ -408,7 +411,7 @@ export default function Page() {
             {new Intl.DateTimeFormat('en-US', { timeZone: timezone, weekday: 'long', month: 'long', day: 'numeric' }).format(now)}
             <SkyGlyph now={now} timezone={timezone} />
           </div>
-          <h1>Today</h1>
+          <h1>{BABY_NAME}</h1>
         </div>
         <Link href="/upcoming" className="header-icon-btn" aria-label="Upcoming schedule">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
