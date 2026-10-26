@@ -4700,44 +4700,10 @@ body:has(.sky) { background: transparent; }
   background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 55%, rgba(90, 58, 85, 0.07) 100%);
 }
 
-/* ---------- Line-art scene under Today's buttons (lib/SkyBackdrop.js) ----------
-   Takes over the bottom share of the flexible gap (it used to be an empty
-   ::after), so the buttons sit exactly where they did. The drawing sits at
-   the bottom of that space, up to 130px tall, and simply isn't shown when
-   the space is too small (short phones). */
-.wrap:has(.today-scene)::after { content: none; }
-.today-scene {
-  --sky-line: #8a6fb5;
-  flex: var(--gap-below) 1 0px;
-  min-height: 0;
-  position: relative;
-  color: var(--sky-line);
-  pointer-events: none;
-}
-.today-scene-art {
-  position: absolute;
-  left: 50%;
-  bottom: 6px;
-  width: min(300px, 100%);
-  height: min(130px, calc(100% - 22px));
-  transform: translateX(-50%);
-  opacity: 0.42;
-}
-@media (max-height: 740px) { .today-scene-art { display: none; } }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .today-scene { --sky-line: #efe6fb; }
-  :root:not([data-theme="light"]) .today-scene-art { opacity: 0.32; }
-}
-:root[data-theme="dark"] .today-scene { --sky-line: #efe6fb; }
-:root[data-theme="dark"] .today-scene-art { opacity: 0.32; }
 
-/* ---------- Subtler scene + see-through center button (Oct 26) ---------- */
-/* The hills / moon under Today's buttons fade to the doodles' strength. */
-.today-scene-art { opacity: 0.2; stroke-width: 1.5; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .today-scene-art { opacity: 0.14; }
-}
-:root[data-theme="dark"] .today-scene-art { opacity: 0.14; }
+
+/* ---------- Center + button (Oct 26) ---------- */
+
 
 /* Center +: stays raised above the bar, but the white is gone. The circle
    and its halo take the tab bar's own color, so it reads as a bump of the
