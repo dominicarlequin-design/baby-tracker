@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import { TabBar } from '../lib/TabBar';
 import { SkyBackdrop, SkyGlyph } from '../lib/SkyBackdrop';
-import { computeStatus, lastEventOf, localDateStr } from '../lib/logic';
+import { ageInMonths, computeStatus, lastEventOf, localDateStr } from '../lib/logic';
 import { dailySummaries } from '../lib/summaries';
 import {
   formatLocalTime,
@@ -32,8 +32,20 @@ import { describeLog, findDoubleLog, whoLogged } from '../lib/logText';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
-// Her name, shown as the title of this screen.
+// Her name, shown as the title of this screen, with her age under it.
 const BABY_NAME = 'Cassia';
+
+// "6 months, 17 days old", "1 month old", "12 days old" from the birth
+// date on Profile. Null until a birth date is set.
+function ageLine(birthDate, now, timezone) {
+  const age = ageInMonths(birthDate, now, timezone);
+  if (!age) return null;
+  const part = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+  const bits = [];
+  if (age.months > 0) bits.push(part(age.months, 'month', 'months'));
+  if (age.days > 0 || age.months === 0) bits.push(part(age.days, 'day', 'days'));
+  return `${bits.join(', ')} old`;
+}
 
 // Status card shown while she's napping or asleep for the night. The live
 // duration is the headline (ticks with the page's 10s `now`), since "how
@@ -412,6 +424,9 @@ export default function Page() {
             <SkyGlyph now={now} timezone={timezone} />
           </div>
           <h1>{BABY_NAME}</h1>
+          {config && ageLine(config.birth_date, now, timezone) && (
+            <div className="today-age" suppressHydrationWarning>{ageLine(config.birth_date, now, timezone)}</div>
+          )}
         </div>
         <Link href="/upcoming" className="header-icon-btn" aria-label="Upcoming schedule">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

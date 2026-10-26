@@ -4210,3 +4210,11 @@ body:has(.sky) { background: transparent; }
 .history-stats .stat-tile-row { column-gap: 5px; }
 .history-stats .stat-tile .tile-icon { width: 18px; height: 18px; border-radius: 6px; }
 .history-stats .stat-label { font-size: 12px; text-overflow: clip; }
+
+/* Her age under her name on Today ("6 months, 17 days old"). */
+.today-age {
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
