@@ -4730,3 +4730,26 @@ body:has(.sky) { background: transparent; }
 }
 :root[data-theme="dark"] .today-scene { --sky-line: #efe6fb; }
 :root[data-theme="dark"] .today-scene-art { opacity: 0.32; }
+
+/* ---------- Subtler scene + see-through center button (Oct 26) ---------- */
+/* The hills / moon under Today's buttons fade to the doodles' strength. */
+.today-scene-art { opacity: 0.2; stroke-width: 1.5; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .today-scene-art { opacity: 0.14; }
+}
+:root[data-theme="dark"] .today-scene-art { opacity: 0.14; }
+
+/* Center +: just the pink ring and plus, no white fill or white halo, sitting
+   inside the bar so the bar shows through it. */
+.tab-fab,
+:root[data-theme="dark"] .tab-fab {
+  width: 54px;
+  height: 54px;
+  margin: 0 4px;
+  background: transparent;
+  box-shadow: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .tab-fab { background: transparent; box-shadow: none; }
+}
+.tab-fab:active { transform: scale(0.92); background: color-mix(in srgb, var(--accent) 10%, transparent); }
