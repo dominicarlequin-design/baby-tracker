@@ -4851,3 +4851,42 @@ body:has(.sky) { background: transparent; }
 }
 :root[data-theme="dark"] .skin-option { background: var(--glass); border-color: var(--glass-edge); }
 :root[data-theme="dark"] .skin-option.is-on { border-color: var(--accent-text); }
+
+/* ---------- Olive & Blue tiles ----------
+   Blossom shows the colorful drawings. Olive & Blue shows the line-art
+   drawings in black on flat Olive Branch / French Blue tiles with a black
+   outline, alternating like a checkerboard so neighbors never match. */
+.tile-icon .tile-art-line { display: none; }
+:root[data-skin="olive"] .tile-icon .tile-art-flat { display: none; }
+:root[data-skin="olive"] .tile-icon .tile-art-line { display: block; color: #1f2328; }
+:root[data-skin="olive"] .tile-icon {
+  --olive: #b4bda2;
+  --french: #7c8ba8;
+  background-image: none !important;
+  box-shadow: inset 0 0 0 2px #1f2328 !important;
+}
+:root[data-skin="olive"] .tile-btn:active .tile-icon { transform: translateY(2px) scale(0.96); }
+:root[data-skin="olive"] .tile-icon[data-art="feed"],
+:root[data-skin="olive"] .tile-icon[data-art="sleep"],
+:root[data-skin="olive"] .tile-icon[data-art="medicine"],
+:root[data-skin="olive"] .tile-icon[data-art="custom"] { background-color: var(--olive) !important; }
+:root[data-skin="olive"] .tile-icon[data-art="diaper"],
+:root[data-skin="olive"] .tile-icon[data-art="bedtime"],
+:root[data-skin="olive"] .tile-icon[data-art="journal"] { background-color: var(--french) !important; }
+/* Small icons (History rows, Next up, stats) get a thinner outline. */
+:root[data-skin="olive"] .history-cat-head .tile-icon,
+:root[data-skin="olive"] .nextup-row .tile-icon { box-shadow: inset 0 0 0 1.5px #1f2328 !important; }
+:root[data-skin="olive"] .stat-tile .tile-icon,
+:root[data-skin="olive"] .milk-bottle .tile-icon { box-shadow: inset 0 0 0 1px #1f2328 !important; }
+:root[data-skin="olive"] .history-cat-all-icon { background: #b4bda2; color: #1f2328; box-shadow: inset 0 0 0 1.5px #1f2328; }
+/* The line drawing is the tile's second <svg>, so it gets the same size,
+   loading fade and tap animations the colorful one has. */
+.tile-icon > svg.tile-art-line { width: 72%; height: 72%; filter: none; transition: opacity 0.2s ease; }
+.tile-btn.is-loading .tile-icon > svg.tile-art-line { opacity: 0.55; }
+.tile-icon.tap[data-art="feed"] > svg.tile-art-line { animation: art-tip 0.45s ease-out; }
+.tile-icon.tap[data-art="diaper"] > svg.tile-art-line { animation: art-wiggle 0.45s ease-out; }
+.tile-icon.tap[data-art="sleep"] > svg.tile-art-line { animation: art-float 0.5s ease-out; }
+.tile-icon.tap[data-art="bedtime"] > svg.tile-art-line { animation: art-rock 0.55s ease-out; }
+.tile-icon.tap[data-art="medicine"] > svg.tile-art-line { animation: art-jiggle 0.4s ease-out; }
+.tile-icon.tap[data-art="journal"] > svg.tile-art-line { animation: art-flip 0.45s ease-out; }
+@media (prefers-reduced-motion: reduce) { .tile-icon.tap > svg.tile-art-line { animation: none !important; } }

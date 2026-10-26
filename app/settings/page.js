@@ -496,7 +496,7 @@ export default function SettingsPage() {
                 </button>
               ))}
             </div>
-            <div className="form-hint">Just for this phone. Feed, diaper and sleep colors stay the same in every skin.</div>
+            <div className="form-hint">Just for this phone, so you and the other parent can each pick your own.</div>
           </div>
 
           {/* Sounds: saved on this phone only. */}
