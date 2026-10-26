@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { ThemeToggle } from '../../lib/theme';
 import { TabBar } from '../../lib/TabBar';
+import { EVENTS_CHANGED } from '../../lib/QuickLogSheet';
 import { isoToLocalDatetimeInputValue, localDateTimeToUtc } from '../../lib/logic';
 import {
   formatLocalTime,
@@ -111,6 +112,12 @@ export default function RecentPage() {
 
   useEffect(() => {
     fetchAll();
+  }, [fetchAll]);
+
+  // Refresh when something is logged or undone from the center + sheet.
+  useEffect(() => {
+    window.addEventListener(EVENTS_CHANGED, fetchAll);
+    return () => window.removeEventListener(EVENTS_CHANGED, fetchAll);
   }, [fetchAll]);
 
   // Keeps "5m ago"-style relative times on today's rows fresh while this

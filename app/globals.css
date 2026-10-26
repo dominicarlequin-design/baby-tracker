@@ -3850,50 +3850,9 @@ body:has(.sky) { background: transparent; }
 }
 :root[data-theme="dark"] .tab-bar { --chip-mix: 20%; }
 
-/* ---------- Custom log button (app/page.js) ----------
-   The 7th button, under the six: a slim pill as wide as the button grid,
-   with the tag icon, "Custom", and the last custom entry underneath. */
-.custom-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: min(100%, 284px); /* same width as the button grid: 3 x 76px + 2 x 28px gaps */
-  margin: 16px auto 0;
-  padding: 8px 14px 8px 8px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  font: inherit;
-  color: var(--ink);
-  text-align: left;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  box-shadow: 0 6px 14px -8px rgba(90, 58, 85, 0.25);
-  transition: transform 0.12s ease;
-}
-.custom-btn:active { transform: scale(0.98); }
-.custom-btn .tile-icon {
-  flex: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px -4px rgba(90, 58, 85, 0.35), inset 0 1.5px 0 rgba(255, 255, 255, 0.7);
-}
-.custom-btn .tile-icon > svg:first-child { width: 78%; height: 78%; }
-.custom-btn .tile-overlay .btn-spinner,
-.custom-btn .tile-overlay .btn-check { width: 20px; height: 20px; }
-.custom-btn-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.custom-btn-label { font-weight: 700; font-size: 15px; }
-.custom-btn-sub {
-  font-size: 12.5px;
-  color: var(--ink-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.custom-btn-plus { flex: none; width: 20px; height: 20px; color: var(--accent-text); }
-@media (max-height: 740px) {
-  .custom-btn { width: 100%; margin-top: 12px; } /* short phones spread the grid edge to edge */
-}
+/* ---------- Custom log (lib/QuickLogSheet.js, opened by the center +) ---------- */
 .custom-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: -6px 0 18px; }
 .activity-dot-custom { background: #7fbf8f; }
+.custom-toast { max-width: calc(100vw - 48px); }
+.custom-toast span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.custom-toast .toast-action { flex: none; }
