@@ -4317,3 +4317,186 @@ body:has(.sky) { background: transparent; }
 .swipe-col:last-child .swipe-tick { align-self: flex-end; text-align: right; }
 /* Labels never widen the scroll area, whichever day of the week it is. */
 .swipe-inner { overflow-x: clip; }
+
+/* =====================================================================
+   Button polish, round 2 (Oct 26)
+   ===================================================================== */
+
+/* 1. Every tappable control presses in a little, so a tap always gets
+   feedback (these nine had none). */
+.swipe-tab, .swipe-range, .journal-filter, .modal-btn-cancel, .modal-btn-skip,
+.milk-sheet-close, .header-back-link, .why-btn, .advanced-summary, .picker-btn,
+.pattern-nav-row, .history-cat-head, .export-btn, .theme-toggle, .header-icon-btn {
+  transition: transform 0.12s ease, opacity 0.12s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.swipe-tab:active, .swipe-range:active, .journal-filter:active, .modal-btn-cancel:active,
+.modal-btn-skip:active, .milk-sheet-close:active, .header-back-link:active, .why-btn:active,
+.picker-btn:active, .theme-toggle:active, .header-icon-btn:active, .export-btn:active {
+  transform: scale(0.94);
+}
+.pattern-nav-row:active, .history-cat-head:active { transform: scale(0.985); opacity: 1; }
+.advanced-summary:active { opacity: 0.6; }
+@media (prefers-reduced-motion: reduce) {
+  .swipe-tab:active, .swipe-range:active, .journal-filter:active, .modal-btn-cancel:active,
+  .modal-btn-skip:active, .milk-sheet-close:active, .header-back-link:active, .why-btn:active,
+  .picker-btn:active, .theme-toggle:active, .header-icon-btn:active, .export-btn:active,
+  .pattern-nav-row:active, .history-cat-head:active { transform: none; opacity: 0.7; }
+}
+
+/* 2. One round header button: 40px, white, soft shadow (the moon/sun
+   toggle used to be a smaller 30px circle with a hairline border). */
+.theme-toggle,
+.header-icon-btn,
+.today-header .header-icon-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: 0 2px 6px rgba(44, 42, 38, 0.12);
+}
+.theme-toggle { color: var(--accent-text); }
+.theme-toggle svg, .header-icon-btn svg { width: 19px; height: 19px; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-toggle,
+  :root:not([data-theme="light"]) .header-icon-btn { background: var(--glass); box-shadow: inset 0 0 0 1px var(--glass-edge); }
+}
+:root[data-theme="dark"] .theme-toggle,
+:root[data-theme="dark"] .header-icon-btn { background: var(--glass); box-shadow: inset 0 0 0 1px var(--glass-edge); }
+
+/* 3. Back link becomes a small pill: "‹ Today". */
+.header-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 8px;
+  padding: 5px 12px 5px 9px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--accent-text);
+  background: color-mix(in srgb, var(--accent) 10%, var(--card));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.header-back-link::after { inset: -10px -6px; }
+
+/* 4. "Why?" is a soft info chip instead of underlined link text. */
+.why-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 8px 2px 6px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.5;
+  vertical-align: 1px;
+  color: var(--ink-muted);
+  background: color-mix(in srgb, var(--ink) 6%, var(--card));
+}
+.why-btn::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9.5'/%3E%3Cpath d='M12 11v6'/%3E%3Ccircle cx='12' cy='7.6' r='0.6' fill='black'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9.5'/%3E%3Cpath d='M12 11v6'/%3E%3Ccircle cx='12' cy='7.6' r='0.6' fill='black'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+/* 5. 7D / 14D / 30D: a small sliding switch, same family as the
+   Feeds / Sleep / Diapers / Milk switch above it. */
+.swipe-ranges {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 44px);
+  gap: 0;
+  padding: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 7%, var(--card));
+  box-shadow: inset 0 1px 2px rgba(42, 34, 48, 0.06);
+}
+.swipe-range,
+.swipe-range.is-on {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 30px;
+  border: none;
+  background: transparent;
+  color: var(--ink-muted);
+}
+.swipe-range.is-on { color: var(--card); }
+.swipe-range-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 44px;
+  height: 30px;
+  border-radius: 999px;
+  background: var(--c-ink);
+  box-shadow: 0 2px 6px -2px var(--c-glow);
+  transition: transform 0.28s cubic-bezier(0.3, 1.3, 0.5, 1), background-color 0.2s ease;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .swipe-range.is-on { color: #1c1340; }
+}
+:root[data-theme="dark"] .swipe-range.is-on { color: #1c1340; }
+@media (prefers-reduced-motion: reduce) { .swipe-range-thumb { transition: none; } }
+
+/* 6. The chosen sound gets a check mark. */
+.picker-check { width: 15px; height: 15px; margin-right: 6px; flex: none; vertical-align: -2px; }
+.sound-grid .picker-btn { display: inline-flex; align-items: center; justify-content: center; }
+
+/* 7. Switches: the off track is a soft lilac that shows up on both themes
+   (flat gray almost vanished on the purple dark mode). */
+.switch { background: color-mix(in srgb, #a99be3 34%, var(--card)); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .switch:not([aria-checked="true"]) { background: color-mix(in srgb, #a99be3 30%, var(--card)); box-shadow: inset 0 0 0 1px var(--glass-edge); }
+}
+:root[data-theme="dark"] .switch:not([aria-checked="true"]) { background: color-mix(in srgb, #a99be3 30%, var(--card)); box-shadow: inset 0 0 0 1px var(--glass-edge); }
+
+/* 8. History's category icons get the same raised edge as Today's
+   buttons, and sink a little when the row is pressed. */
+.history-cat-head .tile-icon {
+  box-shadow:
+    0 6px 12px -6px rgba(90, 58, 85, 0.42),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -3px 0 rgba(90, 50, 80, 0.09);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.history-cat-head:active .tile-icon {
+  transform: translateY(2px);
+  box-shadow: 0 2px 4px -3px rgba(90, 58, 85, 0.5), inset 0 1.5px 0 rgba(255, 255, 255, 0.75);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .history-cat-head .tile-icon { box-shadow: 0 8px 14px -8px rgba(0, 0, 0, 0.6), inset 0 1.5px 0 rgba(255, 255, 255, 0.3), inset 0 -3px 0 rgba(0, 0, 0, 0.08); }
+}
+:root[data-theme="dark"] .history-cat-head .tile-icon { box-shadow: 0 8px 14px -8px rgba(0, 0, 0, 0.6), inset 0 1.5px 0 rgba(255, 255, 255, 0.3), inset 0 -3px 0 rgba(0, 0, 0, 0.08); }
+
+/* 9. Tab bar: one highlight pill that glides between tabs (lib/TabBar.js
+   positions it); the per-tab background steps aside for it. */
+.tab-glow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 0;
+  border-radius: 14px;
+  opacity: 0;
+  pointer-events: none;
+  background: color-mix(in srgb, #f6b3c6 var(--chip-mix, 32%), var(--card));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #f6b3c6 45%, transparent);
+  transition: transform 0.38s cubic-bezier(0.3, 1.25, 0.5, 1), opacity 0.2s ease;
+}
+.tab-bar.has-glow .tab-active .tab-icon-wrap { background: transparent; box-shadow: none; }
+.tab-bar .tab-item, .tab-bar .tab-fab { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: reduce) { .tab-glow { transition: none; } }
+/* Dark mode: unselected choice buttons (sounds, ounces, diaper) sit on
+   frosted purple glass instead of near-black. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .picker-btn:not(.selected) { background: var(--glass); border-color: var(--glass-edge); color: var(--ink); }
+}
+:root[data-theme="dark"] .picker-btn:not(.selected) { background: var(--glass); border-color: var(--glass-edge); color: var(--ink); }

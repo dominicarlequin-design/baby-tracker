@@ -297,9 +297,13 @@ export default function SettingsPage() {
             <button
               key={s.id}
               className={`picker-btn ${soundSettings.style === s.id ? 'selected' : ''}`}
+              aria-pressed={soundSettings.style === s.id}
               data-skip-click-sound="true"
               onClick={() => handleSelectSoundStyle(s.id)}
             >
+              {soundSettings.style === s.id && (
+                <svg className="picker-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+              )}
               {s.label}
             </button>
           ))}
