@@ -126,8 +126,9 @@ const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 // The Journal opens to every past entry, newest first, grouped by month.
 // "New entry" (and tapping any entry) opens the same editor sheet. Each
 // entry shows her age that day and that day's feeds / diapers / naps.
-// Arriving from Today's Journal tile (/journal?new=1) opens the editor
-// straight away and returns to Today after saving, like before.
+// Today's Journal tile opens this page (the feed); the editor opens only
+// when you tap "New entry" or an entry. /journal?new=1 still jumps straight
+// into a new entry and returns to Today after saving, if ever linked.
 export default function JournalPage() {
   const router = useRouter();
   const [timezone, setTimezone] = useState('America/New_York');

@@ -567,7 +567,7 @@ export default function Page() {
               <span className="tile-label">Medicine{dotText(dotFor(status.medicine))}</span>
               <span className="tile-sub">{medicineSub()}</span>
             </button>
-            <Link href="/journal?new=1" className="tile-btn">
+            <Link href="/journal" className="tile-btn">
               <TileIcon name="journal" />
               <span className="tile-label">Journal</span>
               <span className="tile-sub">{lastJournalAt ? `last entry ${formatRelative(lastJournalAt, now)}` : 'write a note'}</span>
