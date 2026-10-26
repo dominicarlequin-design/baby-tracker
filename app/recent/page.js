@@ -166,34 +166,31 @@ export default function RecentPage() {
     return out;
   }, [events, timezone, now]);
 
-  // Today's line under each category button, kept short enough to fit on
-  // one line ("4 today · 3 wet · 2 dirty").
-  const todayLine = (cat) => {
+  // The line under each category button says when it last happened ("Last
+  // 1h ago · 4 oz"). Today's counts live in "Today's stats" just above, so
+  // the rows don't repeat them.
+  const lastLine = (cat) => {
     const groups = groupsByCategory[cat.key] || [];
-    const today = groups[0]?.label === 'Today' ? groups[0] : null;
-    if (!today) return cat.none;
-    const items = today.items;
-    if (cat.key === 'feed') {
-      const oz = items.reduce((sum, i) => sum + (i.raw.feed_ounces || 0), 0);
-      return `${items.length} today` + (oz ? ` · ${oz} oz` : '');
-    }
+    const item = groups[0]?.items?.[0];
+    if (!item) return 'Nothing logged yet';
+    const at = item.kind === 'nap' ? item.end : item.event_time;
+    const ago = formatRelative(at, now);
+    const raw = item.raw || {};
+    if (cat.key === 'feed') return raw.feed_ounces != null ? `Last ${ago} · ${raw.feed_ounces} oz` : `Last ${ago}`;
     if (cat.key === 'diaper') {
-      const wet = items.filter(i => i.raw.diaper_detail === 'pee' || i.raw.diaper_detail === 'both').length;
-      const dirty = items.filter(i => i.raw.diaper_detail === 'poop' || i.raw.diaper_detail === 'both').length;
-      return `${items.length} today · ${wet} wet · ${dirty} dirty`;
+      const detail = { pee: 'wet', poop: 'dirty', both: 'wet + dirty' }[raw.diaper_detail];
+      return detail ? `Last ${ago} · ${detail}` : `Last ${ago}`;
     }
     if (cat.key === 'sleep') {
-      const naps = items.filter(i => i.kind === 'nap');
-      if (!naps.length) return cat.none;
-      const hours = naps.reduce((sum, i) => sum + (new Date(i.end) - new Date(i.start)) / 3600000, 0);
-      return `${plural(naps.length, 'nap', 'naps')} today · ${formatHours(hours)}`;
+      if (item.kind === 'nap') return `Nap ended ${ago} · ${formatHours((new Date(item.end) - new Date(item.start)) / 3600000)}`;
+      if (item.type === 'nap_start') return `Napping now · started ${ago}`;
+      if (item.type === 'sleep_start') return `Bedtime ${ago}`;
+      if (item.type === 'sleep_end') return `Woke up ${ago}`;
+      return `Last ${ago}`;
     }
-    if (cat.key === 'medicine') return `${plural(items.length, 'dose', 'doses')} today`;
-    if (cat.key === 'custom') {
-      const labels = [...new Set(items.map(i => i.raw.custom_label).filter(Boolean))];
-      return `${items.length} today · ${labels.join(', ')}`;
-    }
-    return `${plural(items.length, 'entry', 'entries')} today`;
+    if (cat.key === 'medicine') return `Last given ${ago}`;
+    if (cat.key === 'custom') return `Last ${ago} · ${raw.custom_label || 'Custom'}`;
+    return `Last ${ago} · ${activityTitle(raw)}`;
   };
 
   // Today's stats (moved here from the sheet behind Today's title): feeds
@@ -386,7 +383,7 @@ export default function RecentPage() {
                   )}
                   <span className="history-cat-text">
                     <span className="history-cat-label">{cat.label}</span>
-                    <span className="history-cat-sub">{todayLine(cat)}</span>
+                    <span className="history-cat-sub">{lastLine(cat)}</span>
                   </span>
                   <svg className="history-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
                 </button>

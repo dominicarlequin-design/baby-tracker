@@ -402,7 +402,10 @@ export default function JournalPage() {
   return (
     <div className="wrap">
       <div className="header-row">
-        <h1>Journal</h1>
+        <div>
+          <Link href="/" className="header-back-link">&lsaquo; Today</Link>
+          <h1>Journal</h1>
+        </div>
         <div className="header-actions">
           <ThemeToggle />
         </div>

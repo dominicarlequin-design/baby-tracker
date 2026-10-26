@@ -365,7 +365,14 @@ export default function SettingsPage() {
             <div className="form-hint" id="weight_hint">Weight x 2.5 oz, up to 32 oz a day. Update it after weigh-ins.</div>
           </div>
 
-          <div className="section-title" style={{ marginTop: '20px' }}>Tuning</div>
+          {/* Technical fine-tuning, tucked away so the page leads with what
+              you actually change (alerts, sounds, birth date, weight). */}
+          <details className="advanced">
+            <summary className="advanced-summary">
+              <span className="section-title">Advanced</span>
+              <span className="advanced-hint">Bedtime, medicine times, timezone, alert timing</span>
+              <svg className="advanced-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+            </summary>
           {FIELDS.map(f => (
             <div key={f.key} className="form-row">
               <label className="form-label" htmlFor={f.key}>{f.label}</label>
@@ -380,6 +387,7 @@ export default function SettingsPage() {
               {f.hint && <div className="form-hint">{f.hint}</div>}
             </div>
           ))}
+          </details>
 
           {message && (
             <div className={`form-message ${message.isError ? 'error' : 'success'}`}>{message.text}</div>

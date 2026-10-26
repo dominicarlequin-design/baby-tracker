@@ -4218,3 +4218,102 @@ body:has(.sky) { background: transparent; }
   font-weight: 600;
   color: var(--ink-muted);
 }
+
+/* =====================================================================
+   Visual pass (Oct 26)
+   ===================================================================== */
+
+/* 1. Insights: the headline sentence wraps instead of being cut off. */
+.nextup-headline-card .nextup-headline {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.25;
+  margin-bottom: 6px;
+}
+
+/* 2. Chart: the last date label ("Oct 26") hangs left from its bar instead
+   of poking past the right edge, which used to scroll the chart ~11px too
+   far and slice the first bar in half. */
+.swipe-col:last-child .swipe-tick { align-self: flex-end; text-align: right; }
+
+/* 3. Chart colors follow the Today buttons: feeds honey (bottle), diapers
+   pink (diaper), sleep mint (nap). Milk keeps its own goal colors. */
+:root {
+  --chart-feeds-top: #f5cf6c;   --chart-feeds-bottom: #dfa23a;   --chart-feeds-soft: #fbeec7;   --chart-feeds-ink: #946410;   --chart-feeds-glow: rgba(223, 162, 58, 0.35);
+  --chart-diapers-top: #f6a9c4; --chart-diapers-bottom: #d8578b; --chart-diapers-soft: #fbd9e5; --chart-diapers-ink: #b23a6c; --chart-diapers-glow: rgba(216, 87, 139, 0.32);
+  --chart-sleep-top: #86d7c6;   --chart-sleep-bottom: #3aa592;   --chart-sleep-soft: #cdeee6;   --chart-sleep-ink: #1f7a69;   --chart-sleep-glow: rgba(58, 165, 146, 0.32);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --chart-feeds-top: #ffe08f;   --chart-feeds-bottom: #e7b04c;   --chart-feeds-soft: #4a3d24;   --chart-feeds-ink: #ffd877;   --chart-feeds-glow: rgba(255, 216, 119, 0.3);
+    --chart-diapers-top: #ffbdd4; --chart-diapers-bottom: #e46f9d; --chart-diapers-soft: #4d2a3f; --chart-diapers-ink: #ff9ccb; --chart-diapers-glow: rgba(255, 156, 203, 0.3);
+    --chart-sleep-top: #a3e6d8;   --chart-sleep-bottom: #4dbaa5;   --chart-sleep-soft: #24443f; --chart-sleep-ink: #93e2d1;   --chart-sleep-glow: rgba(147, 226, 209, 0.3);
+  }
+}
+:root[data-theme="dark"] {
+  --chart-feeds-top: #ffe08f;   --chart-feeds-bottom: #e7b04c;   --chart-feeds-soft: #4a3d24;   --chart-feeds-ink: #ffd877;   --chart-feeds-glow: rgba(255, 216, 119, 0.3);
+  --chart-diapers-top: #ffbdd4; --chart-diapers-bottom: #e46f9d; --chart-diapers-soft: #4d2a3f; --chart-diapers-ink: #ff9ccb; --chart-diapers-glow: rgba(255, 156, 203, 0.3);
+  --chart-sleep-top: #a3e6d8;   --chart-sleep-bottom: #4dbaa5;   --chart-sleep-soft: #24443f; --chart-sleep-ink: #93e2d1;   --chart-sleep-glow: rgba(147, 226, 209, 0.3);
+}
+/* Selected range pill: dark ink would vanish in dark mode, so the pill
+   uses the category color with dark text there. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .swipe-range.is-on { color: #1c1340; }
+}
+:root[data-theme="dark"] .swipe-range.is-on { color: #1c1340; }
+
+/* 4. Next up: each phrase on its own line ("Last fed 4:08 PM" / "usual gap
+   2h 58m"), so no dot is left hanging at the end of a line. */
+.nextup-sub-line { display: block; }
+
+/* 5. Fed / Diaper pickers use the same sheet top as Custom log. */
+.picker-sheet .picker-grid,
+.picker-sheet .picker-grid-3 { margin-top: 4px; }
+
+/* 7. Journal mood filters: one row you can swipe sideways, running to the
+   screen edges so it's clear there's more. */
+.journal-filters {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  margin-left: -40px;
+  margin-right: -40px;
+  padding: 2px 40px;
+  scroll-padding-inline: 40px;
+  scrollbar-width: none;
+}
+.journal-filters::-webkit-scrollbar { display: none; }
+.journal-filter { flex: none; }
+
+/* 9. Profile: Advanced settings fold away. */
+.advanced { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 4px; }
+.advanced-summary {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 8px;
+  padding: 12px 0 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.advanced-summary::-webkit-details-marker { display: none; }
+.advanced-summary .section-title { grid-column: 1; margin: 0; }
+.advanced-hint { grid-column: 1; grid-row: 2; font-size: 12.5px; color: var(--ink-muted); margin-top: 2px; }
+.advanced-chevron { grid-column: 2; grid-row: 1 / span 2; width: 20px; height: 20px; color: var(--ink-muted); transition: transform 0.2s ease; }
+.advanced[open] .advanced-chevron { transform: rotate(180deg); }
+.advanced[open] .advanced-summary { margin-bottom: 4px; }
+
+/* 10. Short phones (iPhone SE): a little more room above the date and
+   titles instead of hugging the status bar. */
+@media (max-height: 740px) {
+  .wrap,
+  .wrap:has(.tile-grid) { padding-top: calc(env(safe-area-inset-top, 0px) + 22px); }
+}
+/* Week labels start at their Monday bar and run right, so a label from a
+   week scrolled off the left edge can't peek in as a stray "2". Today's
+   label still hangs left from the last bar. */
+.swipe-tick { align-self: flex-start; text-align: left; white-space: nowrap; }
+.swipe-col:last-child .swipe-tick { align-self: flex-end; text-align: right; }
+/* Labels never widen the scroll area, whichever day of the week it is. */
+.swipe-inner { overflow-x: clip; }

@@ -22,6 +22,7 @@ import {
   Icon,
   phaseClass,
   TileIcon,
+  SheetHead,
 } from '../lib/homeUi';
 import {
   dailyMilkTarget, milkStatus, milkStatusText, usualFeedsPerDay, nextBottle, showEveningNudge,
@@ -511,7 +512,10 @@ export default function Page() {
                     {nextUp.headline}
                     {nextUp.lateBy && <span className="nextup-lateby"> · {nextUp.lateBy}</span>}
                   </div>
-                  <div className="nextup-sub">{nextUp.sub}</div>
+                  <div className="nextup-sub">
+                    {/* One phrase per line, so a wrap never leaves a dot hanging at a line end. */}
+                    {nextUp.sub.split(' · ').map((part, i) => <span key={i} className="nextup-sub-line">{part}</span>)}
+                  </div>
                 </div>
               </div>
               {nextUpProgressValue != null && (
@@ -602,8 +606,8 @@ export default function Page() {
 
       {feedPickerOpen && (
         <div className="modal-overlay" onClick={() => setFeedPickerOpen(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-title">How many ounces?</div>
+          <div className="modal milk-sheet picker-sheet" role="dialog" aria-label="How many ounces?" onClick={e => e.stopPropagation()}>
+            <SheetHead title="How many ounces?" onClose={() => setFeedPickerOpen(false)} />
             <div className="picker-grid">
               {FEED_OUNCE_OPTIONS.map(oz => (
                 <button
@@ -633,8 +637,8 @@ export default function Page() {
 
       {diaperPickerOpen && (
         <div className="modal-overlay" onClick={() => setDiaperPickerOpen(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-title">Diaper</div>
+          <div className="modal milk-sheet picker-sheet" role="dialog" aria-label="Diaper" onClick={e => e.stopPropagation()}>
+            <SheetHead title="Diaper" onClose={() => setDiaperPickerOpen(false)} />
             <div className="picker-grid-3">
               <button
                 className="picker-btn"

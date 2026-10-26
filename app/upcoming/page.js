@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
 import { ThemeToggle } from '../../lib/theme';
 import { TabBar } from '../../lib/TabBar';
@@ -56,7 +57,10 @@ export default function UpcomingPage() {
   return (
     <div className="wrap">
       <div className="header-row">
-        <h1>Upcoming</h1>
+        <div>
+          <Link href="/" className="header-back-link">&lsaquo; Today</Link>
+          <h1>Upcoming</h1>
+        </div>
         <div className="header-actions">
           <ThemeToggle />
         </div>
