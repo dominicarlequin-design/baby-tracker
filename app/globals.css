@@ -4890,3 +4890,13 @@ body:has(.sky) { background: transparent; }
 .tile-icon.tap[data-art="medicine"] > svg.tile-art-line { animation: art-jiggle 0.4s ease-out; }
 .tile-icon.tap[data-art="journal"] > svg.tile-art-line { animation: art-flip 0.45s ease-out; }
 @media (prefers-reduced-motion: reduce) { .tile-icon.tap > svg.tile-art-line { animation: none !important; } }
+
+/* Olive & Blue tab bar: black line-art icons (light lines in dark mode);
+   Blossom keeps the colorful ones. */
+.tab-icon-line { display: none; }
+:root[data-skin="olive"] .tab-icon-color { display: none; }
+:root[data-skin="olive"] .tab-icon-line { display: block; color: #1f2328; }
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="olive"]:not([data-theme="light"]) .tab-icon-line { color: #e6eaf1; }
+}
+:root[data-skin="olive"][data-theme="dark"] .tab-icon-line { color: #e6eaf1; }
