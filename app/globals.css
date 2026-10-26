@@ -4031,3 +4031,143 @@ body:has(.sky) { background: transparent; }
 }
 /* The running ring wraps the clay edge under the button too. */
 .tile-grid .tile-running .tile-icon::before { inset: -5px -5px -11px -5px; }
+
+/* ---------- Dreamy dark mode ----------
+   Dark mode as a night sky: a deep indigo background with a faint violet
+   haze up top and a sprinkle of still stars (fixed layers behind every
+   page), frosted-glass cards with a soft lilac edge, moonlight text, a
+   gentler pink, lavender doodles, a glassy tab bar, and the clay buttons
+   dimmed a touch so they don't glare at 3 AM. Status colors (due soon,
+   overdue, the sleeping card) are left alone so warnings still read. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15122a;
+    --card: #221d3a;
+    --ink: #f4eefc;
+    --ink-muted: #b4a8cc;
+    --border: #3a3260;
+    --accent-text: #ff9ccb;
+    --glass: rgba(40, 33, 70, 0.6);
+    --glass-edge: rgba(196, 176, 255, 0.18);
+    background: #120f22;
+  }
+  :root:not([data-theme="light"]) body, :root:not([data-theme="light"]) body:has(.sky) { background: transparent; }
+  :root:not([data-theme="light"]) body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(120% 55% at 85% -8%, rgba(150, 118, 230, 0.32), transparent 60%),
+      radial-gradient(90% 45% at -10% 35%, rgba(236, 128, 190, 0.12), transparent 60%),
+      radial-gradient(100% 40% at 50% 110%, rgba(110, 120, 230, 0.16), transparent 60%),
+      linear-gradient(180deg, #1c1739 0%, #15112b 45%, #110e21 100%);
+  }
+  :root:not([data-theme="light"]) body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    opacity: 0.55;
+    background-image:
+      radial-gradient(1.2px 1.2px at 12% 18%, #fff, transparent),
+      radial-gradient(1px 1px at 32% 8%, #fff, transparent),
+      radial-gradient(1.4px 1.4px at 68% 14%, #fff, transparent),
+      radial-gradient(1px 1px at 86% 30%, #fff, transparent),
+      radial-gradient(1.2px 1.2px at 6% 52%, #fff, transparent),
+      radial-gradient(1px 1px at 94% 58%, #fff, transparent),
+      radial-gradient(1.3px 1.3px at 22% 78%, #fff, transparent),
+      radial-gradient(1px 1px at 76% 84%, #fff, transparent),
+      radial-gradient(1px 1px at 50% 40%, #fff, transparent),
+      radial-gradient(1.1px 1.1px at 58% 66%, #fff, transparent);
+  }
+  :root:not([data-theme="light"]) .card,
+  :root:not([data-theme="light"]) .nextup:not(.asleep-card):not(.nextup-due-soon):not(.nextup-overdue),
+  :root:not([data-theme="light"]) .history-cat,
+  :root:not([data-theme="light"]) .journal-card,
+  :root:not([data-theme="light"]) .swipe-card,
+  :root:not([data-theme="light"]) .milk-nudge {
+    background: var(--glass) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-color: var(--glass-edge) !important;
+    box-shadow: 0 12px 30px -14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+  :root:not([data-theme="light"]) .tab-bar {
+    --bar-bg: rgba(30, 25, 54, 0.72);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+    border-color: var(--glass-edge);
+  }
+  :root:not([data-theme="light"]) .tab-fab { box-shadow: 0 0 0 6px var(--card), 0 10px 22px -6px rgba(255, 120, 190, 0.35); }
+  :root:not([data-theme="light"]) .sky { --sky-line: #c8b8f5; --sky-doodle-opacity: 0.13; }
+  :root:not([data-theme="light"]) .tile-grid .tile-icon { filter: brightness(0.94); }
+  :root:not([data-theme="light"]) .tile-grid .tile-btn:active .tile-icon { filter: brightness(0.88); }
+}
+:root[data-theme="dark"] {
+  --bg: #15122a;
+  --card: #221d3a;
+  --ink: #f4eefc;
+  --ink-muted: #b4a8cc;
+  --border: #3a3260;
+  --accent-text: #ff9ccb;
+  --glass: rgba(40, 33, 70, 0.6);
+  --glass-edge: rgba(196, 176, 255, 0.18);
+  background: #120f22;
+}
+:root[data-theme="dark"] body, :root[data-theme="dark"] body:has(.sky) { background: transparent; }
+:root[data-theme="dark"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 55% at 85% -8%, rgba(150, 118, 230, 0.32), transparent 60%),
+    radial-gradient(90% 45% at -10% 35%, rgba(236, 128, 190, 0.12), transparent 60%),
+    radial-gradient(100% 40% at 50% 110%, rgba(110, 120, 230, 0.16), transparent 60%),
+    linear-gradient(180deg, #1c1739 0%, #15112b 45%, #110e21 100%);
+}
+:root[data-theme="dark"] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0.55;
+  background-image:
+    radial-gradient(1.2px 1.2px at 12% 18%, #fff, transparent),
+    radial-gradient(1px 1px at 32% 8%, #fff, transparent),
+    radial-gradient(1.4px 1.4px at 68% 14%, #fff, transparent),
+    radial-gradient(1px 1px at 86% 30%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 6% 52%, #fff, transparent),
+    radial-gradient(1px 1px at 94% 58%, #fff, transparent),
+    radial-gradient(1.3px 1.3px at 22% 78%, #fff, transparent),
+    radial-gradient(1px 1px at 76% 84%, #fff, transparent),
+    radial-gradient(1px 1px at 50% 40%, #fff, transparent),
+    radial-gradient(1.1px 1.1px at 58% 66%, #fff, transparent);
+}
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .nextup:not(.asleep-card):not(.nextup-due-soon):not(.nextup-overdue),
+:root[data-theme="dark"] .history-cat,
+:root[data-theme="dark"] .journal-card,
+:root[data-theme="dark"] .swipe-card,
+:root[data-theme="dark"] .milk-nudge {
+  background: var(--glass) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  border-color: var(--glass-edge) !important;
+  box-shadow: 0 12px 30px -14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+:root[data-theme="dark"] .tab-bar {
+  --bar-bg: rgba(30, 25, 54, 0.72);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  border-color: var(--glass-edge);
+}
+:root[data-theme="dark"] .tab-fab { box-shadow: 0 0 0 6px var(--card), 0 10px 22px -6px rgba(255, 120, 190, 0.35); }
+:root[data-theme="dark"] .sky { --sky-line: #c8b8f5; --sky-doodle-opacity: 0.13; }
+:root[data-theme="dark"] .tile-grid .tile-icon { filter: brightness(0.94); }
+:root[data-theme="dark"] .tile-grid .tile-btn:active .tile-icon { filter: brightness(0.88); }
