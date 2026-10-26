@@ -3972,3 +3972,62 @@ body:has(.sky) { background: transparent; }
   .tile-icon.tap > svg:first-child { animation: none !important; }
   .tile-running .tile-icon::before { animation: none; opacity: 0.5; transform: none; }
 }
+
+/* ---------- Clay buttons (Today's six log buttons) ----------
+   Each button sits on a thick edge in a deeper shade of its own color,
+   with a soft top-lit gradient and a small glossy highlight, so it reads
+   as a squishy toy button. Pressing squashes it flat onto that edge.
+   When Today opens, the six bounce in one after another (once per visit;
+   app/page.js clears .is-entering after the first moment). */
+.tile-grid .tile-icon[data-art="feed"]     { --clay: #f0bf4c; }
+.tile-grid .tile-icon[data-art="diaper"]   { --clay: #f08aaa; }
+.tile-grid .tile-icon[data-art="sleep"]    { --clay: #5cc2ad; }
+.tile-grid .tile-icon[data-art="bedtime"]  { --clay: #a088df; }
+.tile-grid .tile-icon[data-art="medicine"] { --clay: #79a9e3; }
+.tile-grid .tile-icon[data-art="journal"]  { --clay: #eda873; }
+
+.tile-grid .tile-icon {
+  /* the pastel itself comes from the inline background color */
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 60%) !important;
+  box-shadow:
+    0 6px 0 color-mix(in srgb, var(--clay) 62%, #fff),
+    0 16px 20px -12px rgba(90, 58, 85, 0.4),
+    inset 0 3px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -2px 0 color-mix(in srgb, var(--clay) 20%, transparent);
+  transform: translateY(-3px);
+}
+.tile-grid .tile-icon::after {
+  content: '';
+  position: absolute;
+  top: 7%;
+  left: 14%;
+  width: 52%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 40% 40%, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+}
+.tile-grid .tile-btn:active .tile-icon {
+  transform: translateY(3px);
+  filter: none;
+  box-shadow:
+    0 0 0 color-mix(in srgb, var(--clay) 62%, #fff),
+    0 4px 8px -6px rgba(90, 58, 85, 0.4),
+    inset 0 3px 0 rgba(255, 255, 255, 0.75);
+}
+
+.tile-grid.is-entering .tile-btn { animation: tile-in 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.tile-grid.is-entering .tile-btn:nth-child(2) { animation-delay: 45ms; }
+.tile-grid.is-entering .tile-btn:nth-child(3) { animation-delay: 90ms; }
+.tile-grid.is-entering .tile-btn:nth-child(4) { animation-delay: 135ms; }
+.tile-grid.is-entering .tile-btn:nth-child(5) { animation-delay: 180ms; }
+.tile-grid.is-entering .tile-btn:nth-child(6) { animation-delay: 225ms; }
+@keyframes tile-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.86); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile-grid.is-entering .tile-btn { animation: none; }
+}
+/* The running ring wraps the clay edge under the button too. */
+.tile-grid .tile-running .tile-icon::before { inset: -5px -5px -11px -5px; }

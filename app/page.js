@@ -376,6 +376,17 @@ export default function Page() {
   // but was never actually wired to anything — removed as dead code.
   const overdueItems = useMemo(() => overdueSummary(status, now), [status, now]);
 
+  // The six buttons bounce in once when Today first shows them; after that
+  // the class comes off, so a button swapping (Start nap -> End nap) or a
+  // re-render never replays it.
+  const statusReady = Boolean(status);
+  const [tilesEntering, setTilesEntering] = useState(true);
+  useEffect(() => {
+    if (!statusReady) return undefined;
+    const t = setTimeout(() => setTilesEntering(false), 900);
+    return () => clearTimeout(t);
+  }, [statusReady]);
+
   return (
     <div className="wrap">
       <SkyBackdrop now={now} timezone={timezone} asleep={Boolean(status?.sleep?.asleep || status?.nap?.asleep)} />
@@ -508,7 +519,7 @@ export default function Page() {
           {/* Flexible gap above the buttons; see "Today: action buttons" in globals.css. */}
           <div className="today-spacer" aria-hidden="true" />
 
-          <div className="tile-grid" onPointerDown={playTapAnimation}>
+          <div className={`tile-grid${tilesEntering ? ' is-entering' : ''}`} onPointerDown={playTapAnimation}>
             <button className={`tile-btn ${phaseClass(phase.feed)}`} onClick={() => setFeedPickerOpen(true)}>
               <TileIcon name="feed" phase={phase.feed} dot={dotFor(status.feed)} />
               <span className="tile-label">Fed{dotText(dotFor(status.feed))}</span>
