@@ -4739,17 +4739,17 @@ body:has(.sky) { background: transparent; }
 }
 :root[data-theme="dark"] .today-scene-art { opacity: 0.14; }
 
-/* Center +: just the pink ring and plus, no white fill or white halo, sitting
-   inside the bar so the bar shows through it. */
+/* Center +: stays raised above the bar, but the white is gone. The circle
+   and its halo take the tab bar's own color, so it reads as a bump of the
+   bar with just the pink ring and plus on top. */
 .tab-fab,
 :root[data-theme="dark"] .tab-fab {
-  width: 54px;
-  height: 54px;
-  margin: 0 4px;
-  background: transparent;
-  box-shadow: none;
+  background: var(--bar-bg);
+  box-shadow: 0 0 0 5px var(--bar-bg), 0 -6px 14px -8px rgba(90, 58, 85, 0.25);
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .tab-fab { background: transparent; box-shadow: none; }
+  :root:not([data-theme="light"]) .tab-fab { background: var(--bar-bg); box-shadow: 0 0 0 5px var(--bar-bg), 0 -6px 14px -8px rgba(0, 0, 0, 0.5); }
 }
-.tab-fab:active { transform: scale(0.92); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+:root[data-theme="dark"] .tab-fab { box-shadow: 0 0 0 5px var(--bar-bg), 0 -6px 14px -8px rgba(0, 0, 0, 0.5); }
+.tab-fab:active { transform: translateY(2px) scale(0.94); }
+
