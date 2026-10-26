@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import { TabBar } from '../lib/TabBar';
 import { SkyBackdrop, SkyGlyph } from '../lib/SkyBackdrop';
-import { ageInMonths, computeStatus, lastEventOf, localDateStr } from '../lib/logic';
+import { computeStatus, lastEventOf, localDateStr } from '../lib/logic';
 import { dailySummaries } from '../lib/summaries';
 import {
   formatLocalTime,
@@ -23,6 +23,8 @@ import {
   phaseClass,
   TileIcon,
   SheetHead,
+  BABY_NAME,
+  ageLine,
 } from '../lib/homeUi';
 import {
   dailyMilkTarget, milkStatus, milkStatusText, usualFeedsPerDay, nextBottle, showEveningNudge,
@@ -33,20 +35,6 @@ import { describeLog, findDoubleLog, whoLogged } from '../lib/logText';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
-// Her name, shown as the title of this screen, with her age under it.
-const BABY_NAME = 'Cassia';
-
-// "6 months, 17 days old", "1 month old", "12 days old" from the birth
-// date on Profile. Null until a birth date is set.
-function ageLine(birthDate, now, timezone) {
-  const age = ageInMonths(birthDate, now, timezone);
-  if (!age) return null;
-  const part = (n, one, many) => `${n} ${n === 1 ? one : many}`;
-  const bits = [];
-  if (age.months > 0) bits.push(part(age.months, 'month', 'months'));
-  if (age.days > 0 || age.months === 0) bits.push(part(age.days, 'day', 'days'));
-  return `${bits.join(', ')} old`;
-}
 
 // Status card shown while she's napping or asleep for the night. The live
 // duration is the headline (ticks with the page's 10s `now`), since "how
