@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import { TabBar } from '../lib/TabBar';
-import { SkyBackdrop, SkyGlyph } from '../lib/SkyBackdrop';
+import { SkyBackdrop, SkyGlyph, BottomScene } from '../lib/SkyBackdrop';
 import { computeStatus, lastEventOf, localDateStr } from '../lib/logic';
 import { dailySummaries } from '../lib/summaries';
 import {
@@ -574,6 +574,9 @@ export default function Page() {
             </Link>
           </div>
 
+          {/* Fills the open space under the buttons (the bottom share of the
+              flexible gap): hills by day, a sleepy moon at night. */}
+          <BottomScene now={now} timezone={timezone} />
         </>
       )}
 
