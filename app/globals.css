@@ -4033,7 +4033,7 @@ body:has(.sky) { background: transparent; }
 .tile-grid .tile-running .tile-icon::before { inset: -5px -5px -11px -5px; }
 
 /* ---------- Dreamy dark mode ----------
-   Dark mode as a night sky: a deep indigo background with a faint violet
+   Dark mode as a twilight-violet night sky: a deep purple background with a faint violet
    haze up top and a sprinkle of still stars (fixed layers behind every
    page), frosted-glass cards with a soft lilac edge, moonlight text, a
    gentler pink, lavender doodles, a glassy tab bar, and the clay buttons
@@ -4041,15 +4041,15 @@ body:has(.sky) { background: transparent; }
    overdue, the sleeping card) are left alone so warnings still read. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #15122a;
-    --card: #221d3a;
+    --bg: #1c1340;
+    --card: #2a1f55;
     --ink: #f4eefc;
     --ink-muted: #b4a8cc;
     --border: #3a3260;
     --accent-text: #ff9ccb;
-    --glass: rgba(40, 33, 70, 0.6);
+    --glass: rgba(54, 38, 98, 0.6);
     --glass-edge: rgba(196, 176, 255, 0.18);
-    background: #120f22;
+    background: #130c2b;
   }
   :root:not([data-theme="light"]) body, :root:not([data-theme="light"]) body:has(.sky) { background: transparent; }
   :root:not([data-theme="light"]) body::before {
@@ -4059,10 +4059,10 @@ body:has(.sky) { background: transparent; }
     z-index: -2;
     pointer-events: none;
     background:
-      radial-gradient(120% 55% at 85% -8%, rgba(150, 118, 230, 0.32), transparent 60%),
+      radial-gradient(120% 55% at 85% -8%, rgba(176, 132, 255, 0.38), transparent 60%),
       radial-gradient(90% 45% at -10% 35%, rgba(236, 128, 190, 0.12), transparent 60%),
-      radial-gradient(100% 40% at 50% 110%, rgba(110, 120, 230, 0.16), transparent 60%),
-      linear-gradient(180deg, #1c1739 0%, #15112b 45%, #110e21 100%);
+      radial-gradient(100% 40% at 50% 110%, rgba(110, 120, 230, 0.12), transparent 60%),
+      linear-gradient(180deg, #271b52 0%, #1c1340 45%, #130c2b 100%);
   }
   :root:not([data-theme="light"]) body::after {
     content: '';
@@ -4096,7 +4096,7 @@ body:has(.sky) { background: transparent; }
     box-shadow: 0 12px 30px -14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
   :root:not([data-theme="light"]) .tab-bar {
-    --bar-bg: rgba(30, 25, 54, 0.72);
+    --bar-bg: rgba(42, 31, 85, 0.78);
     -webkit-backdrop-filter: blur(16px) saturate(150%);
     backdrop-filter: blur(16px) saturate(150%);
     border-color: var(--glass-edge);
@@ -4107,15 +4107,15 @@ body:has(.sky) { background: transparent; }
   :root:not([data-theme="light"]) .tile-grid .tile-btn:active .tile-icon { filter: brightness(0.88); }
 }
 :root[data-theme="dark"] {
-  --bg: #15122a;
-  --card: #221d3a;
+  --bg: #1c1340;
+  --card: #2a1f55;
   --ink: #f4eefc;
   --ink-muted: #b4a8cc;
   --border: #3a3260;
   --accent-text: #ff9ccb;
-  --glass: rgba(40, 33, 70, 0.6);
+  --glass: rgba(54, 38, 98, 0.6);
   --glass-edge: rgba(196, 176, 255, 0.18);
-  background: #120f22;
+  background: #130c2b;
 }
 :root[data-theme="dark"] body, :root[data-theme="dark"] body:has(.sky) { background: transparent; }
 :root[data-theme="dark"] body::before {
@@ -4125,10 +4125,10 @@ body:has(.sky) { background: transparent; }
   z-index: -2;
   pointer-events: none;
   background:
-    radial-gradient(120% 55% at 85% -8%, rgba(150, 118, 230, 0.32), transparent 60%),
+    radial-gradient(120% 55% at 85% -8%, rgba(176, 132, 255, 0.38), transparent 60%),
     radial-gradient(90% 45% at -10% 35%, rgba(236, 128, 190, 0.12), transparent 60%),
-    radial-gradient(100% 40% at 50% 110%, rgba(110, 120, 230, 0.16), transparent 60%),
-    linear-gradient(180deg, #1c1739 0%, #15112b 45%, #110e21 100%);
+    radial-gradient(100% 40% at 50% 110%, rgba(110, 120, 230, 0.12), transparent 60%),
+    linear-gradient(180deg, #271b52 0%, #1c1340 45%, #130c2b 100%);
 }
 :root[data-theme="dark"] body::after {
   content: '';
@@ -4162,7 +4162,7 @@ body:has(.sky) { background: transparent; }
   box-shadow: 0 12px 30px -14px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 :root[data-theme="dark"] .tab-bar {
-  --bar-bg: rgba(30, 25, 54, 0.72);
+  --bar-bg: rgba(42, 31, 85, 0.78);
   -webkit-backdrop-filter: blur(16px) saturate(150%);
   backdrop-filter: blur(16px) saturate(150%);
   border-color: var(--glass-edge);
