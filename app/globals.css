@@ -4938,3 +4938,15 @@ body:has(.sky) { background: transparent; }
 :root[data-skin="olive"][data-theme="dark"] .asleep-nap .nextup-eyebrow,
 :root[data-skin="olive"][data-theme="dark"] .asleep-nap .asleep-duration,
 :root[data-skin="olive"][data-theme="dark"] .tile-running .tile-sub { color: #c9d3e6; }
+
+/* ---------- Today: card + buttons as one group ----------
+   The status card (Next up / Napping / Sleeping, plus any overdue or milk
+   banner) now sits right above the buttons with the same small gap as
+   between button rows, and the open space splits above and below the
+   pair (2:3, same as before). Proximity: the card and the buttons are
+   about the same thing, so they read as one block. */
+.wrap:has(.tile-grid) > .tile-grid { margin-top: 22px; }
+.wrap:has(.tile-grid) > .today-spacer + * { margin-top: 0; }
+@media (max-height: 740px) {
+  .wrap:has(.tile-grid) > .tile-grid { margin-top: 14px; }
+}

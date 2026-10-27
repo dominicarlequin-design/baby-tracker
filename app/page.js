@@ -429,6 +429,12 @@ export default function Page() {
         <div className="card"><div className="info-item">Loading{'…'}</div></div>
       ) : (
         <>
+          {/* Flexible gap above the status card. The card and the buttons
+              move together as one group (they're about the same thing),
+              placed a little above center; see "Today: card + buttons as
+              one group" in globals.css. */}
+          <div className="today-spacer" aria-hidden="true" />
+
           {overdueItems.length > 0 && (
             <div className="overdue-banner">
               <button
@@ -522,8 +528,6 @@ export default function Page() {
             </div>
           ))}
 
-          {/* Flexible gap above the buttons; see "Today: action buttons" in globals.css. */}
-          <div className="today-spacer" aria-hidden="true" />
 
           <div className="tile-grid" onPointerDown={playTapAnimation}>
             <button className={`tile-btn ${phaseClass(phase.feed)}`} onClick={() => setFeedPickerOpen(true)}>
