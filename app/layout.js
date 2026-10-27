@@ -13,7 +13,7 @@ import { LogSyncProvider } from '../lib/LogSync';
 // failing, which just falls back to the 'Georgia, serif' stack below.
 
 export const metadata = {
-  title: 'Baby Tracker',
+  title: 'Bay Bee Tracker',
   description: 'Tap-to-log baby habit tracker',
   // icons + appleWebApp is what actually gets Safari's "Add to Home
   // Screen" to use a real app icon and open without browser chrome —
@@ -26,7 +26,7 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Baby Tracker',
+    title: 'Bay Bee Tracker',
   },
   // Next only emits the modern, unprefixed mobile-web-app-capable tag from
   // appleWebApp.capable above. Older iOS versions specifically look for

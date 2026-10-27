@@ -54,7 +54,7 @@ function groupByDay(entries, timezone, now) {
 // copy-to-clipboard fallback — kept as one function so the two can never
 // drift into describing different content.
 function buildDigestText(groups, rangeLabel) {
-  const lines = [`Baby Tracker — weekly digest (${rangeLabel})`, ''];
+  const lines = [`Bay Bee Tracker — weekly digest (${rangeLabel})`, ''];
   if (!groups.length) {
     lines.push('No journal entries this week.');
     return lines.join('\n');

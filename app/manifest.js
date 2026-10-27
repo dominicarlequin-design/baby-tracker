@@ -5,12 +5,12 @@
 // home screen as a standalone icon instead of just a bookmarked tab.
 export default function manifest() {
   return {
-    name: 'Baby Tracker',
-    short_name: 'Baby Tracker',
+    name: 'Bay Bee Tracker',
+    short_name: 'Bay Bee Tracker',
     description: 'Tap-to-log baby habit tracker',
     start_url: '/',
     display: 'standalone',
-    background_color: '#263c72', // night sky from the icon, for Android's launch screen
+    background_color: '#7c8ba8', // French Blue from the icon, for Android's launch screen
     theme_color: '#fbeaf1',
     icons: [
       { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },

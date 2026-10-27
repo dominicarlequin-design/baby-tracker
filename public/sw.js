@@ -8,10 +8,10 @@ self.addEventListener('push', (event) => {
   try {
     data = event.data ? event.data.json() : {};
   } catch (err) {
-    data = { title: 'Baby Tracker', body: event.data ? event.data.text() : '' };
+    data = { title: 'Bay Bee Tracker', body: event.data ? event.data.text() : '' };
   }
 
-  const title = data.title || 'Baby Tracker';
+  const title = data.title || 'Bay Bee Tracker';
   const options = {
     body: data.body || '',
     icon: '/icon-192.png',
