@@ -4905,3 +4905,36 @@ body:has(.sky) { background: transparent; }
    every category and for "due soon". Overdue keeps its red so a real
    warning still stands out. */
 :root[data-skin="olive"] .nextup:not(.nextup-overdue) { --nextup-progress-color: #d78d65; }
+
+/* ---------- Olive & Blue: icons (style D) and the asleep states ----------
+   Icons: bold black lines, cream shapes, Clementine details, a touch
+   bigger. The napping / sleeping card, the ring around End nap / Wake Up
+   and its "asleep" line move from Blossom's lilac and mint to the skin's
+   own olive, French Blue and Clementine. */
+:root[data-skin="olive"] .tile-icon > svg.tile-art-line { width: 78%; height: 78%; }
+:root[data-skin="olive"] .tile-running { --running-color: #d78d65; }
+:root[data-skin="olive"] .tile-running .tile-sub { color: #56688d; }
+:root[data-skin="olive"] .nextup.asleep-nap {
+  background: color-mix(in srgb, #b4bda2 22%, var(--card));
+  border-color: color-mix(in srgb, #b4bda2 60%, var(--border));
+}
+:root[data-skin="olive"] .asleep-nap .nextup-eyebrow,
+:root[data-skin="olive"] .asleep-nap .asleep-duration { color: #56688d; }
+:root[data-skin="olive"] .nextup.asleep-sleep {
+  background:
+    radial-gradient(circle at 88% 20%, rgba(255, 255, 255, 0.9) 0 1.2px, transparent 2px),
+    radial-gradient(circle at 76% 32%, rgba(255, 255, 255, 0.55) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 94% 44%, rgba(255, 255, 255, 0.7) 0 1px, transparent 1.8px),
+    radial-gradient(circle at 68% 14%, rgba(255, 255, 255, 0.5) 0 0.8px, transparent 1.5px),
+    linear-gradient(135deg, #2c3852 0%, #56688d 100%);
+  box-shadow: 0 14px 28px -16px rgba(30, 40, 60, 0.75);
+}
+:root[data-skin="olive"] .asleep-sleep .nextup-eyebrow { color: #f2b48f; }
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="olive"]:not([data-theme="light"]) .asleep-nap .nextup-eyebrow,
+  :root[data-skin="olive"]:not([data-theme="light"]) .asleep-nap .asleep-duration,
+  :root[data-skin="olive"]:not([data-theme="light"]) .tile-running .tile-sub { color: #c9d3e6; }
+}
+:root[data-skin="olive"][data-theme="dark"] .asleep-nap .nextup-eyebrow,
+:root[data-skin="olive"][data-theme="dark"] .asleep-nap .asleep-duration,
+:root[data-skin="olive"][data-theme="dark"] .tile-running .tile-sub { color: #c9d3e6; }
