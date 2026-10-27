@@ -32,6 +32,7 @@ import {
 import { EVENTS_CHANGED } from '../lib/QuickLogSheet';
 import { useLogSync } from '../lib/LogSync';
 import { describeLog, findDoubleLog, whoLogged } from '../lib/logText';
+import { useSupplies, isLow } from '../lib/supplies';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -101,6 +102,8 @@ export default function Page() {
   const [nudgeDismissedDay, setNudgeDismissedDay] = useState(null);
   const toastTimeoutRef = useRef(null);
   const { email: myEmail } = useLogSync();
+  const { supplies } = useSupplies();
+  const lowSupplies = supplies.filter(isLow);
 
   // Per-button loading/success/error state, keyed by category ('feed',
   // 'diaper', 'nap', 'sleep', 'medicine') rather than by event id — the
@@ -417,12 +420,25 @@ export default function Page() {
             <div className="today-age" suppressHydrationWarning>{ageLine(config.birth_date, now, timezone)}</div>
           )}
         </div>
-        <Link href="/upcoming" className="header-icon-btn" aria-label="Upcoming schedule">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <rect x="4" y="5.5" width="16" height="15" rx="2.5" />
-            <path d="M4 10h16M8 3.5v3M16 3.5v3" />
-          </svg>
-        </Link>
+        <div className="today-header-actions">
+          <Link
+            href="/supplies"
+            className="header-icon-btn supplies-btn"
+            aria-label={lowSupplies.length ? `Supplies: ${lowSupplies.map(s => s.name).join(', ')} running low` : 'Supplies'}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M3.5 8.5 12 4l8.5 4.5v8.2L12 21l-8.5-4.3z" />
+              <path d="M3.5 8.5 12 13l8.5-4.5M12 13v8M7.8 6.2l8.5 4.6" />
+            </svg>
+            {lowSupplies.length > 0 && <span className="supplies-dot" aria-hidden="true" />}
+          </Link>
+          <Link href="/upcoming" className="header-icon-btn" aria-label="Upcoming schedule">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="4" y="5.5" width="16" height="15" rx="2.5" />
+              <path d="M4 10h16M8 3.5v3M16 3.5v3" />
+            </svg>
+          </Link>
+        </div>
       </div>
 
       {loading || !status ? (

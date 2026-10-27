@@ -1,5 +1,6 @@
 // Partner alert: when one parent logs something, push it to the other
-// parent's phones ("Ysa logged a feed / 4 oz · 3:42 PM").
+// parent's phones ("Ysa logged a feed / 4 oz · 3:42 PM"). Also sends the
+// "Running low: Diapers" alert to every phone (migration 0006).
 //
 // Called by the baby_events_notify_partner trigger (migration 0005) through
 // pg_net, with the same x-cron-secret that guards check-overdue. Phones
@@ -30,6 +31,41 @@ Deno.serve(async (req) => {
 
     let body: any = {};
     try { body = await req.json(); } catch (_e) { body = {}; }
+
+    // Low supply (from the baby_supplies_low trigger, migration 0006): tell
+    // every phone, since either parent might be the one at the store.
+    if (body?.supply) {
+      const sup = body.supply;
+      const { data: cfg, error: cfgErr } = await admin.from("baby_config").select("vapid_public_key").eq("id", 1).single();
+      if (cfgErr) throw cfgErr;
+      const { data: vapidPriv, error: vErr } = await admin.rpc("app_get_secret", { secret_name: "vapid_private_key" });
+      if (vErr) throw vErr;
+      if (!cfg.vapid_public_key || !vapidPriv) return json({ error: "vapid keys not configured" }, 500);
+      webpush.setVapidDetails("mailto:dominic.arlequin@gmail.com", cfg.vapid_public_key, vapidPriv);
+      const { data: all, error: allErr } = await admin.from("push_subscriptions").select("*");
+      if (allErr) throw allErr;
+      const left = `${sup.count} ${sup.unit || ""}`.trim();
+      const payload = JSON.stringify({
+        title: `Running low: ${sup.name}`,
+        body: `${left} left · added to the shopping list`,
+        category: "supply",
+        tag: `supply-${sup.id}`,
+      });
+      let sentLow = 0;
+      const staleLow: string[] = [];
+      for (const sub of all ?? []) {
+        try {
+          await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, payload);
+          sentLow++;
+        } catch (err: any) {
+          if (err?.statusCode === 404 || err?.statusCode === 410) staleLow.push(sub.endpoint);
+          else console.error("supply push failed:", err?.message || err);
+        }
+      }
+      if (staleLow.length) await admin.from("push_subscriptions").delete().in("endpoint", staleLow);
+      return json({ sent: sentLow, kind: "supply" });
+    }
+
     const record = body?.record;
     if (!record || !record.type) return json({ error: "no record" }, 400);
     const loggedBy = String(record.logged_by || "").toLowerCase();
