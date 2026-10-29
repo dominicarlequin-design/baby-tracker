@@ -4808,6 +4808,192 @@ body:has(.sky) { background: transparent; }
 }
 :root[data-skin="olive"][data-theme="dark"] .sky { --sky-line: #dfe6d4; }
 
+/* Swiss Brutal: Swiss print grid discipline with neo-brutalist weight.
+   Newsprint paper, pure black 3px borders, hard offset shadows with zero
+   blur, square corners, heavy grotesk type with tight tracking, small
+   uppercase labels. Colors are paper, black and one cobalt accent. Status
+   colors (due soon, overdue) and the category colors on the log tiles are
+   left alone so they keep their meaning. Dark mode flips the ink: paper-
+   colored borders and shadows on near-black.
+
+   Selectors use the html:root[data-skin="brutal"] prefix (expanded when this block was inserted) so
+   they outrank the per-theme card rules earlier in this file. */
+
+html:root[data-skin="brutal"] {
+  --bk: #0b0b0b;
+  --bg: #f4f1ea;
+  --card: #ffffff;
+  --ink: #0b0b0b;
+  --ink-muted: #4a4a4a;
+  --border: #0b0b0b;
+  --soft-beige-tint: #ffffff;
+  --accent: #1a3cff;
+  --accent-text: #1a3cff;
+  --accent-ink: #ffffff;
+  --radius: 0px;
+  --bar-tint: #ffffff;
+  --glow-tint: transparent;
+  --glass: #ffffff;
+  --glass-edge: #0b0b0b;
+  --brutal-font: 'Helvetica Neue', Helvetica, 'Arial Nova', Arial, sans-serif;
+}
+html:root[data-skin="brutal"] .sky { --sky-line: #0b0b0b; }
+@media (prefers-color-scheme: dark) {
+  html:root[data-skin="brutal"]:not([data-theme="light"]) {
+    --bk: #f4f1ea;
+    --bg: #0e0e0e;
+    --card: #1a1a1a;
+    --ink: #f4f1ea;
+    --ink-muted: #b8b5ac;
+    --border: #5a5a57;
+    --soft-beige-tint: #141414;
+    --accent: #4c63ff;
+    --accent-text: #9aa9ff;
+    --glass: #1a1a1a;
+    --glass-edge: #f4f1ea;
+    --bar-dark: #1a1a1a;
+    --night-top: #0e0e0e;
+    --night-mid: #0e0e0e;
+    --night-bottom: #0e0e0e;
+    --night-haze-1: transparent;
+    --night-haze-2: transparent;
+    --night-haze-3: transparent;
+  }
+  html:root[data-skin="brutal"]:not([data-theme="light"]) .sky { --sky-line: #f4f1ea; }
+}
+html:root[data-skin="brutal"][data-theme="dark"] {
+  --bk: #f4f1ea;
+  --bg: #0e0e0e;
+  --card: #1a1a1a;
+  --ink: #f4f1ea;
+  --ink-muted: #b8b5ac;
+  --border: #5a5a57;
+  --soft-beige-tint: #141414;
+  --accent: #4c63ff;
+  --accent-text: #9aa9ff;
+  --glass: #1a1a1a;
+  --glass-edge: #f4f1ea;
+  --bar-dark: #1a1a1a;
+  --night-top: #0e0e0e;
+  --night-mid: #0e0e0e;
+  --night-bottom: #0e0e0e;
+  --night-haze-1: transparent;
+  --night-haze-2: transparent;
+  --night-haze-3: transparent;
+}
+html:root[data-skin="brutal"][data-theme="dark"] .sky { --sky-line: #f4f1ea; }
+
+/* Square everything. Dots, spinners and switches become squares too. */
+html:root[data-skin="brutal"] *, html:root[data-skin="brutal"] *::before, html:root[data-skin="brutal"] *::after { border-radius: 0 !important; }
+
+/* Quiet the decoration: no blur, no wrapping-paper doodles, no tab glow. */
+html:root[data-skin="brutal"] .sky-doodles, html:root[data-skin="brutal"] .tab-glow, html:root[data-skin="brutal"] body::after { display: none; }
+html:root[data-skin="brutal"] .card, html:root[data-skin="brutal"] .nextup, html:root[data-skin="brutal"] .tab-bar, html:root[data-skin="brutal"] .modal, html:root[data-skin="brutal"] .stats-pill {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* Type: heavy grotesk, tight tracking, for everything that was serif. */
+html:root[data-skin="brutal"] h1, html:root[data-skin="brutal"] .log-btn-primary, html:root[data-skin="brutal"] .stateful-label, html:root[data-skin="brutal"] .medicine-label,
+html:root[data-skin="brutal"] .nextup-headline, html:root[data-skin="brutal"] .stat-value, html:root[data-skin="brutal"] .milk-next-head,
+html:root[data-skin="brutal"] .milk-progress-head, html:root[data-skin="brutal"] .milk-sheet-title, html:root[data-skin="brutal"] .profile-name,
+html:root[data-skin="brutal"] .quicklog-btn, html:root[data-skin="brutal"] .recipe-row-title, html:root[data-skin="brutal"] .supply-sheet-num,
+html:root[data-skin="brutal"] .swipe-value {
+  font-family: var(--brutal-font);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+}
+html:root[data-skin="brutal"] h1 { font-size: 46px; line-height: 0.92; letter-spacing: -0.05em; text-transform: uppercase; }
+html:root[data-skin="brutal"] .nextup-headline { letter-spacing: -0.04em; }
+
+/* Small labels: uppercase, wide tracking, heavy. */
+html:root[data-skin="brutal"] .section-title, html:root[data-skin="brutal"] .form-label, html:root[data-skin="brutal"] .nextup-eyebrow, html:root[data-skin="brutal"] .today-date {
+  font-family: var(--brutal-font);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+html:root[data-skin="brutal"] .tab-label {
+  font-family: var(--brutal-font);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+html:root[data-skin="brutal"] .today-age, html:root[data-skin="brutal"] .tile-sub {
+  font-family: var(--brutal-font);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+html:root[data-skin="brutal"] .tile-label { font-family: var(--brutal-font); font-weight: 900; text-transform: uppercase; letter-spacing: 0.02em; }
+
+/* Big surfaces: 3px black border, 6px hard shadow. */
+html:root[data-skin="brutal"] .card, html:root[data-skin="brutal"] .nextup, html:root[data-skin="brutal"] .nextup.nextup-due-soon, html:root[data-skin="brutal"] .history-cat,
+html:root[data-skin="brutal"] .journal-card, html:root[data-skin="brutal"] .modal, html:root[data-skin="brutal"] .partner-banner, html:root[data-skin="brutal"] .pattern-nav-row,
+html:root[data-skin="brutal"] .recipe-row, html:root[data-skin="brutal"] .skin-option, html:root[data-skin="brutal"] .stats-pill, html:root[data-skin="brutal"] .tab-bar {
+  background: var(--card);
+  border: 3px solid var(--bk);
+  box-shadow: 6px 6px 0 var(--bk);
+}
+html:root[data-skin="brutal"] .tab-bar { box-shadow: 4px 4px 0 var(--bk); }
+html:root[data-skin="brutal"] .skin-option.is-on { background: var(--accent); color: var(--accent-ink); border-color: var(--bk); }
+html:root[data-skin="brutal"] .skin-option.is-on .skin-name, html:root[data-skin="brutal"] .skin-option.is-on .skin-note, html:root[data-skin="brutal"] .skin-option.is-on .skin-check { color: var(--accent-ink); }
+html:root[data-skin="brutal"] .skin-swatch { border: 2.5px solid var(--bk); }
+
+/* Small surfaces and buttons: 2.5px border, 3px shadow, press to flatten. */
+html:root[data-skin="brutal"] .stat-tile, html:root[data-skin="brutal"] .header-icon-btn, html:root[data-skin="brutal"] .theme-toggle, html:root[data-skin="brutal"] .stepper-btn,
+html:root[data-skin="brutal"] .export-btn, html:root[data-skin="brutal"] .journal-filter, html:root[data-skin="brutal"] .journal-photo-btn,
+html:root[data-skin="brutal"] .milestone-stage-pill, html:root[data-skin="brutal"] .stateful-btn.outline, html:root[data-skin="brutal"] .add-row-btn,
+html:root[data-skin="brutal"] .digest-mood-chip, html:root[data-skin="brutal"] .milk-preview-pill, html:root[data-skin="brutal"] .picker-btn,
+html:root[data-skin="brutal"] .shop-add-btn, html:root[data-skin="brutal"] .supply-count-btn, html:root[data-skin="brutal"] .supply-low-chip,
+html:root[data-skin="brutal"] .why-btn, html:root[data-skin="brutal"] .log-btn, html:root[data-skin="brutal"] .tab-fab {
+  border: 2.5px solid var(--bk);
+  box-shadow: 3px 3px 0 var(--bk);
+}
+html:root[data-skin="brutal"] .card:active, html:root[data-skin="brutal"] .history-cat:active, html:root[data-skin="brutal"] .pattern-nav-row:active, html:root[data-skin="brutal"] .recipe-row:active,
+html:root[data-skin="brutal"] .header-icon-btn:active, html:root[data-skin="brutal"] .theme-toggle:active, html:root[data-skin="brutal"] .stepper-btn:active,
+html:root[data-skin="brutal"] .export-btn:active, html:root[data-skin="brutal"] .picker-btn:active, html:root[data-skin="brutal"] .why-btn:active, html:root[data-skin="brutal"] .log-btn:active,
+html:root[data-skin="brutal"] .tab-fab:active, html:root[data-skin="brutal"] .skin-option:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 var(--bk);
+}
+
+/* The big center + button: solid accent square. */
+html:root[data-skin="brutal"] .tab-fab { background: var(--accent); color: var(--accent-ink); border-width: 3px; box-shadow: 4px 4px 0 var(--bk); }
+html:root[data-skin="brutal"] .tab-fab svg { stroke: var(--accent-ink); }
+
+/* Tab bar: line icons in ink, the current tab inverts. */
+html:root[data-skin="brutal"] .tab-icon-color { display: none; }
+html:root[data-skin="brutal"] .tab-icon-line { display: block; }
+html:root[data-skin="brutal"] .tab-item { color: var(--ink); }
+html:root[data-skin="brutal"] .tab-item.tab-active { background: var(--bk); color: var(--bg); }
+html:root[data-skin="brutal"] .tab-item.tab-active .tab-icon-wrap { background: transparent; box-shadow: none; }
+
+/* Log tiles keep their category colors; the art becomes black line work on
+   flat color, boxed and shadowed like a poster block. */
+html:root[data-skin="brutal"] .tile-icon { background-image: none !important; border: 3px solid var(--bk); box-shadow: 5px 5px 0 var(--bk) !important; }
+html:root[data-skin="brutal"] .tile-icon .tile-art-flat { display: none; }
+html:root[data-skin="brutal"] .tile-icon .tile-art-line { display: block; color: #0b0b0b; }
+html:root[data-skin="brutal"] .tile-icon > svg.tile-art-line { width: 78%; height: 78%; }
+html:root[data-skin="brutal"] .tile-btn:active .tile-icon { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--bk) !important; }
+html:root[data-skin="brutal"] .history-cat-head .tile-icon, html:root[data-skin="brutal"] .nextup-row .tile-icon,
+html:root[data-skin="brutal"] .stat-tile .tile-icon, html:root[data-skin="brutal"] .milk-bottle .tile-icon { border-width: 2.5px; box-shadow: 3px 3px 0 var(--bk) !important; }
+
+/* Inputs: boxed, no soft edges. */
+html:root[data-skin="brutal"] input, html:root[data-skin="brutal"] select, html:root[data-skin="brutal"] textarea {
+  background: var(--card);
+  color: var(--ink);
+  border: 3px solid var(--bk);
+  box-shadow: none;
+}
+html:root[data-skin="brutal"] :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Progress bar under Next up: thick, boxed. */
+html:root[data-skin="brutal"] .nextup-progress-track { border: 2.5px solid var(--bk); height: 12px; background: var(--card); }
+html:root[data-skin="brutal"] .nextup-progress-fill { background: var(--bk); }
+
+
 /* App look picker (Profile). */
 .skin-grid { display: grid; gap: 10px; margin-top: 2px; }
 .skin-option {
