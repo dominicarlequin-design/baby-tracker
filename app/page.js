@@ -33,6 +33,7 @@ import { EVENTS_CHANGED } from '../lib/QuickLogSheet';
 import { useLogSync } from '../lib/LogSync';
 import { describeLog, findDoubleLog, whoLogged } from '../lib/logText';
 import { useSupplies, isLow } from '../lib/supplies';
+import { LONG_NAP_HOURS } from '../lib/logic';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -51,7 +52,11 @@ function AsleepCard({ kind, since, now, timezone }) {
         <div className="nextup-text">
           <div className="nextup-eyebrow">{kind === 'nap' ? 'Napping' : 'Sleeping'}</div>
           <div className="nextup-headline asleep-duration">{formatHours(hours)}</div>
-          <div className="nextup-sub">Since {formatLocalTime(since, timezone)} · alerts paused</div>
+          <div className="nextup-sub">
+            {kind === 'nap' && hours > LONG_NAP_HOURS
+              ? `Still asleep? Tap End nap if she's up · since ${formatLocalTime(since, timezone)}`
+              : `Since ${formatLocalTime(since, timezone)} · feed & diaper alerts paused`}
+          </div>
         </div>
       </div>
     </div>
