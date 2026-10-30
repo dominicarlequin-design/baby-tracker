@@ -5438,3 +5438,45 @@ html:root[data-skin="brutal"] .nextup-progress-fill { background: var(--bk); }
   :root[data-skin="olive"]:not([data-theme="light"]) .form-input { background-color: rgba(14, 20, 34, 0.5); }
 }
 :root[data-skin="olive"][data-theme="dark"] .form-input { background-color: rgba(14, 20, 34, 0.5); }
+
+/* Blossom page lift: cards, banners, pills, header buttons and the tab bar get
+   the same treatment as the tiles: a solid ledge (their thickness) in a deeper
+   shade, plus a longer soft shadow. Other skins keep their own depth. */
+:root:not([data-skin]) {
+  --lift-edge: color-mix(in srgb, var(--border) 60%, #8a4a7e);
+  --lift-shadow: rgba(90, 58, 85, 0.3);
+}
+:root:not([data-skin]) .card,
+:root:not([data-skin]) .nextup,
+:root:not([data-skin]) .stats-pill,
+:root:not([data-skin]) .history-cat,
+:root:not([data-skin]) .journal-card,
+:root:not([data-skin]) .pattern-nav-row,
+:root:not([data-skin]) .recipe-row {
+  box-shadow:
+    0 4px 0 -1px var(--lift-edge),
+    0 14px 22px -10px var(--lift-shadow);
+}
+:root:not([data-skin]) .nextup.nextup-overdue { --lift-edge: color-mix(in srgb, var(--overdue) 38%, var(--card)); --lift-shadow: color-mix(in srgb, var(--overdue) 35%, transparent); }
+:root:not([data-skin]) .nextup.nextup-due-soon { --lift-edge: color-mix(in srgb, var(--due-soon) 40%, var(--card)); --lift-shadow: color-mix(in srgb, var(--due-soon) 35%, transparent); }
+:root:not([data-skin]) .header-icon-btn {
+  box-shadow:
+    0 3px 0 -1px var(--lift-edge),
+    0 8px 14px -6px var(--lift-shadow);
+}
+:root:not([data-skin]) .tab-bar {
+  box-shadow:
+    0 5px 0 -1px var(--lift-edge),
+    0 20px 32px -10px var(--lift-shadow);
+}
+:root:not([data-skin]) .tab-fab {
+  box-shadow:
+    0 4px 0 -1px color-mix(in srgb, var(--accent) 45%, #fff),
+    0 12px 20px -6px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+:root:not([data-skin]) .tab-fab:active { box-shadow: 0 1px 0 -1px color-mix(in srgb, var(--accent) 45%, #fff); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-skin]):not([data-theme="light"]) { --lift-edge: rgba(8, 3, 24, 0.75); --lift-shadow: rgba(0, 0, 0, 0.6); }
+  :root:not([data-skin]):not([data-theme="light"]) .tab-fab { box-shadow: 0 4px 0 -1px rgba(8, 3, 24, 0.8), 0 12px 20px -6px rgba(0, 0, 0, 0.6); }
+}
+:root:not([data-skin])[data-theme="dark"] { --lift-edge: rgba(8, 3, 24, 0.75); --lift-shadow: rgba(0, 0, 0, 0.6); }
