@@ -2418,6 +2418,55 @@ button:focus-visible {
   .tile-icon { box-shadow: 0 10px 18px -8px rgba(0, 0, 0, 0.6), inset 0 2px 0 rgba(255, 255, 255, 0.25); }
 }
 
+/* Blossom only: extra lift. Each button gets a solid "ledge" (its thickness,
+   a deeper shade of its own color) plus a longer, softer drop shadow. Pressed
+   states above still win and flatten it. Other skins keep their own depth. */
+:root:not([data-skin]) .tile-icon {
+  --edge: color-mix(in srgb, var(--tile-bg, #e8d5e4) 62%, #6b2f63);
+  box-shadow:
+    0 5px 0 -1px var(--edge),
+    0 20px 28px -10px color-mix(in srgb, var(--edge) 75%, transparent),
+    inset 0 2px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -4px 0 rgba(90, 50, 80, 0.07);
+}
+:root:not([data-skin]) .stat-tile .tile-icon,
+:root:not([data-skin]) .nextup-row .tile-icon {
+  box-shadow:
+    0 3px 0 -1px var(--edge),
+    0 9px 14px -6px color-mix(in srgb, var(--edge) 70%, transparent),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.7);
+}
+:root:not([data-skin]) .tile-btn:active .tile-icon {
+  box-shadow:
+    0 1px 0 -1px var(--edge),
+    0 3px 6px -4px color-mix(in srgb, var(--edge) 80%, transparent),
+    inset 0 2px 0 rgba(255, 255, 255, 0.75);
+}
+:root:not([data-skin]) .log-btn {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 4px 0 -1px rgba(44, 42, 38, 0.16),
+    0 12px 20px -6px rgba(44, 42, 38, 0.24),
+    0 10px 18px -6px var(--glow);
+}
+:root:not([data-skin]) .stateful-btn {
+  box-shadow:
+    0 3px 0 -1px rgba(44, 42, 38, 0.12),
+    0 10px 18px -6px rgba(44, 42, 38, 0.2),
+    0 10px 18px -6px var(--glow);
+}
+:root:not([data-skin]) .form-save {
+  box-shadow:
+    0 4px 0 -1px color-mix(in srgb, var(--accent) 55%, #000),
+    0 14px 22px -8px color-mix(in srgb, var(--accent) 70%, #000),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+:root:not([data-skin]) .log-btn:active,
+:root:not([data-skin]) .stateful-btn:active { box-shadow: 0 1px 3px rgba(44, 42, 38, 0.12); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-skin]):not([data-theme="light"]) .tile-icon { --edge: color-mix(in srgb, var(--tile-bg, #6a5a8a) 45%, #12082a); }
+}
+
 /* Short phones (about 740px tall or less): tighten Today so the whole screen,
    stats included, sits above the tab bar without scrolling. Taller phones
    keep the roomier layout. */
