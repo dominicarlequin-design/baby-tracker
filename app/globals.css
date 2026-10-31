@@ -5723,3 +5723,20 @@ html:root[data-skin="brutal"] .header-icon-label { color: inherit; }
 /* Theme button caption (same as the Today header buttons). */
 .theme-toggle { position: relative; }
 .header-row:has(.theme-toggle) { padding-bottom: 16px; }
+
+/* iOS Safari date/time inputs ignore width:100% and push past their card
+   (Profile: Birth date, Usual bedtime). Clamp them and left-align the
+   value so they line up with the Weight field. */
+input.form-input[type="date"],
+input.form-input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  text-align: left;
+}
+input.form-input[type="date"]::-webkit-date-and-time-value,
+input.form-input[type="time"]::-webkit-date-and-time-value { text-align: left; margin: 0; }
