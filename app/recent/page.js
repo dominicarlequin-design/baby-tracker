@@ -9,6 +9,7 @@ import { parentName } from '../../lib/logText';
 import { isoToLocalDatetimeInputValue, localDateTimeToUtc, localDateStr } from '../../lib/logic';
 import { dailySummaries } from '../../lib/summaries';
 import { dailyMilkTarget } from '../../lib/milk';
+import { REACTIONS, normalizeFood } from '../../lib/solids';
 import { DailyMilkSheet, useDailyMilk } from '../../lib/DailyMilkSheet';
 import {
   formatLocalTime,
@@ -21,7 +22,7 @@ import {
   TileIcon,
 } from '../../lib/homeUi';
 
-const EVENT_TYPES = ['feed', 'diaper', 'nap_start', 'nap_end', 'medicine', 'sleep_start', 'sleep_end', 'custom'];
+const EVENT_TYPES = ['feed', 'diaper', 'nap_start', 'nap_end', 'medicine', 'sleep_start', 'sleep_end', 'custom', 'solid'];
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 // Same fetch window as the Log screen; the activity list itself only shows
@@ -37,6 +38,7 @@ const CATEGORIES = [
   { key: 'diaper', label: 'Diapers', icon: 'diaper', none: 'No diapers yet today' },
   { key: 'sleep', label: 'Sleep', icon: 'sleep', none: 'No naps yet today' },
   { key: 'medicine', label: 'Medicine', icon: 'medicine', none: 'No medicine yet today' },
+  { key: 'solid', label: 'Solids', icon: 'solid', none: 'No solids yet today' },
   { key: 'custom', label: 'Custom', icon: 'custom', none: 'Nothing custom yet today' },
   { key: 'all', label: 'All activity', icon: null, none: 'Nothing logged yet today' },
 ];
@@ -46,6 +48,7 @@ const EMPTY_TEXT = {
   diaper: 'No diapers in the last 30 days.',
   sleep: 'No naps or night sleep in the last 30 days.',
   medicine: 'No medicine in the last 30 days.',
+  solid: 'No solids in the last 30 days.',
   custom: 'Nothing custom logged in the last 30 days.',
 };
 
@@ -55,6 +58,7 @@ function categoryOf(item) {
   if (item.type === 'diaper') return 'diaper';
   if (item.type === 'medicine') return 'medicine';
   if (item.type === 'custom') return 'custom';
+  if (item.type === 'solid') return 'solid';
   return 'sleep'; // nap_start / nap_end / sleep_start / sleep_end
 }
 
@@ -79,6 +83,7 @@ function daySummary(filter, items) {
     return naps.length ? `${plural(naps.length, 'nap', 'naps')} · ${formatHours(hours)}` : '';
   }
   if (filter === 'medicine') return plural(items.length, 'dose', 'doses');
+  if (filter === 'solid') return plural(items.length, 'meal', 'meals');
   if (filter === 'custom') return plural(items.length, 'entry', 'entries');
   return '';
 }
@@ -96,6 +101,8 @@ export default function RecentPage() {
   const [editFeedOunces, setEditFeedOunces] = useState('');
   const [editDiaperDetail, setEditDiaperDetail] = useState('');
   const [editCustomLabel, setEditCustomLabel] = useState('');
+  const [editFoodName, setEditFoodName] = useState('');
+  const [editFoodReaction, setEditFoodReaction] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
   const [deletingEdit, setDeletingEdit] = useState(false);
   const [openKey, setOpenKey] = useState(null);
@@ -189,6 +196,7 @@ export default function RecentPage() {
       return `Last ${ago}`;
     }
     if (cat.key === 'medicine') return `Last given ${ago}`;
+    if (cat.key === 'solid') return raw.food_name ? `Last ${ago} · ${raw.food_name}` : `Last ${ago}`;
     if (cat.key === 'custom') return `Last ${ago}`;
     return `Last ${ago} · ${activityTitle(raw)}`;
   };
@@ -225,6 +233,8 @@ export default function RecentPage() {
     setEditFeedOunces(event.feed_ounces != null ? String(event.feed_ounces) : '');
     setEditDiaperDetail(event.diaper_detail || '');
     setEditCustomLabel(event.custom_label || '');
+    setEditFoodName(event.food_name || '');
+    setEditFoodReaction(event.food_reaction || '');
   }, [config]);
 
   const cancelEdit = useCallback(() => {
@@ -234,6 +244,8 @@ export default function RecentPage() {
     setEditFeedOunces('');
     setEditDiaperDetail('');
     setEditCustomLabel('');
+    setEditFoodName('');
+    setEditFoodReaction('');
   }, []);
 
   const confirmEdit = useCallback(async () => {
@@ -241,6 +253,11 @@ export default function RecentPage() {
     const customLabel = editCustomLabel.trim().replace(/\s+/g, ' ');
     if (editType === 'custom' && !customLabel) {
       showToast('Give the custom entry a label');
+      return;
+    }
+    const foodName = normalizeFood(editFoodName);
+    if (editType === 'solid' && !foodName) {
+      showToast('Give the solid entry a food name');
       return;
     }
     const [datePart, timePart] = editValue.split('T');
@@ -257,6 +274,8 @@ export default function RecentPage() {
           feed_ounces: editType === 'feed' && editFeedOunces ? Number(editFeedOunces) : null,
           diaper_detail: editType === 'diaper' && editDiaperDetail ? editDiaperDetail : null,
           custom_label: editType === 'custom' ? customLabel.slice(0, 60) : null,
+          food_name: editType === 'solid' ? foodName.slice(0, 60) : null,
+          food_reaction: editType === 'solid' && editFoodReaction ? editFoodReaction : null,
         })
         .eq('id', editingEvent.id)
         .select()
@@ -271,7 +290,7 @@ export default function RecentPage() {
     } finally {
       setSavingEdit(false);
     }
-  }, [editingEvent, editValue, editType, editFeedOunces, editDiaperDetail, editCustomLabel, config, cancelEdit, showToast]);
+  }, [editingEvent, editValue, editType, editFeedOunces, editDiaperDetail, editCustomLabel, editFoodName, editFoodReaction, config, cancelEdit, showToast]);
 
   const deleteEdit = useCallback(async () => {
     if (!editingEvent) return;
@@ -469,6 +488,22 @@ export default function RecentPage() {
                 value={editCustomLabel}
                 onChange={e => setEditCustomLabel(e.target.value)}
               />
+            )}
+            {editType === 'solid' && (
+              <>
+                <input
+                  className="form-input modal-select"
+                  type="text"
+                  maxLength={60}
+                  placeholder="What did she eat? e.g. Pumpkin"
+                  value={editFoodName}
+                  onChange={e => setEditFoodName(e.target.value)}
+                />
+                <select className="modal-select" value={editFoodReaction} onChange={e => setEditFoodReaction(e.target.value)}>
+                  <option value="">No reaction logged</option>
+                  {Object.entries(REACTIONS).map(([k, t]) => <option key={k} value={k}>{t}</option>)}
+                </select>
+              </>
             )}
             {editType === 'diaper' && (
               <select className="modal-select" value={editDiaperDetail} onChange={e => setEditDiaperDetail(e.target.value)}>
