@@ -36,6 +36,8 @@ import { useSupplies, isLow } from '../lib/supplies';
 import { LONG_NAP_HOURS } from '../lib/logic';
 import { SolidsSheet } from '../lib/SolidsSheet';
 import { useHandoff, HandoffBanner, HandoffRow, HandoffSheet, otherParentName } from '../lib/Handoff';
+
+import { isNetworkError, enqueue, dequeue, pendingAsEvents, flushQueue, readQueue, QUEUE_CHANGED } from '../lib/offlineQueue';
 import { summarizeFoods } from '../lib/solids';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -110,6 +112,10 @@ export default function Page() {
   const [solidRows, setSolidRows] = useState([]);
   const [solidsOpen, setSolidsOpen] = useState(false);
   const [handoffOpen, setHandoffOpen] = useState(false);
+
+  const [pendingCount, setPendingCount] = useState(0);
+  const flushingRef = useRef(false);
+  const queuedRef = useRef({});
   const [nudgeDismissedDay, setNudgeDismissedDay] = useState(null);
   const toastTimeoutRef = useRef(null);
   const { email: myEmail } = useLogSync();
@@ -148,7 +154,7 @@ export default function Page() {
     if (configRes.error) console.error(configRes.error);
     if (eventsRes.error) console.error(eventsRes.error);
     if (configRes.data) setConfig(configRes.data);
-    if (eventsRes.data) setEvents(eventsRes.data);
+    if (eventsRes.data) setEvents([...pendingAsEvents(), ...eventsRes.data]);
     setLoading(false);
   }, []);
 
@@ -218,6 +224,39 @@ export default function Page() {
     toastTimeoutRef.current = setTimeout(() => setToastShow(false), opts.actionLabel ? 4000 : 2200);
   }, []);
 
+  // Send logs saved while there was no signal: on open, when the phone comes
+  // back online or to the foreground, and every 20s while any are waiting.
+  const flushPending = useCallback(async () => {
+    if (flushingRef.current || readQueue().length === 0) return;
+    flushingRef.current = true;
+    try {
+      const { sent, dropped } = await flushQueue(supabase);
+      if (sent || dropped) {
+        queuedRef.current = {};
+        await fetchAll();
+        if (sent) showToast(`Back online: sent ${sent} saved ${sent === 1 ? 'log' : 'logs'}`);
+      }
+    } finally {
+      flushingRef.current = false;
+    }
+  }, [fetchAll, showToast]);
+  useEffect(() => {
+    const count = () => setPendingCount(readQueue().length);
+    count();
+    flushPending();
+    const onVisible = () => { if (document.visibilityState === 'visible') flushPending(); };
+    window.addEventListener(QUEUE_CHANGED, count);
+    window.addEventListener('online', flushPending);
+    document.addEventListener('visibilitychange', onVisible);
+    const t = setInterval(() => { if (readQueue().length) flushPending(); }, 20000);
+    return () => {
+      window.removeEventListener(QUEUE_CHANGED, count);
+      window.removeEventListener('online', flushPending);
+      document.removeEventListener('visibilitychange', onVisible);
+      clearInterval(t);
+    };
+  }, [flushPending]);
+
   // Inserts optimistically so a tap feels instant and the rolling averages
   // driving the whole screen don't wait on a round trip. Wrapping the
   // supabase call in Promise.resolve() up front is what makes it safe to
@@ -244,6 +283,13 @@ export default function Page() {
       actionLabel: 'Undo',
       onAction: async () => {
         const { data, error } = await insertPromise;
+        if (queuedRef.current[tempId]) {
+          const qid = queuedRef.current[tempId];
+          dequeue(qid);
+          delete queuedRef.current[tempId];
+          setEvents(prev => prev.filter(e => e.id !== tempId && e.id !== `temp-${qid}`));
+          return;
+        }
         if (!error && data) {
           await supabase.from('baby_events').delete().eq('id', data.id);
           setEvents(prev => prev.filter(e => e.id !== data.id));
@@ -262,6 +308,14 @@ export default function Page() {
 
     insertPromise.then(async ({ data, error }) => {
       if (minWait) await minWait;
+      if (error && isNetworkError(error)) {
+        // No signal: keep it on this phone and send it later (lib/offlineQueue.js).
+        queuedRef.current[tempId] = enqueue({ type, event_time: eventTime, ...extra });
+        setEvents(prev => prev.map(e => (e.id === tempId ? { ...e, pending: true } : e)));
+        showToast(`No signal. ${label} is saved on this phone and sends when you're back online.`);
+        if (phaseKey) setButtonPhase(phaseKey, 'success', 900);
+        return;
+      }
       if (error) {
         console.error(error);
         setEvents(prev => prev.filter(e => e.id !== tempId));
@@ -490,6 +544,13 @@ export default function Page() {
 
       {handoff.note && !handoff.mine && (
         <HandoffBanner note={handoff.note} now={now} onSeen={handoff.markSeen} />
+      )}
+
+      {pendingCount > 0 && (
+        <button type="button" className="pending-pill" onClick={flushPending}>
+          <span className="pending-dot" aria-hidden="true" />
+          {pendingCount} {pendingCount === 1 ? 'log' : 'logs'} waiting for signal · tap to retry
+        </button>
       )}
 
       {loading || !status ? (
