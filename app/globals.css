@@ -5590,3 +5590,14 @@ html:root[data-skin="brutal"] .nextup-progress-fill { background: var(--bk); }
   :root:not([data-skin]):not([data-theme="light"]) { --border: #52295e; }
 }
 :root:not([data-skin])[data-theme="dark"] { --border: #52295e; }
+
+/* Tile captions: wrap long ones ("last entry 23h ago") onto two lines instead
+   of running into the neighbouring tile's caption. */
+.tile-btn .tile-sub {
+  white-space: normal;
+  width: max-content;
+  max-width: 100px;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+.wrap:has(.tile-grid) > .tile-grid { padding-bottom: 8px; }
