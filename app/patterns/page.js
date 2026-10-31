@@ -93,6 +93,11 @@ export default function PatternsPage() {
             sub={milestoneSub}
           />
           <NavRow
+            href="/patterns/summary"
+            title="Visit summary"
+            sub="One page for the pediatrician, ready to print"
+          />
+          <NavRow
             href="/patterns/foods"
             title="Foods tried"
             sub="Every new food and how it went"
