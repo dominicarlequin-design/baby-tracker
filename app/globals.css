@@ -5601,3 +5601,17 @@ html:root[data-skin="brutal"] .nextup-progress-fill { background: var(--bk); }
   text-wrap: balance;
 }
 .wrap:has(.tile-grid) > .tile-grid { padding-bottom: 8px; }
+
+/* Status card: let the headline and the sentence under it wrap to fit
+   instead of cutting off with "...". The big nap/sleep timer stays one line. */
+.nextup .nextup-headline:not(.asleep-duration) {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.2;
+}
+.nextup .nextup-sub {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
