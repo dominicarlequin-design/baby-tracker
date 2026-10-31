@@ -5683,3 +5683,43 @@ html:root[data-skin="brutal"] .nextup-progress-fill { background: var(--bk); }
 }
 .today-header-actions { padding-bottom: 18px; }
 html:root[data-skin="brutal"] .header-icon-label { color: inherit; }
+
+/* ---- Soft Lilac screens pass: Journal, Insights, History ---- */
+/* Journal: photos 16:9, title on its own line, digest link reads as a button. */
+:root:not([data-skin]) .journal-card-photo { aspect-ratio: 16 / 9; }
+:root:not([data-skin]) .journal-card-head { flex-direction: column; align-items: flex-start; gap: 2px; }
+:root:not([data-skin]) .journal-card-title { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+:root:not([data-skin]) .journal-digest-link {
+  align-items: center;
+  margin: 14px 0 4px;
+  padding: 12px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 0 -1px var(--lift-edge), 0 14px 22px -10px var(--lift-shadow);
+}
+/* Insights: lilac tracks instead of grey, one accent for the selected pill. */
+:root:not([data-skin]) .swipe-tabs,
+:root:not([data-skin]) .swipe-ranges { background: color-mix(in srgb, var(--accent) 10%, var(--card)); box-shadow: inset 0 1px 2px rgba(79, 52, 190, 0.1); }
+:root:not([data-skin]) .swipe-range-thumb { background: var(--accent); box-shadow: 0 2px 6px -2px rgba(79, 52, 190, 0.5); }
+:root:not([data-skin]) .swipe-range.is-on { color: #fff; }
+:root:not([data-skin]) .swipe-tab.is-on { color: var(--accent-text); }
+.swipe-avg-label {
+  position: absolute;
+  right: 0;
+  transform: translateY(-100%);
+  padding: 0 4px 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-muted);
+  background: var(--card);
+  pointer-events: none;
+}
+/* History: tighter rows, lilac "All activity" icon, roomier stats columns. */
+:root:not([data-skin]) .history-cat-head { padding-top: 9px; padding-bottom: 9px; }
+:root:not([data-skin]) .history-cat-all-icon { color: var(--accent-text); background: color-mix(in srgb, var(--accent) 16%, var(--card)); }
+.stats-row .stat-tile { padding-left: 12px; padding-right: 12px; }
+.stats-row .stat-tile:first-child { padding-left: 4px; }
+/* Theme button caption (same as the Today header buttons). */
+.theme-toggle { position: relative; }
+.header-row:has(.theme-toggle) { padding-bottom: 16px; }
