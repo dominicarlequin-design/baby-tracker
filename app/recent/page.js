@@ -189,7 +189,7 @@ export default function RecentPage() {
       return `Last ${ago}`;
     }
     if (cat.key === 'medicine') return `Last given ${ago}`;
-    if (cat.key === 'custom') return `Last ${ago} · ${raw.custom_label || 'Custom'}`;
+    if (cat.key === 'custom') return `Last ${ago}`;
     return `Last ${ago} · ${activityTitle(raw)}`;
   };
 

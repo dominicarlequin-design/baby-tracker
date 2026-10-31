@@ -80,7 +80,7 @@ export default function PatternsPage() {
           <NavRow
             href="/patterns/typical-day"
             title="Typical day"
-            sub={typicalDay ? 'Naps, wake window, bedtime & feed/diaper gaps' : 'Keep logging two weeks to unlock this'}
+            sub={typicalDay ? 'Naps, wake windows & bedtime' : 'Keep logging two weeks to unlock this'}
           />
           <NavRow
             href="/patterns/compare"
