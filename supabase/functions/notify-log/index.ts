@@ -1,6 +1,7 @@
 // Partner alert: when one parent logs something, push it to the other
 // parent's phones ("Ysa logged a feed / 4 oz · 3:42 PM"). Also sends the
-// "Running low: Diapers" alert to every phone (migration 0006).
+// "Running low: Diapers" alert to every phone (migration 0006), and
+// handoff notes to the other parent (migration 0008).
 //
 // Called by the baby_events_notify_partner trigger (migration 0005) through
 // pg_net, with the same x-cron-secret that guards check-overdue. Phones
@@ -64,6 +65,42 @@ Deno.serve(async (req) => {
       }
       if (staleLow.length) await admin.from("push_subscriptions").delete().in("endpoint", staleLow);
       return json({ sent: sentLow, kind: "supply" });
+    }
+
+    // Handoff note (migration 0008): push it to the other parent's phones.
+    if (body?.handoff) {
+      const h = body.handoff;
+      const author = String(h.created_by || "").toLowerCase();
+      if (!author) return json({ skipped: "no author" });
+      const { data: cfgH, error: cfgHErr } = await admin.from("baby_config").select("vapid_public_key").eq("id", 1).single();
+      if (cfgHErr) throw cfgHErr;
+      const { data: vapidH, error: vHErr } = await admin.rpc("app_get_secret", { secret_name: "vapid_private_key" });
+      if (vHErr) throw vHErr;
+      if (!cfgH.vapid_public_key || !vapidH) return json({ error: "vapid keys not configured" }, 500);
+      webpush.setVapidDetails("mailto:dominic.arlequin@gmail.com", cfgH.vapid_public_key, vapidH);
+      const { data: others, error: oErr } = await admin
+        .from("push_subscriptions").select("*").not("user_email", "is", null).neq("user_email", author);
+      if (oErr) throw oErr;
+      const note = String(h.note || "");
+      const payload = JSON.stringify({
+        title: `${parentName(author) || "Someone"} left you a note`,
+        body: note.length > 140 ? `${note.slice(0, 137)}...` : note,
+        category: "handoff",
+        tag: `handoff-${h.id}`,
+      });
+      let sentH = 0;
+      const staleH: string[] = [];
+      for (const sub of others ?? []) {
+        try {
+          await webpush.sendNotification({ endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } }, payload);
+          sentH++;
+        } catch (err: any) {
+          if (err?.statusCode === 404 || err?.statusCode === 410) staleH.push(sub.endpoint);
+          else console.error("handoff push failed:", err?.message || err);
+        }
+      }
+      if (staleH.length) await admin.from("push_subscriptions").delete().in("endpoint", staleH);
+      return json({ sent: sentH, kind: "handoff" });
     }
 
     const record = body?.record;
