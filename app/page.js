@@ -436,12 +436,14 @@ export default function Page() {
               <path d="M3.5 8.5 12 13l8.5-4.5M12 13v8M7.8 6.2l8.5 4.6" />
             </svg>
             {lowSupplies.length > 0 && <span className="supplies-dot" aria-hidden="true" />}
+            <span className="header-icon-label" aria-hidden="true">Supplies</span>
           </Link>
           <Link href="/upcoming" className="header-icon-btn" aria-label="Upcoming schedule">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <rect x="4" y="5.5" width="16" height="15" rx="2.5" />
               <path d="M4 10h16M8 3.5v3M16 3.5v3" />
             </svg>
+            <span className="header-icon-label" aria-hidden="true">Schedule</span>
           </Link>
         </div>
       </div>
@@ -595,7 +597,7 @@ export default function Page() {
             <Link href="/journal" className="tile-btn">
               <TileIcon name="journal" />
               <span className="tile-label">Journal</span>
-              <span className="tile-sub">{lastJournalAt ? `last entry ${formatRelative(lastJournalAt, now)}` : 'write a note'}</span>
+              <span className="tile-sub">{lastJournalAt ? formatRelative(lastJournalAt, now) : 'write a note'}</span>
             </Link>
           </div>
         </>

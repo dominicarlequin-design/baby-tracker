@@ -5566,15 +5566,14 @@ html:root[data-skin="brutal"] .nextup-progress-fill { background: var(--bk); }
   --lift-shadow: rgba(79, 52, 190, 0.26);
 }
 /* Today tiles: violet, orchid-pink, periwinkle, aqua. */
-:root:not([data-skin]) .tile-icon[data-art="feed"],
-:root:not([data-skin]) .tile-icon[data-art="journal"] { --tile-bg: #c4b5ff !important; background-color: #c4b5ff !important; }
-:root:not([data-skin]) .tile-icon[data-art="diaper"] { --tile-bg: #f3b6e6 !important; background-color: #f3b6e6 !important; }
-:root:not([data-skin]) .tile-icon[data-art="bedtime"] { --tile-bg: #a995f5 !important; background-color: #a995f5 !important; }
+:root:not([data-skin]) .tile-icon[data-art="feed"] { --tile-bg: #c4b5ff !important; background-color: #c4b5ff !important; }
+:root:not([data-skin]) .tile-icon[data-art="diaper"] { --tile-bg: #e3a6f2 !important; background-color: #e3a6f2 !important; }
+:root:not([data-skin]) .tile-icon[data-art="bedtime"] { --tile-bg: #8f7bee !important; background-color: #8f7bee !important; }
 :root:not([data-skin]) .tile-icon[data-art="sleep"] { --tile-bg: #b4d4ff !important; background-color: #b4d4ff !important; }
 :root:not([data-skin]) .tile-icon[data-art="medicine"] { --tile-bg: #b8e8ef !important; background-color: #b8e8ef !important; }
 :root:not([data-skin]) .tile-icon[data-art="custom"] { --tile-bg: #d9d0ff !important; background-color: #d9d0ff !important; }
 :root:not([data-skin]) .tile-icon[data-art] {
-  --edge: color-mix(in srgb, var(--tile-bg) 55%, #3d1fa8);
+  --edge: color-mix(in srgb, var(--tile-bg) 70%, #4a2bbf);
   background-image: linear-gradient(180deg, color-mix(in srgb, var(--tile-bg) 45%, #fff) 0%, var(--tile-bg) 55%, color-mix(in srgb, var(--tile-bg) 88%, #3d1fa8) 100%) !important;
 }
 :root:not([data-skin]) .tab-fab { border-color: var(--accent); }
@@ -5651,3 +5650,36 @@ html:root[data-skin="brutal"] .nextup-progress-fill { background: var(--bk); }
     linear-gradient(180deg, #2a2060 0%, #15112e 45%, #0e0a22 100%);
 }
 :root:not([data-skin])[data-theme="dark"] .tile-icon[data-art] { --edge: color-mix(in srgb, var(--tile-bg) 45%, #0e0a22); }
+
+/* ---- Soft Lilac UX pass ---- */
+/* Journal reads as its own pale tile; Bedtime is the deep indigo one. */
+:root:not([data-skin]) .tile-icon[data-art="journal"] { --tile-bg: #ece7ff !important; background-color: #ece7ff !important; }
+/* Overdue card gets a real red edge so pink tiles never read as "late". */
+:root:not([data-skin]) .nextup.nextup-overdue {
+  border-color: var(--overdue);
+  --lift-edge: color-mix(in srgb, var(--overdue) 55%, #fff);
+}
+/* Doodles stay in the page body; they fade out before the tab bar and the
+   bar itself is solid so nothing shows through next to the labels. */
+:root:not([data-skin]) .sky-doodles {
+  -webkit-mask-image: linear-gradient(transparent 0, transparent 116px, #000 170px, #000 40%, transparent 68%);
+  mask-image: linear-gradient(transparent 0, transparent 116px, #000 170px, #000 40%, transparent 68%);
+}
+:root:not([data-skin]) .tab-bar { background: var(--card); -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* Header icon captions */
+.today-header-actions { align-items: flex-start; gap: 24px; }
+.header-icon-btn { position: relative; }
+.header-icon-label {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.today-header-actions { padding-bottom: 18px; }
+html:root[data-skin="brutal"] .header-icon-label { color: inherit; }
