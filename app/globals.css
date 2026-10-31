@@ -5480,3 +5480,93 @@ html:root[data-skin="brutal"] .nextup-progress-fill { background: var(--bk); }
   :root:not([data-skin]):not([data-theme="light"]) .tab-fab { box-shadow: 0 4px 0 -1px rgba(8, 3, 24, 0.8), 0 12px 20px -6px rgba(0, 0, 0, 0.6); }
 }
 :root:not([data-skin])[data-theme="dark"] { --lift-edge: rgba(8, 3, 24, 0.75); --lift-shadow: rgba(0, 0, 0, 0.6); }
+
+/* Blossom palette (Dom's): base #CC14F0, accent-1 #F0CC14, accent-2 #14F0CC,
+   tint #F2D4F7, ink #3C1943. Blossom only; other skins keep their own colors.
+   --accent is the base darkened ~10% (#b812d8) so white button text and small
+   accent text clear 4.5:1 (the raw base is 4.26:1 on white); the raw base is
+   still used for glows and the FAB ring. Checked: ink 13.2:1 on --bg, muted
+   text 5.4:1, dark-mode accent text 7.2:1+. */
+:root:not([data-skin]) {
+  --base: #CC14F0;
+  --accent-1: #F0CC14;
+  --accent-2: #14F0CC;
+  --tint: #F2D4F7;
+  --bg: #faeefc;
+  --card: #ffffff;
+  --ink: #3C1943;
+  --ink-muted: #735a7b;
+  --border: #F2D4F7;
+  --accent: #b812d8;
+  --accent-text: #b812d8;
+  --soft-beige-tint: #fdf6fe;
+  --bar-tint: #f6dcfa;
+  --glow-tint: #F2D4F7;
+  --ok: #8a2fa0;
+  --ok-bg: #f6e3fa;
+  --butter-yellow: #F0CC14;
+  --mint-bg: #d0fcf5;
+  --mint-deep: #0b6b5e;
+  --wake-badge: #3C1943;
+  --sky-line: #9a5aa8;
+}
+/* Today tiles take the palette: lemon, tint, mint, violet, teal-blue, blush. */
+:root:not([data-skin]) .tile-icon[data-art="feed"]     { --tile-bg: #fcf4cb !important; background-color: #fcf4cb !important; }
+:root:not([data-skin]) .tile-icon[data-art="diaper"]   { --tile-bg: #F2D4F7 !important; background-color: #F2D4F7 !important; }
+:root:not([data-skin]) .tile-icon[data-art="sleep"]    { --tile-bg: #d0fcf5 !important; background-color: #d0fcf5 !important; }
+:root:not([data-skin]) .tile-icon[data-art="bedtime"]  { --tile-bg: #e8c6fa !important; background-color: #e8c6fa !important; }
+:root:not([data-skin]) .tile-icon[data-art="medicine"] { --tile-bg: #c9f1f5 !important; background-color: #c9f1f5 !important; }
+:root:not([data-skin]) .tile-icon[data-art="journal"]  { --tile-bg: #fde8f9 !important; background-color: #fde8f9 !important; }
+:root:not([data-skin]) .tile-icon[data-art="custom"]   { --tile-bg: #e4f8c9 !important; background-color: #e4f8c9 !important; }
+:root:not([data-skin]) .tile-icon[data-art] {
+  background-image: linear-gradient(180deg, color-mix(in srgb, var(--tile-bg) 45%, #fff) 0%, var(--tile-bg) 55%, color-mix(in srgb, var(--tile-bg) 88%, #3C1943) 100%) !important;
+}
+:root:not([data-skin]) .tab-fab { border-color: var(--base); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-skin]):not([data-theme="light"]) {
+    --bg: #210d27;
+    --card: #321640;
+    --ink: #fbeffd;
+    --ink-muted: #c9a6d1;
+    --border: #52295e;
+    --accent-text: #f08cff;
+    --soft-beige-tint: #3a1a48;
+    --ok: #d68fe4;
+    --ok-bg: #3a1a48;
+    --glass: rgba(60, 25, 67, 0.6);
+    --glass-edge: rgba(242, 212, 247, 0.18);
+    --sky-line: #d9a8e6;
+    --bar-dark: rgba(50, 22, 64, 0.82);
+    background: #170820;
+  }
+  :root:not([data-skin]):not([data-theme="light"]) body::before {
+    background:
+      radial-gradient(120% 55% at 85% -8%, rgba(204, 20, 240, 0.34), transparent 60%),
+      radial-gradient(90% 45% at -10% 35%, rgba(20, 240, 204, 0.08), transparent 60%),
+      radial-gradient(100% 40% at 50% 110%, rgba(240, 204, 20, 0.05), transparent 60%),
+      linear-gradient(180deg, #3C1943 0%, #210d27 45%, #170820 100%);
+  }
+}
+:root:not([data-skin])[data-theme="dark"] {
+  --bg: #210d27;
+  --card: #321640;
+  --ink: #fbeffd;
+  --ink-muted: #c9a6d1;
+  --border: #52295e;
+  --accent-text: #f08cff;
+  --soft-beige-tint: #3a1a48;
+  --ok: #d68fe4;
+  --ok-bg: #3a1a48;
+  --glass: rgba(60, 25, 67, 0.6);
+  --glass-edge: rgba(242, 212, 247, 0.18);
+  --sky-line: #d9a8e6;
+  --bar-dark: rgba(50, 22, 64, 0.82);
+  background: #170820;
+}
+:root:not([data-skin])[data-theme="dark"] body::before {
+  background:
+    radial-gradient(120% 55% at 85% -8%, rgba(204, 20, 240, 0.34), transparent 60%),
+    radial-gradient(90% 45% at -10% 35%, rgba(20, 240, 204, 0.08), transparent 60%),
+    radial-gradient(100% 40% at 50% 110%, rgba(240, 204, 20, 0.05), transparent 60%),
+    linear-gradient(180deg, #3C1943 0%, #210d27 45%, #170820 100%);
+}
