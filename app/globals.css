@@ -5481,115 +5481,11 @@ html:root[data-skin="brutal"] .nextup-progress-fill { background: var(--bk); }
 }
 :root:not([data-skin])[data-theme="dark"] { --lift-edge: rgba(8, 3, 24, 0.75); --lift-shadow: rgba(0, 0, 0, 0.6); }
 
-/* Blossom palette (Dom's): base #CC14F0, accent-1 #F0CC14, accent-2 #14F0CC,
-   tint #F2D4F7, ink #3C1943. Blossom only; other skins keep their own colors.
-   --accent is the base darkened ~10% (#b812d8) so white button text and small
-   accent text clear 4.5:1 (the raw base is 4.26:1 on white); the raw base is
-   still used for glows and the FAB ring. Checked: ink 13.2:1 on --bg, muted
-   text 5.4:1, dark-mode accent text 7.2:1+. */
-:root:not([data-skin]) {
-  --base: #CC14F0;
-  --accent-1: #F0CC14;
-  --accent-2: #14F0CC;
-  --tint: #F2D4F7;
-  --bg: #ffffff;
-  --card: #ffffff;
-  --ink: #3C1943;
-  --ink-muted: #735a7b;
-  --border: #F2D4F7;
-  --accent: #b812d8;
-  --accent-text: #b812d8;
-  --soft-beige-tint: #fdf6fe;
-  --bar-tint: #f6dcfa;
-  --glow-tint: #F2D4F7;
-  --ok: #8a2fa0;
-  --ok-bg: #f6e3fa;
-  --butter-yellow: #F0CC14;
-  --mint-bg: #d0fcf5;
-  --mint-deep: #0b6b5e;
-  --wake-badge: #3C1943;
-  --sky-line: #9a5aa8;
-}
-/* Today tiles take the palette: lemon, tint, mint, violet, teal-blue, blush. */
-:root:not([data-skin]) .tile-icon[data-art="feed"]     { --tile-bg: #fcf4cb !important; background-color: #fcf4cb !important; }
-:root:not([data-skin]) .tile-icon[data-art="diaper"]   { --tile-bg: #F2D4F7 !important; background-color: #F2D4F7 !important; }
-:root:not([data-skin]) .tile-icon[data-art="sleep"]    { --tile-bg: #d0fcf5 !important; background-color: #d0fcf5 !important; }
-:root:not([data-skin]) .tile-icon[data-art="bedtime"]  { --tile-bg: #e8c6fa !important; background-color: #e8c6fa !important; }
-:root:not([data-skin]) .tile-icon[data-art="medicine"] { --tile-bg: #c9f1f5 !important; background-color: #c9f1f5 !important; }
-:root:not([data-skin]) .tile-icon[data-art="journal"]  { --tile-bg: #fde8f9 !important; background-color: #fde8f9 !important; }
-:root:not([data-skin]) .tile-icon[data-art="custom"]   { --tile-bg: #e4f8c9 !important; background-color: #e4f8c9 !important; }
-:root:not([data-skin]) .tile-icon[data-art] {
-  background-image: linear-gradient(180deg, color-mix(in srgb, var(--tile-bg) 45%, #fff) 0%, var(--tile-bg) 55%, color-mix(in srgb, var(--tile-bg) 88%, #3C1943) 100%) !important;
-}
-:root:not([data-skin]) .tab-fab { border-color: var(--base); }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-skin]):not([data-theme="light"]) {
-    --bg: #210d27;
-    --card: #321640;
-    --ink: #fbeffd;
-    --ink-muted: #c9a6d1;
-    --border: #52295e;
-    --accent-text: #f08cff;
-    --soft-beige-tint: #3a1a48;
-    --ok: #d68fe4;
-    --ok-bg: #3a1a48;
-    --glass: rgba(60, 25, 67, 0.6);
-    --glass-edge: rgba(242, 212, 247, 0.18);
-    --sky-line: #d9a8e6;
-    --bar-dark: rgba(50, 22, 64, 0.82);
-    background: #170820;
-  }
-  :root:not([data-skin]):not([data-theme="light"]) body::before {
-    background:
-      radial-gradient(120% 55% at 85% -8%, rgba(204, 20, 240, 0.34), transparent 60%),
-      radial-gradient(90% 45% at -10% 35%, rgba(20, 240, 204, 0.08), transparent 60%),
-      radial-gradient(100% 40% at 50% 110%, rgba(240, 204, 20, 0.05), transparent 60%),
-      linear-gradient(180deg, #3C1943 0%, #210d27 45%, #170820 100%);
-  }
-}
-:root:not([data-skin])[data-theme="dark"] {
-  --bg: #210d27;
-  --card: #321640;
-  --ink: #fbeffd;
-  --ink-muted: #c9a6d1;
-  --border: #52295e;
-  --accent-text: #f08cff;
-  --soft-beige-tint: #3a1a48;
-  --ok: #d68fe4;
-  --ok-bg: #3a1a48;
-  --glass: rgba(60, 25, 67, 0.6);
-  --glass-edge: rgba(242, 212, 247, 0.18);
-  --sky-line: #d9a8e6;
-  --bar-dark: rgba(50, 22, 64, 0.82);
-  background: #170820;
-}
-:root:not([data-skin])[data-theme="dark"] body::before {
-  background:
-    radial-gradient(120% 55% at 85% -8%, rgba(204, 20, 240, 0.34), transparent 60%),
-    radial-gradient(90% 45% at -10% 35%, rgba(20, 240, 204, 0.08), transparent 60%),
-    radial-gradient(100% 40% at 50% 110%, rgba(240, 204, 20, 0.05), transparent 60%),
-    linear-gradient(180deg, #3C1943 0%, #210d27 45%, #170820 100%);
-}
-
 /* UX pass: 44px touch targets (look unchanged) */
 .stepper-btn, .journal-filter { position: relative; }
 .stepper-btn::after { content: ''; position: absolute; inset: -4px; }
 .journal-filter::after { content: ''; position: absolute; inset: -6px 0; }
 .supply-count-btn { min-height: 44px; }
-
-/* UX pass (Blossom): tiles use three palette families so the plus button
-   stays the one strong accent. Lemon = Fed, Journal. Tint violet = Diaper,
-   Bedtime. Mint = Start nap, Medicine, custom. Medicine is a deeper mint. */
-:root:not([data-skin]) .tile-icon[data-art="journal"] { --tile-bg: #fcf4cb !important; background-color: #fcf4cb !important; }
-:root:not([data-skin]) .tile-icon[data-art="bedtime"] { --tile-bg: #e6c3f6 !important; background-color: #e6c3f6 !important; }
-:root:not([data-skin]) .tile-icon[data-art="medicine"] { --tile-bg: #b6f5e8 !important; background-color: #b6f5e8 !important; }
-:root:not([data-skin]) .tile-icon[data-art="custom"] { --tile-bg: #d0fcf5 !important; background-color: #d0fcf5 !important; }
-/* Card edges: a deeper tint so tappable cards read against the white page. */
-:root:not([data-skin]) { --border: #d9aee4; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-skin]):not([data-theme="light"]) { --border: #52295e; }
-}
-:root:not([data-skin])[data-theme="dark"] { --border: #52295e; }
 
 /* Tile captions: wrap long ones ("last entry 23h ago") onto two lines instead
    of running into the neighbouring tile's caption. */
@@ -5616,18 +5512,142 @@ html:root[data-skin="brutal"] .nextup-progress-fill { background: var(--bk); }
   overflow: visible;
 }
 
-/* Blossom color pass: fewer hues, more of the real palette.
-   - Tiles share one vivid violet family (from the base #CC14F0) so the plus
-     button stays the single bold accent; lemon and mint live in the artwork.
-   - Muted text, card edges and ledges lean violet instead of dusty gray. */
+/* =====================================================================
+   Blossom: "Soft Lilac" color scheme. One calm blue-violet family.
+   accent #6d3fe0 on a lavender page (#f7f5ff), ink #251a4a. Category colors
+   step through violet (feed), orchid-pink (diaper), periwinkle (nap),
+   indigo (sleep) and aqua (medicine). Status colors (overdue, due soon)
+   are unchanged. Blossom only; other skins keep their own colors.
+   Contrast checked: text 5.9:1+, accent 5.7:1+, deep category text 5:1+
+   on their tinted cards; dark-mode text 7:1+.
+   ===================================================================== */
 :root:not([data-skin]) {
-  --ink-muted: #7d4a8f;
-  --border: #e3a9f3;
-  --lift-edge: color-mix(in srgb, #CC14F0 42%, #ffffff);
-  --lift-shadow: rgba(176, 30, 214, 0.28);
+  --bg: #f7f5ff;
+  --card: #ffffff;
+  --ink: #251a4a;
+  --ink-muted: #5f5a85;
+  --border: #cdbfff;
+  --accent: #6d3fe0;
+  --accent-text: #6d3fe0;
+  --accent-ink: #ffffff;
+  --soft-beige-tint: #f1edff;
+  --bar-tint: #e8e2ff;
+  --glow-tint: #cdbfff;
+  --ok: #5b3fd0;
+  --ok-bg: #ece6ff;
+
+  --blush-rose: #9b84f5;
+  --blush-rose-fill: #5b3fd0;
+  --blush-rose-deep: #5b3fd0;
+  --blush-rose-btn: #5b3fd0;
+  --orchid: #e07ad0;
+  --orchid-fill: #a8309a;
+  --orchid-deep: #a8309a;
+  --orchid-btn: #b83aa8;
+  --dusty-pink: #f3b6e6;
+  --dusty-pink-bg: #fdeaf8;
+  --dusty-pink-fill: #b83aa8;
+  --muted-lilac: #8fb2ff;
+  --lilac-deep: #2f5bc7;
+  --lilac-fill: #2f5bc7;
+  --berry: #7f6ae0;
+  --berry-deep: #4a37b0;
+  --berry-fill: #4a37b0;
+  --wake-badge: #2a1f66;
+  --mint-bg: #d4f1f5;
+  --mint-deep: #0f6577;
+  --sky-line: #8a7bd0;
+
+  --chart-feeds-top: #b9a6ff;   --chart-feeds-bottom: #7a5ce6;   --chart-feeds-soft: #e6e0ff;   --chart-feeds-ink: #4b34b8;   --chart-feeds-glow: rgba(91, 63, 208, 0.32);
+  --chart-diapers-top: #f6b3ea; --chart-diapers-bottom: #d05cc0; --chart-diapers-soft: #fbdcf5; --chart-diapers-ink: #a8309a; --chart-diapers-glow: rgba(176, 60, 164, 0.3);
+  --chart-sleep-top: #a9c8ff;   --chart-sleep-bottom: #4f86e6;   --chart-sleep-soft: #dbe8ff;   --chart-sleep-ink: #2f5bc7;   --chart-sleep-glow: rgba(47, 91, 199, 0.3);
+
+  --lift-edge: color-mix(in srgb, #6d3fe0 38%, #ffffff);
+  --lift-shadow: rgba(79, 52, 190, 0.26);
 }
+/* Today tiles: violet, orchid-pink, periwinkle, aqua. */
+:root:not([data-skin]) .tile-icon[data-art="feed"],
+:root:not([data-skin]) .tile-icon[data-art="journal"] { --tile-bg: #c4b5ff !important; background-color: #c4b5ff !important; }
+:root:not([data-skin]) .tile-icon[data-art="diaper"] { --tile-bg: #f3b6e6 !important; background-color: #f3b6e6 !important; }
+:root:not([data-skin]) .tile-icon[data-art="bedtime"] { --tile-bg: #a995f5 !important; background-color: #a995f5 !important; }
+:root:not([data-skin]) .tile-icon[data-art="sleep"] { --tile-bg: #b4d4ff !important; background-color: #b4d4ff !important; }
+:root:not([data-skin]) .tile-icon[data-art="medicine"] { --tile-bg: #b8e8ef !important; background-color: #b8e8ef !important; }
+:root:not([data-skin]) .tile-icon[data-art="custom"] { --tile-bg: #d9d0ff !important; background-color: #d9d0ff !important; }
 :root:not([data-skin]) .tile-icon[data-art] {
-  --tile-bg: #e39af6 !important;
-  background-color: #e39af6 !important;
-  --edge: color-mix(in srgb, #e39af6 55%, #8a1fb0);
+  --edge: color-mix(in srgb, var(--tile-bg) 55%, #3d1fa8);
+  background-image: linear-gradient(180deg, color-mix(in srgb, var(--tile-bg) 45%, #fff) 0%, var(--tile-bg) 55%, color-mix(in srgb, var(--tile-bg) 88%, #3d1fa8) 100%) !important;
 }
+:root:not([data-skin]) .tab-fab { border-color: var(--accent); }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-skin]):not([data-theme="light"]) {
+    --bg: #15112e;
+    --card: #221b45;
+    --ink: #efeaff;
+    --ink-muted: #b7b0dc;
+    --border: #3a3170;
+    --accent-text: #b9a3ff;
+    --soft-beige-tint: #2a2160;
+    --ok: #b9a3ff;
+    --ok-bg: #2a2160;
+    --blush-rose-deep: #b9a3ff;
+    --orchid-deep: #f09be4;
+    --lilac-deep: #9bbcff;
+    --berry-deep: #a99bff;
+    --mint-bg: #17383f;
+    --mint-deep: #7fdcea;
+    --sky-line: #bfb2f0;
+    --glass: rgba(34, 27, 69, 0.6);
+    --glass-edge: rgba(185, 163, 255, 0.18);
+    --bar-dark: rgba(34, 27, 69, 0.85);
+    --lift-edge: rgba(8, 4, 24, 0.75);
+    --lift-shadow: rgba(0, 0, 0, 0.6);
+    --chart-feeds-top: #cbbdff;   --chart-feeds-bottom: #8b72f0;   --chart-feeds-soft: #2e2766;   --chart-feeds-ink: #cbbdff;   --chart-feeds-glow: rgba(185, 163, 255, 0.3);
+    --chart-diapers-top: #f8c3ef; --chart-diapers-bottom: #dc72cc; --chart-diapers-soft: #4a2650; --chart-diapers-ink: #f6a9e8; --chart-diapers-glow: rgba(246, 169, 232, 0.3);
+    --chart-sleep-top: #bcd5ff;   --chart-sleep-bottom: #5f93ee;   --chart-sleep-soft: #1f3560;   --chart-sleep-ink: #a9c8ff;   --chart-sleep-glow: rgba(169, 200, 255, 0.3);
+    background: #0e0a22;
+  }
+  :root:not([data-skin]):not([data-theme="light"]) body::before {
+    background:
+      radial-gradient(120% 55% at 85% -8%, rgba(109, 63, 224, 0.4), transparent 60%),
+      radial-gradient(90% 45% at -10% 35%, rgba(224, 122, 208, 0.1), transparent 60%),
+      radial-gradient(100% 40% at 50% 110%, rgba(79, 134, 230, 0.12), transparent 60%),
+      linear-gradient(180deg, #2a2060 0%, #15112e 45%, #0e0a22 100%);
+  }
+  :root:not([data-skin]):not([data-theme="light"]) .tile-icon[data-art] { --edge: color-mix(in srgb, var(--tile-bg) 45%, #0e0a22); }
+}
+:root:not([data-skin])[data-theme="dark"] {
+  --bg: #15112e;
+  --card: #221b45;
+  --ink: #efeaff;
+  --ink-muted: #b7b0dc;
+  --border: #3a3170;
+  --accent-text: #b9a3ff;
+  --soft-beige-tint: #2a2160;
+  --ok: #b9a3ff;
+  --ok-bg: #2a2160;
+  --blush-rose-deep: #b9a3ff;
+  --orchid-deep: #f09be4;
+  --lilac-deep: #9bbcff;
+  --berry-deep: #a99bff;
+  --mint-bg: #17383f;
+  --mint-deep: #7fdcea;
+  --sky-line: #bfb2f0;
+  --glass: rgba(34, 27, 69, 0.6);
+  --glass-edge: rgba(185, 163, 255, 0.18);
+  --bar-dark: rgba(34, 27, 69, 0.85);
+  --lift-edge: rgba(8, 4, 24, 0.75);
+  --lift-shadow: rgba(0, 0, 0, 0.6);
+  --chart-feeds-top: #cbbdff;   --chart-feeds-bottom: #8b72f0;   --chart-feeds-soft: #2e2766;   --chart-feeds-ink: #cbbdff;   --chart-feeds-glow: rgba(185, 163, 255, 0.3);
+  --chart-diapers-top: #f8c3ef; --chart-diapers-bottom: #dc72cc; --chart-diapers-soft: #4a2650; --chart-diapers-ink: #f6a9e8; --chart-diapers-glow: rgba(246, 169, 232, 0.3);
+  --chart-sleep-top: #bcd5ff;   --chart-sleep-bottom: #5f93ee;   --chart-sleep-soft: #1f3560;   --chart-sleep-ink: #a9c8ff;   --chart-sleep-glow: rgba(169, 200, 255, 0.3);
+  background: #0e0a22;
+}
+:root:not([data-skin])[data-theme="dark"] body::before {
+  background:
+    radial-gradient(120% 55% at 85% -8%, rgba(109, 63, 224, 0.4), transparent 60%),
+    radial-gradient(90% 45% at -10% 35%, rgba(224, 122, 208, 0.1), transparent 60%),
+    radial-gradient(100% 40% at 50% 110%, rgba(79, 134, 230, 0.12), transparent 60%),
+    linear-gradient(180deg, #2a2060 0%, #15112e 45%, #0e0a22 100%);
+}
+:root:not([data-skin])[data-theme="dark"] .tile-icon[data-art] { --edge: color-mix(in srgb, var(--tile-bg) 45%, #0e0a22); }
