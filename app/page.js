@@ -35,6 +35,7 @@ import { describeLog, findDoubleLog, whoLogged } from '../lib/logText';
 import { useSupplies, isLow } from '../lib/supplies';
 import { LONG_NAP_HOURS } from '../lib/logic';
 import { SolidsSheet } from '../lib/SolidsSheet';
+import { useHandoff, HandoffBanner, HandoffRow, HandoffSheet, otherParentName } from '../lib/Handoff';
 import { summarizeFoods } from '../lib/solids';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -108,9 +109,12 @@ export default function Page() {
   const [lastJournalAt, setLastJournalAt] = useState(null);
   const [solidRows, setSolidRows] = useState([]);
   const [solidsOpen, setSolidsOpen] = useState(false);
+  const [handoffOpen, setHandoffOpen] = useState(false);
   const [nudgeDismissedDay, setNudgeDismissedDay] = useState(null);
   const toastTimeoutRef = useRef(null);
   const { email: myEmail } = useLogSync();
+  const handoff = useHandoff(myEmail);
+  const partner = otherParentName(myEmail);
   const { supplies } = useSupplies();
   const lowSupplies = supplies.filter(isLow);
 
@@ -484,6 +488,10 @@ export default function Page() {
         </div>
       </div>
 
+      {handoff.note && !handoff.mine && (
+        <HandoffBanner note={handoff.note} now={now} onSeen={handoff.markSeen} />
+      )}
+
       {loading || !status ? (
         <div className="card"><div className="info-item">Loading{'…'}</div></div>
       ) : (
@@ -646,8 +654,20 @@ export default function Page() {
             <svg className="solids-card-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
             <span className="visually-hidden">Log solids</span>
           </button>
+
+          <HandoffRow note={handoff.note} mine={handoff.mine} partner={partner} onOpen={() => setHandoffOpen(true)} />
         </>
       )}
+
+      <HandoffSheet
+        open={handoffOpen}
+        onClose={() => setHandoffOpen(false)}
+        initial={handoff.mine ? handoff.note.note : ''}
+        partner={partner}
+        canClear={handoff.mine}
+        onSend={handoff.send}
+        onClear={handoff.clear}
+      />
 
       <SolidsSheet
         open={solidsOpen}
