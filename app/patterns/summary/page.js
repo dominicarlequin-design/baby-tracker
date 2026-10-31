@@ -10,6 +10,7 @@ import { formatMinutesDuration, formatShortDate } from '../../../lib/patterns';
 import { ageLine, BABY_NAME } from '../../../lib/homeUi';
 import { dailyMilkTarget } from '../../../lib/milk';
 import { REACTIONS } from '../../../lib/solids';
+import { useCheckups, fmtDay } from '../../../lib/CheckupsCard';
 
 const NOTES_KEY = 'visit-notes';
 const hrs = (h) => (h == null ? '—' : formatMinutesDuration(h * 60));
@@ -50,6 +51,8 @@ export default function VisitSummaryPage() {
   const timezone = config?.timezone || 'America/New_York';
   const summary = useMemo(() => (config ? buildVisitSummary(events, config, days, now) : null), [config, events, days, now]);
   const goal = config ? dailyMilkTarget(config.weight_lbs) : null;
+  const checkups = useCheckups(config?.birth_date, timezone);
+  const lastCheckup = [...checkups.timeline].reverse().find(c => c.status === 'done');
 
   return (
     <div className="wrap visit-page">
@@ -144,6 +147,16 @@ export default function VisitSummaryPage() {
                     ))}
                   </ul>
                 )}
+              </section>
+            )}
+
+            {config.birth_date && (lastCheckup || checkups.next) && (
+              <section className="visit-section">
+                <h3>Checkups</h3>
+                {lastCheckup && (
+                  <p>Last: {lastCheckup.title} checkup on {fmtDay(lastCheckup.record.visit_date)}{lastCheckup.record.notes ? ` · ${lastCheckup.record.notes}` : ''}</p>
+                )}
+                {checkups.next && <p>Next: {checkups.next.title} checkup, around {fmtDay(checkups.next.due)}</p>}
               </section>
             )}
 

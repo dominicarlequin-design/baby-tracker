@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node lib/logic.test.js && node lib/summaries.test.js && node lib/milk.test.js && node lib/recipes.test.js && node lib/logText.test.js && node lib/solids.test.js && node lib/visitSummary.test.js && node lib/edgeSync.test.js",
+    "test": "node lib/logic.test.js && node lib/summaries.test.js && node lib/milk.test.js && node lib/recipes.test.js && node lib/logText.test.js && node lib/solids.test.js && node lib/visitSummary.test.js && node lib/checkups.test.js && node lib/edgeSync.test.js",
     "sync:edge": "node scripts/sync-edge-logic.mjs"
   },
   "dependencies": {
