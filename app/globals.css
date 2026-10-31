@@ -5615,3 +5615,19 @@ html:root[data-skin="brutal"] .nextup-progress-fill { background: var(--bk); }
   -webkit-line-clamp: unset;
   overflow: visible;
 }
+
+/* Blossom color pass: fewer hues, more of the real palette.
+   - Tiles share one vivid violet family (from the base #CC14F0) so the plus
+     button stays the single bold accent; lemon and mint live in the artwork.
+   - Muted text, card edges and ledges lean violet instead of dusty gray. */
+:root:not([data-skin]) {
+  --ink-muted: #7d4a8f;
+  --border: #e3a9f3;
+  --lift-edge: color-mix(in srgb, #CC14F0 42%, #ffffff);
+  --lift-shadow: rgba(176, 30, 214, 0.28);
+}
+:root:not([data-skin]) .tile-icon[data-art] {
+  --tile-bg: #e39af6 !important;
+  background-color: #e39af6 !important;
+  --edge: color-mix(in srgb, #e39af6 55%, #8a1fb0);
+}
