@@ -92,6 +92,11 @@ export default function PatternsPage() {
             title="Milestones"
             sub={milestoneSub}
           />
+          <NavRow
+            href="/patterns/foods"
+            title="Foods tried"
+            sub="Every new food and how it went"
+          />
           <Link href="/patterns/recipes" className="pattern-nav-row recipe-nav-row">
             <RecipeArt name="bowl" size="sm" />
             <span className="pattern-nav-text">

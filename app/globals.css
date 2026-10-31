@@ -5775,3 +5775,69 @@ input.form-input[type="time"]::-webkit-date-and-time-value { text-align: left; m
   color: #fff;
 }
 :root:not([data-skin]) .tile-art-flat > ellipse[cy="90"] { display: none; }
+
+/* ---- Solids log (Today card, sheet, History) ---- */
+.activity-dot-solid { background: #5fc4a3; }
+.solids-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.solids-card:active { transform: scale(0.98); opacity: 0.85; }
+.solids-card .tile-icon { flex: none; width: 44px; height: 44px; border-radius: 14px; }
+.solids-card-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.solids-card-headline { font-weight: 700; font-size: 15px; line-height: 1.25; }
+.solids-card-sub { font-size: 12.5px; line-height: 1.3; color: var(--ink-muted); }
+.solids-card-plus { flex: none; width: 20px; height: 20px; color: var(--accent-text); }
+.solids-card-strong { border-color: var(--overdue); }
+.solids-card-strong .solids-card-sub { color: var(--overdue); font-weight: 600; }
+.solids-hint { margin: -8px 0 16px; font-size: 13px; line-height: 1.4; color: var(--ink-muted); }
+.solids-hint-alert { margin-top: 8px; padding: 10px 12px; border-radius: 12px; color: var(--overdue); background: color-mix(in srgb, var(--overdue) 10%, var(--card)); font-weight: 600; }
+.solids-reactions { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+.solids-reaction {
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.solids-reaction.is-on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--card)); color: var(--accent-text); }
+.solids-reaction-strong.is-on { border-color: var(--overdue); background: color-mix(in srgb, var(--overdue) 10%, var(--card)); color: var(--overdue); }
+/* Blossom: green tile for solids (flat, like the others), card lifted. */
+:root:not([data-skin]) .tile-icon[data-art="solid"] { --tile-bg: #2fa87f !important; background-color: #2fa87f !important; }
+:root:not([data-skin]) .solids-card { box-shadow: 0 4px 0 -1px var(--lift-edge), 0 14px 22px -10px var(--lift-shadow); }
+.foods-summary { display: flex; align-items: center; gap: 14px; }
+.foods-summary-count { font-family: var(--font-serif, inherit); font-size: 40px; font-weight: 700; line-height: 1; color: var(--accent-text); }
+.foods-summary-text { display: flex; flex-direction: column; font-weight: 700; font-size: 16px; }
+.foods-summary-sub { font-weight: 500; font-size: 13px; color: var(--ink-muted); margin-top: 2px; }
+.foods-list { padding-top: 4px; padding-bottom: 4px; }
+.foods-row { display: flex; flex-direction: column; gap: 6px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.foods-row:last-child { border-bottom: 0; }
+.foods-row-main { display: flex; flex-direction: column; gap: 2px; }
+.foods-row-name { font-weight: 700; font-size: 16px; }
+.foods-row-meta { font-size: 12.5px; color: var(--ink-muted); }
+.foods-row-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.foods-tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 7%, var(--card)); color: var(--ink-muted); }
+.foods-tag-none { background: color-mix(in srgb, var(--accent) 12%, var(--card)); color: var(--accent-text); }
+.foods-tag-mild { background: color-mix(in srgb, #b8860b 16%, var(--card)); color: #7a5a00; }
+.foods-tag-strong { background: color-mix(in srgb, var(--overdue) 14%, var(--card)); color: var(--overdue); }
+.foods-tag-allergen { background: color-mix(in srgb, var(--orchid) 22%, var(--card)); color: var(--orchid-deep); }
+.foods-note { margin: 4px 2px 12px; }

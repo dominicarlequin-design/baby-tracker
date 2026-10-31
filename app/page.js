@@ -34,6 +34,8 @@ import { useLogSync } from '../lib/LogSync';
 import { describeLog, findDoubleLog, whoLogged } from '../lib/logText';
 import { useSupplies, isLow } from '../lib/supplies';
 import { LONG_NAP_HOURS } from '../lib/logic';
+import { SolidsSheet } from '../lib/SolidsSheet';
+import { summarizeFoods } from '../lib/solids';
 
 const FEED_OUNCE_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -104,6 +106,8 @@ export default function Page() {
   const [overdueOpen, setOverdueOpen] = useState(true);
   const [pendingDuplicate, setPendingDuplicate] = useState(null);
   const [lastJournalAt, setLastJournalAt] = useState(null);
+  const [solidRows, setSolidRows] = useState([]);
+  const [solidsOpen, setSolidsOpen] = useState(false);
   const [nudgeDismissedDay, setNudgeDismissedDay] = useState(null);
   const toastTimeoutRef = useRef(null);
   const { email: myEmail } = useLogSync();
@@ -162,6 +166,22 @@ export default function Page() {
     window.addEventListener(EVENTS_CHANGED, onChange);
     return () => { clearTimeout(t); window.removeEventListener(EVENTS_CHANGED, onChange); };
   }, [fetchAll]);
+
+  // Every solid-food entry (the whole history, so "first time" is right even
+  // for foods older than the 30-day events window). Refreshes with the rest.
+  const fetchSolids = useCallback(async () => {
+    const { data, error } = await supabase.from('baby_events').select('*').eq('type', 'solid')
+      .order('event_time', { ascending: false }).limit(500);
+    if (error) { console.error(error); return; }
+    setSolidRows(data || []);
+  }, []);
+  useEffect(() => { fetchSolids(); }, [fetchSolids]);
+  useEffect(() => {
+    let t = null;
+    const onChange = () => { clearTimeout(t); t = setTimeout(fetchSolids, 150); };
+    window.addEventListener(EVENTS_CHANGED, onChange);
+    return () => { clearTimeout(t); window.removeEventListener(EVENTS_CHANGED, onChange); };
+  }, [fetchSolids]);
 
   // When the last journal entry was written, for the Journal button's subtitle.
   useEffect(() => {
@@ -341,6 +361,22 @@ export default function Page() {
   }, [todayExtra]);
 
   const timezone = config?.timezone || 'America/New_York';
+  const solids = useMemo(() => summarizeFoods(solidRows, timezone, now), [solidRows, timezone, now]);
+  const solidsCard = useMemo(() => {
+    const weekday = (ymd) => new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', weekday: 'long' }).format(new Date(`${ymd}T12:00:00Z`));
+    if (solids.watching) {
+      const { food, day, of, okFrom } = solids.watching;
+      const sub = food.reaction === 'strong'
+        ? 'New food · strong reaction logged. Call her pediatrician before trying it again.'
+        : food.reaction === 'mild'
+          ? `New food · mild reaction logged. Keep watching; next one after ${weekday(okFrom)}.`
+          : `New food · ${food.reaction === 'none' ? 'no reaction so far' : 'no reaction logged yet'} · next one ${weekday(okFrom)}`;
+      return { headline: `${food.name} · day ${day} of ${of}`, sub, tone: food.reaction || 'watch' };
+    }
+    if (solids.total === 0) return { headline: 'Log her first food', sub: 'Track new foods one at a time', tone: 'empty' };
+    const last = solids.foods.reduce((a, b) => (new Date(b.lastAt) > new Date(a.lastAt) ? b : a));
+    return { headline: `Solids: ${solids.total} ${solids.total === 1 ? 'food' : 'foods'} tried`, sub: `Last: ${last.name} ${formatRelative(last.lastAt, now)} · ready for a new food`, tone: 'ready' };
+  }, [solids, now]);
 
   // Status dot for a button: amber when due soon, red when overdue.
   const dotFor = (st) => (st?.state === 'overdue' || st?.overdue ? 'overdue' : st?.state === 'due-soon' ? 'due-soon' : null);
@@ -600,8 +636,32 @@ export default function Page() {
               <span className="tile-sub">{lastJournalAt ? formatRelative(lastJournalAt, now) : 'write a note'}</span>
             </Link>
           </div>
+
+          <button type="button" className={`solids-card solids-card-${solidsCard.tone}`} onClick={() => setSolidsOpen(true)}>
+            <TileIcon name="solid" />
+            <span className="solids-card-text">
+              <span className="solids-card-headline">{solidsCard.headline}</span>
+              <span className="solids-card-sub">{solidsCard.sub}</span>
+            </span>
+            <svg className="solids-card-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+            <span className="visually-hidden">Log solids</span>
+          </button>
         </>
       )}
+
+      <SolidsSheet
+        open={solidsOpen}
+        onClose={() => setSolidsOpen(false)}
+        timezone={timezone}
+        foods={solids.foods}
+        onSaved={(row) => showToast(`Logged: ${row.food_name}`, {
+          actionLabel: 'Undo',
+          onAction: async () => {
+            await supabase.from('baby_events').delete().eq('id', row.id);
+            window.dispatchEvent(new Event(EVENTS_CHANGED));
+          },
+        })}
+      />
 
       <div className={`toast ${toastShow ? 'show' : ''}`}>
         <span>{toast?.message}</span>
