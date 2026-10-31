@@ -5806,3 +5806,35 @@ input.form-input[type="time"]::-webkit-date-and-time-value { text-align: left; m
 .foods-tag-strong { background: color-mix(in srgb, var(--overdue) 14%, var(--card)); color: var(--overdue); }
 .foods-tag-allergen { background: color-mix(in srgb, var(--orchid) 22%, var(--card)); color: var(--orchid-deep); }
 .foods-note { margin: 4px 2px 12px; }
+
+/* ---- Visit summary (Insights > Visit summary) ---- */
+.visit-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.visit-print { width: auto; min-width: 0; padding-left: 18px; padding-right: 18px; }
+.visit-notes-input { min-height: 80px; resize: vertical; margin-bottom: 16px; font-family: inherit; }
+.visit-sheet { background: #fff; color: #1a1a1a; border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 16px; font-size: 14px; line-height: 1.4; }
+.visit-head h2 { margin: 0 0 4px; font-size: 20px; }
+.visit-head-sub { font-size: 13px; color: #4a4a4a; }
+.visit-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13.5px; }
+.visit-table th, .visit-table td { text-align: left; padding: 6px 6px; border-bottom: 1px solid #e3e0ee; vertical-align: top; }
+.visit-table th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: #4a4a4a; }
+.visit-days td, .visit-days th { padding: 4px 6px; font-size: 13px; }
+.visit-section { margin-top: 16px; }
+.visit-section h3 { margin: 0 0 4px; font-size: 14px; }
+.visit-section p { margin: 0 0 4px; }
+.visit-foods { margin: 4px 0 0; padding-left: 18px; }
+.visit-notes-print { white-space: pre-wrap; }
+.visit-foot { margin-top: 16px; font-size: 12px; color: #4a4a4a; border-top: 1px solid #e3e0ee; padding-top: 8px; }
+.visit-empty { margin: 12px 0 0; }
+.visit-ranges { flex: none; }
+@media print {
+  .no-print, .tab-bar, .sky, .sky-doodles, .sky-head, .toast, body::before, body::after { display: none !important; }
+  html, body { background: #fff !important; }
+  .wrap.visit-page { padding: 0 !important; max-width: none !important; }
+  .visit-sheet { border: 0; border-radius: 0; padding: 0; box-shadow: none !important; font-size: 12px; }
+  .visit-table th, .visit-table td { padding: 3px 5px; }
+  .visit-section { break-inside: avoid; }
+}
+.visit-table td:first-child { width: 36%; }
+.visit-days th { letter-spacing: 0; font-size: 11.5px; }
+.visit-days td, .visit-days th { padding: 4px 4px; white-space: nowrap; }
+.visit-days td:first-child { width: auto; }
