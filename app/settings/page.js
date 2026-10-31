@@ -15,6 +15,7 @@ import { BABY_NAME, ageLine, formatHours } from '../../lib/homeUi';
 import { useLogSync } from '../../lib/LogSync';
 import { PARENT_NAMES, parentName } from '../../lib/logText';
 import { SKINS, getSkin, applySkin, getMode, applyMode } from '../../lib/skin';
+import { QuickLogKeys } from '../../lib/QuickLogKeys';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -456,6 +457,8 @@ export default function SettingsPage() {
           </div>
 
           {/* App look: skin and light/dark, saved on this phone only. */}
+          <QuickLogKeys />
+
           <div className="card">
             <div className="section-title">App look</div>
             <div className="skin-grid" role="radiogroup" aria-label="Skin">
