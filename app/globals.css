@@ -63,7 +63,7 @@
   --ok: #8a4a96;              /* muted plum, brightened to match the rest of this pass — 6:1 on white, 5.6:1 on --bg */
   --ok-bg: #f6e9f5;
   --due-soon: #9c5c1f;        /* was #a35a30 — same family, shifted toward gold so it's unmistakably not a shade of --overdue; 5.3:1 on white */
-  --overdue: #c8342f;         /* more saturated true red than before; 5.3:1 on white, clearly apart from --due-soon's gold */
+  --overdue: #b82d28;         /* more saturated true red than before; 5.3:1 on white, clearly apart from --due-soon's gold */
   --overdue-bg: #fceae8;
   --radius: 22px; /* cards, Next up, banners, Insights rows: matches the Today tiles */
 
@@ -194,7 +194,7 @@
     --ok: #c98bc4;
     --ok-bg: #332a3a;
     --due-soon: #e2a355;        /* nudged a touch more gold so it stays clearly distinct from --overdue below */
-    --overdue: #ef6459;
+    --overdue: #f57a70;
     --overdue-bg: #402a23;
     --soft-beige-tint: #2b2530;
     --lilac-deep: #b98fce;
@@ -230,7 +230,7 @@
   --ok: #c98bc4;
   --ok-bg: #332a3a;
   --due-soon: #e2a355;
-  --overdue: #ef6459;
+  --overdue: #f57a70;
   --overdue-bg: #402a23;
   --soft-beige-tint: #2b2530;
   --lilac-deep: #b98fce;
@@ -3001,7 +3001,7 @@ button:focus-visible {
   color: var(--accent-text, var(--accent));
   box-shadow: 0 1px 4px rgba(42, 34, 48, 0.12);
 }
-.recipe-stage-badge { font-size: 10.5px; font-weight: 600; color: var(--ink-muted); min-height: 13px; }
+.recipe-stage-badge { font-size: 12px; font-weight: 600; color: var(--ink-muted); min-height: 13px; }
 
 .recipe-stage-card,
 .recipe-callout {
@@ -3057,7 +3057,7 @@ button:focus-visible {
 .recipe-row-title { font-family: 'Fraunces', 'Georgia', serif; font-size: 17px; font-weight: 600; line-height: 1.2; }
 .recipe-row-meta { font-size: 13px; color: var(--ink-muted); }
 .recipe-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 3px; }
-.recipe-tag { display: inline-flex; align-items: center; min-height: 22px; padding: 0 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+.recipe-tag { display: inline-flex; align-items: center; min-height: 22px; padding: 0 9px; border-radius: 999px; font-size: 12px; font-weight: 700; }
 .recipe-tag-ok { background: var(--mint-bg); color: var(--mint-deep); }
 .recipe-tag-iron { background: color-mix(in srgb, var(--muted-lilac) 30%, var(--card)); color: var(--lilac-deep); }
 .recipe-tag-pink { background: color-mix(in srgb, var(--blush-rose) 18%, var(--card)); color: var(--blush-rose-deep); }
@@ -3203,7 +3203,7 @@ button:focus-visible {
    the header, grid and stats each give back a little height. */
 .today-header { margin-bottom: 12px; }
 .today-header h1 { font-size: 29px; }
-.today-date { font-size: 11px; }
+.today-date { font-size: 12px; }
 .today-header .header-icon-btn { width: 40px; height: 40px; }
 
 .overdue-banner { padding: 9px 14px; margin-bottom: 8px; }
@@ -3240,7 +3240,7 @@ button:focus-visible {
 .tile-grid .tile-icon { border-radius: 24px; }
 .tile-btn { gap: 2px; }
 .tile-label { font-size: 14.5px; margin-top: 2px; }
-.tile-sub { font-size: 11.5px; }
+.tile-sub { font-size: 12.5px; }
 @media (max-height: 740px) {
   .tile-grid { --tile-size: 66px; }
 }
@@ -3813,8 +3813,8 @@ body:has(.sky) { background: transparent; }
    leftover space and the layout is the same as before. Bottom padding
    clears the tab bar plus the home-indicator area. */
 .wrap:has(.tile-grid) {
-  --gap-above: 2; /* 40% of the open space above, 60% below: just above center */
-  --gap-below: 3;
+  --gap-above: 2; /* two thirds of the open space above, one third below: buttons sit in the lower half, in thumb reach */
+  --gap-below: 1;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -4440,7 +4440,7 @@ body:has(.sky) { background: transparent; }
   padding: 2px 8px 2px 6px;
   border-radius: 999px;
   text-decoration: none;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.5;
   vertical-align: 1px;
@@ -5273,7 +5273,7 @@ html:root[data-skin="brutal"] .nextup-progress-fill { background: var(--bk); }
   line-height: 1.05;
 }
 .supply-count b { font-size: 17px; font-weight: 800; }
-.supply-count small { font-size: 10.5px; font-weight: 700; color: var(--ink-muted); }
+.supply-count small { font-size: 12px; font-weight: 700; color: var(--ink-muted); }
 .supply-row.is-low .supply-count b { color: var(--low); }
 .supply-count-btn {
   flex: none;
@@ -5398,7 +5398,7 @@ html:root[data-skin="brutal"] .nextup-progress-fill { background: var(--bk); }
   color: var(--ink);
   overflow-wrap: anywhere;
 }
-.shop-text small { font-size: 11.5px; font-weight: 700; color: var(--ink-muted); }
+.shop-text small { font-size: 12px; font-weight: 700; color: var(--ink-muted); }
 .shop-item.is-done .shop-text { color: var(--ink-muted); text-decoration: line-through; font-weight: 500; }
 .shop-item .med-remove { width: 34px; height: 34px; }
 .shop-bought-head {
@@ -5570,3 +5570,23 @@ html:root[data-skin="brutal"] .nextup-progress-fill { background: var(--bk); }
     radial-gradient(100% 40% at 50% 110%, rgba(240, 204, 20, 0.05), transparent 60%),
     linear-gradient(180deg, #3C1943 0%, #210d27 45%, #170820 100%);
 }
+
+/* UX pass: 44px touch targets (look unchanged) */
+.stepper-btn, .journal-filter { position: relative; }
+.stepper-btn::after { content: ''; position: absolute; inset: -4px; }
+.journal-filter::after { content: ''; position: absolute; inset: -6px 0; }
+.supply-count-btn { min-height: 44px; }
+
+/* UX pass (Blossom): tiles use three palette families so the plus button
+   stays the one strong accent. Lemon = Fed, Journal. Tint violet = Diaper,
+   Bedtime. Mint = Start nap, Medicine, custom. Medicine is a deeper mint. */
+:root:not([data-skin]) .tile-icon[data-art="journal"] { --tile-bg: #fcf4cb !important; background-color: #fcf4cb !important; }
+:root:not([data-skin]) .tile-icon[data-art="bedtime"] { --tile-bg: #e6c3f6 !important; background-color: #e6c3f6 !important; }
+:root:not([data-skin]) .tile-icon[data-art="medicine"] { --tile-bg: #b6f5e8 !important; background-color: #b6f5e8 !important; }
+:root:not([data-skin]) .tile-icon[data-art="custom"] { --tile-bg: #d0fcf5 !important; background-color: #d0fcf5 !important; }
+/* Card edges: a deeper tint so tappable cards read against the white page. */
+:root:not([data-skin]) { --border: #d9aee4; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-skin]):not([data-theme="light"]) { --border: #52295e; }
+}
+:root:not([data-skin])[data-theme="dark"] { --border: #52295e; }
