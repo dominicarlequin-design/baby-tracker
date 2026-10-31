@@ -5873,3 +5873,53 @@ input.form-input[type="time"]::-webkit-date-and-time-value { text-align: left; m
 .visit-days th { letter-spacing: 0; font-size: 11.5px; }
 .visit-days td, .visit-days th { padding: 4px 4px; white-space: nowrap; }
 .visit-days td:first-child { width: auto; }
+
+/* ---- Blossom: no glow ----
+   Colored blur halos are gone: tiles, cards and buttons keep their solid
+   ledge for lift but no soft tinted shadow around or under them. Dark mode
+   loses the purple haze at the top of the page. */
+:root:not([data-skin]) { --lift-shadow: transparent; }
+:root:not([data-skin]) .tile-icon {
+  box-shadow:
+    0 5px 0 -1px var(--edge),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -4px 0 rgba(31, 18, 96, 0.12);
+}
+:root:not([data-skin]) .stat-tile .tile-icon,
+:root:not([data-skin]) .nextup-row .tile-icon {
+  box-shadow:
+    0 3px 0 -1px var(--edge),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.4);
+}
+:root:not([data-skin]) .tile-btn:active .tile-icon {
+  box-shadow:
+    0 1px 0 -1px var(--edge),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+}
+:root:not([data-skin]) .log-btn {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 4px 0 -1px rgba(44, 42, 38, 0.16);
+}
+:root:not([data-skin]) .stateful-btn { box-shadow: 0 3px 0 -1px rgba(44, 42, 38, 0.12); }
+:root:not([data-skin]) .form-save {
+  box-shadow:
+    0 4px 0 -1px color-mix(in srgb, var(--accent) 55%, #000),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+:root:not([data-skin]) .log-btn:active,
+:root:not([data-skin]) .stateful-btn:active,
+:root:not([data-skin]) .form-save:active { box-shadow: none; }
+:root:not([data-skin]) .tab-fab { box-shadow: 0 4px 0 -1px color-mix(in srgb, var(--accent) 45%, #fff); }
+:root:not([data-skin]) .tab-fab:active { box-shadow: none; }
+:root:not([data-skin]) .swipe-bar.is-on { box-shadow: none; }
+:root:not([data-skin]) .swipe-range-thumb { box-shadow: none; }
+:root:not([data-skin]) .form-input:focus { box-shadow: 0 0 0 2px var(--accent); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-skin]):not([data-theme="light"]) .tab-fab { box-shadow: 0 4px 0 -1px rgba(8, 3, 24, 0.8); }
+  :root:not([data-skin]):not([data-theme="light"]) body::before {
+    background: linear-gradient(180deg, #1c1640 0%, #15112e 40%, #0e0a22 100%);
+  }
+}
+:root:not([data-skin])[data-theme="dark"] .tab-fab { box-shadow: 0 4px 0 -1px rgba(8, 3, 24, 0.8); }
+:root:not([data-skin])[data-theme="dark"] body::before {
+  background: linear-gradient(180deg, #1c1640 0%, #15112e 40%, #0e0a22 100%);
+}
