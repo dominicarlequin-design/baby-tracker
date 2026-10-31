@@ -8,6 +8,7 @@ import { TabBar } from '../../lib/TabBar';
 import { computeStatus } from '../../lib/logic';
 import { bedtimePattern } from '../../lib/summaries';
 import { formatLocalTime, nextMedicineSlot, explainStatus, MoreRow, NightSleepRow } from '../../lib/homeUi';
+import { CheckupsCard } from '../../lib/CheckupsCard';
 
 // Same window as the Log screen — enough history for the rolling averages
 // and the 14-night bedtime pattern without growing unbounded.
@@ -104,6 +105,8 @@ export default function UpcomingPage() {
           </div>
         </div>
       )}
+
+      {config && <CheckupsCard birthDate={config.birth_date} timezone={timezone} />}
 
       {explainKey && status && (
         <div className="modal-overlay" onClick={() => setExplainKey(null)}>
