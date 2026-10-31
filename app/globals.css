@@ -5740,3 +5740,38 @@ input.form-input[type="time"] {
 }
 input.form-input[type="date"]::-webkit-date-and-time-value,
 input.form-input[type="time"]::-webkit-date-and-time-value { text-align: left; margin: 0; }
+
+/* ---- Blossom: solid buttons, icons that pop ---- */
+/* Tiles are one flat saturated color (no gradient); the artwork gets a white
+   sticker outline and a soft shadow so it stands off the color. */
+:root:not([data-skin]) .tile-icon[data-art] {
+  background-image: none !important;
+  --edge: color-mix(in srgb, var(--tile-bg) 60%, #1f1260);
+}
+:root:not([data-skin]) .tile-icon[data-art="feed"] { --tile-bg: #7c5ce6 !important; background-color: #7c5ce6 !important; }
+:root:not([data-skin]) .tile-icon[data-art="diaper"] { --tile-bg: #d65bc4 !important; background-color: #d65bc4 !important; }
+:root:not([data-skin]) .tile-icon[data-art="sleep"] { --tile-bg: #4f8ae8 !important; background-color: #4f8ae8 !important; }
+:root:not([data-skin]) .tile-icon[data-art="bedtime"] { --tile-bg: #4b36b8 !important; background-color: #4b36b8 !important; }
+:root:not([data-skin]) .tile-icon[data-art="medicine"] { --tile-bg: #1aa3b5 !important; background-color: #1aa3b5 !important; }
+:root:not([data-skin]) .tile-icon[data-art="journal"] { --tile-bg: #a58cf5 !important; background-color: #a58cf5 !important; }
+:root:not([data-skin]) .tile-icon[data-art="custom"] { --tile-bg: #7f8cc9 !important; background-color: #7f8cc9 !important; }
+:root:not([data-skin]) .tile-art-flat {
+  filter:
+    drop-shadow(1.6px 0 0 #fff) drop-shadow(-1.6px 0 0 #fff)
+    drop-shadow(0 1.6px 0 #fff) drop-shadow(0 -1.6px 0 #fff)
+    drop-shadow(0 3px 3px rgba(31, 18, 96, 0.38));
+}
+/* Primary buttons are the accent color, flat. Success and error keep theirs. */
+:root:not([data-skin]) .form-save:not(.is-success):not(.is-error),
+:root:not([data-skin]) .modal-btn-confirm:not(.is-success):not(.is-error) {
+  background: var(--accent);
+  background-image: none;
+  color: #fff;
+}
+/* The center + button: solid accent, white plus. */
+:root:not([data-skin]) .tab-fab {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+:root:not([data-skin]) .tile-art-flat > ellipse[cy="90"] { display: none; }
